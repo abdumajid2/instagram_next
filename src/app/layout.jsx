@@ -38,8 +38,8 @@
 //   const barType = useMemo(() => {
 //     if (windowWidth <= 767) return "bottom";
 //     if (
-//       windowWidth <= 1279 ||
-//       pathname === "/search" ||
+//       windowWidth <= 1279 
+//       pathname === "/search" 
 //       pathname.includes("chat")
 //     )
 //       return "minibar";
@@ -102,4 +102,3 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
-
