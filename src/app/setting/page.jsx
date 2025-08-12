@@ -1,30 +1,28 @@
+'use client'
+import { Switch } from 'antd'
 import Link from 'next/link'
+import { useState } from 'react'
 
 export default function Setting() {
+	let [notificationsModal, setNotificationsModal] = useState(true)
+	let [confidentialityModal, setConfidentialityModal] = useState(false)
+
+	function showNotificationsModal() {
+		setNotificationsModal(true)
+		setConfidentialityModal(false)
+	}
+
+	function showConfidentialityModal() {
+		setNotificationsModal(false)
+		setConfidentialityModal(true)
+	}
+
 	return (
 		<>
-			<div>
-				<div className='lg:w-[280px] fixed top-0  h-screen overflow-y-auto p-4 gap-4 flex flex-col bg-white shadow-md'>
+			<div className='flex justify-between items-center'>
+				<div className='w-[100%] lg:w-[20%] fixed top-0  h-screen overflow-y-auto p-4 gap-4 flex flex-col bg-white shadow-md'>
 					<p className='text-2xl font-semibold mb-2'>Настройки</p>
 					<p className='text-gray-600 mb-4'>Для вас</p>
-
-					<div className='flex items-center gap-3 text-gray-800 hover:text-blue-600 cursor-pointer'>
-						<svg
-							xmlns='http://www.w3.org/2000/svg'
-							fill='none'
-							viewBox='0 0 24 24'
-							strokeWidth={1.5}
-							stroke='currentColor'
-							className='w-6 h-6 flex-shrink-0'
-						>
-							<path
-								strokeLinecap='round'
-								strokeLinejoin='round'
-								d='M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z'
-							/>
-						</svg>
-						<p>Настройки безопасности подростка</p>
-					</div>
 
 					<div className='flex items-center gap-3 text-gray-800 hover:text-blue-600 cursor-pointer'>
 						<svg
@@ -61,9 +59,8 @@ export default function Setting() {
 								d='M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0'
 							/>
 						</svg>
-						<p>Уведомления</p>
+						<p onClick={showNotificationsModal}>Уведомления</p>
 					</div>
-
 					<p className='text-gray-600 mb-4'>Кто может видеть ваш контент</p>
 
 					<div className='flex items-center gap-3 text-gray-800 hover:text-blue-600 cursor-pointer'>
@@ -81,8 +78,12 @@ export default function Setting() {
 								d='M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z'
 							/>
 						</svg>
-						<p>Конфидециальность аккаунта</p>
+						<p onClick={() => showConfidentialityModal()}>
+							Конфидециальность аккаунта
+						</p>
 					</div>
+
+					{/* -------- */}
 
 					<div className='flex items-center gap-3 text-gray-800 hover:text-blue-600 cursor-pointer'>
 						<svg
@@ -443,6 +444,212 @@ export default function Setting() {
 						</svg>
 						<p>Статус аккаунта</p>
 					</div>
+				</div>
+
+				<div className='lg:w-[100%] m-auto ml-[500px]'>
+					{notificationsModal && (
+						<div className='max-w-2xl mx-auto p-6'>
+							<h2 className='text-3xl font-bold text-center mb-8'>
+								Уведомления
+							</h2>
+
+							<div className='space-y-4'>
+								<details className='group rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors duration-200 overflow-hidden'>
+									<summary className='flex justify-between items-center p-4 cursor-pointer list-none'>
+										<span className='font-medium text-gray-800'>
+											Push-уведомления
+										</span>
+										<svg
+											className='w-5 h-5 text-gray-500 transition-transform duration-200 group-open:rotate-180'
+											xmlns='http://www.w3.org/2000/svg'
+											fill='none'
+											viewBox='0 0 24 24'
+											stroke='currentColor'
+										>
+											<path
+												strokeLinecap='round'
+												strokeLinejoin='round'
+												strokeWidth={2}
+												d='M19 9l-7 7-7-7'
+											/>
+										</svg>
+									</summary>
+									<div className='px-4 pb-4 pt-2 text-gray-600'>
+										Настройте получение push-уведомлений на ваше устройство. Вы
+										можете выбрать типы уведомлений, которые хотите получать.
+										<div className='mt-4 space-y-3'>
+											<label className='flex items-center space-x-3'>
+												<input
+													type='checkbox'
+													className='form-checkbox h-5 w-5 text-blue-600 rounded'
+													defaultChecked
+												/>
+												<span>Новые сообщения</span>
+											</label>
+											<label className='flex items-center space-x-3'>
+												<input
+													type='checkbox'
+													className='form-checkbox h-5 w-5 text-blue-600 rounded'
+													defaultChecked
+												/>
+												<span>Лайки и комментарии</span>
+											</label>
+											<label className='flex items-center space-x-3'>
+												<input
+													type='checkbox'
+													className='form-checkbox h-5 w-5 text-blue-600 rounded'
+												/>
+												<span>Рекомендации</span>
+											</label>
+										</div>
+									</div>
+								</details>
+
+								<details className='group rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors duration-200 overflow-hidden'>
+									<summary className='flex justify-between items-center p-4 cursor-pointer list-none'>
+										<span className='font-medium text-gray-800'>
+											Уведомления по электронной почте
+										</span>
+										<svg
+											className='w-5 h-5 text-gray-500 transition-transform duration-200 group-open:rotate-180'
+											xmlns='http://www.w3.org/2000/svg'
+											fill='none'
+											viewBox='0 0 24 24'
+											stroke='currentColor'
+										>
+											<path
+												strokeLinecap='round'
+												strokeLinejoin='round'
+												strokeWidth={2}
+												d='M19 9l-7 7-7-7'
+											/>
+										</svg>
+									</summary>
+									<div className='px-4 pb-4 pt-2 text-gray-600'>
+										Управляйте уведомлениями, которые приходят на вашу
+										электронную почту.
+										<div className='mt-4 space-y-3'>
+											<label className='flex items-center space-x-3'>
+												<input
+													type='checkbox'
+													className='form-checkbox h-5 w-5 text-blue-600 rounded'
+													defaultChecked
+												/>
+												<span>Новые подписчики</span>
+											</label>
+											<label className='flex items-center space-x-3'>
+												<input
+													type='checkbox'
+													className='form-checkbox h-5 w-5 text-blue-600 rounded'
+													defaultChecked
+												/>
+												<span>Упоминания</span>
+											</label>
+											<label className='flex items-center space-x-3'>
+												<input
+													type='checkbox'
+													className='form-checkbox h-5 w-5 text-blue-600 rounded'
+												/>
+												<span>Новости и обновления</span>
+											</label>
+										</div>
+									</div>
+								</details>
+							</div>
+						</div>
+					)}
+
+					{confidentialityModal && (
+						<div className='max-w-2xl mx-auto p-6'>
+							<h2 className='text-3xl font-bold text-center mb-8'>
+								Конфиденциальность аккаунта
+							</h2>
+
+							<div className='space-y-6'>
+								<div className='p-4 bg-gray-50 rounded-lg'>
+									<div className='flex justify-between items-center mb-2'>
+										<div>
+											<h3 className='font-medium text-gray-800'>
+												Закрытый аккаунт
+											</h3>
+											<p className='text-sm text-gray-500'>
+												Одобряйте или отклоняйте подписчиков вручную
+											</p>
+										</div>
+										<Switch
+											className='bg-gray-300'
+											checkedChildren='Вкл'
+											unCheckedChildren='Выкл'
+										/>
+									</div>
+									<p className='text-gray-600 text-sm'>
+										Когда ваш аккаунт закрыт, только утвержденные вами
+										подписчики смогут видеть ваши фото и видео.
+									</p>
+								</div>
+
+								<div className='p-4 bg-gray-50 rounded-lg'>
+									<h3 className='font-medium text-gray-800 mb-3'>Активность</h3>
+
+									<div className='space-y-4'>
+										<div className='flex justify-between items-center'>
+											<div>
+												<p className='text-gray-700'>Показывать активность</p>
+												<p className='text-sm text-gray-500'>
+													Отображать ваши действия другим пользователям
+												</p>
+											</div>
+											<Switch defaultChecked />
+										</div>
+
+										<div className='flex justify-between items-center'>
+											<div>
+												<p className='text-gray-700'>История просмотров</p>
+												<p className='text-sm text-gray-500'>
+													Кто может видеть вашу историю просмотров
+												</p>
+											</div>
+											<Switch defaultChecked />
+										</div>
+									</div>
+								</div>
+
+								<details className='group'>
+									<summary className='flex justify-between items-center p-3 cursor-pointer list-none text-gray-700 hover:bg-gray-50 rounded-lg'>
+										<span className='font-medium'>
+											Дополнительная информация
+										</span>
+										<svg
+											className='w-5 h-5 text-gray-500 transition-transform duration-200 group-open:rotate-180'
+											xmlns='http://www.w3.org/2000/svg'
+											fill='none'
+											viewBox='0 0 24 24'
+											stroke='currentColor'
+										>
+											<path
+												strokeLinecap='round'
+												strokeLinejoin='round'
+												strokeWidth={2}
+												d='M19 9l-7 7-7-7'
+											/>
+										</svg>
+									</summary>
+									<div className='p-4 text-gray-600 bg-gray-50 rounded-lg mt-1'>
+										<p className='mb-3'>
+											Конфиденциальность вашего аккаунта важна для нас. Эти
+											настройки помогают контролировать, кто может видеть ваш
+											контент и взаимодействовать с вами.
+										</p>
+										<p>
+											Помните, что даже при закрытом аккаунте ваша информация
+											профиля (имя пользователя, фото профиля) остается видимой
+											для всех.
+										</p>
+									</div>
+								</details>
+							</div>
+						</div>
+					)}
 				</div>
 			</div>
 		</>
