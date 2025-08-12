@@ -1,34 +1,29 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { Provider } from "react-redux";
+import { store } from "@/store/store";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import BottomNavigation from "@/components/layout/bottom-navigation/bottom-navigation";
 import MiniSideBar from "@/components/layout/mini-side-bar/mini-side-bar";
 import SideBar from "@/components/layout/side-bar/side-bar";
-import TranslatorProvider from "@/components/providers/translator-provider";
-import ThemeWrapper from "@/components/providers/theme-provider";
-import "./globals.css";
-import ReduxProvider from "@/components/providers/redux-toolkit";
 
-export default function RootLayout({ children }) {
-  const [windowWidth, setWindowWidth] = useState(0);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+export default function ReduxProvider({ children }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [windowWidth, setWindowWidth] = useState(0);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Проверка токена в localStorage
   useEffect(() => {
     if (typeof window === "undefined") return;
 
     const token = localStorage.getItem("authToken");
     setIsAuthenticated(!!token);
 
-    // Если не авторизован и не на странице регистрации — перенаправить
     if (!token && pathname !== "/login") {
       router.push("/login");
     }
 
-    // Обработка ресайза
     setWindowWidth(window.innerWidth);
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
@@ -58,25 +53,8 @@ export default function RootLayout({ children }) {
   };
 
   return (
-    <TranslatorProvider>
-      
-      <html lang="en">
-        <body className="h-full">
-
-          
-
-          <ReduxProvider>
-
-
-          <ThemeWrapper>
-            {/* Если на странице регистрации — без баров */}
-            {pathname === "/login"
-              ? children
-              : wrapWithBar(children)}
-          </ThemeWrapper>
-              </ReduxProvider>
-        </body>
-      </html>
-    </TranslatorProvider>
+    <Provider store={store}>
+      {pathname === "/login" ? children : wrapWithBar(children)}
+    </Provider>
   );
 }
