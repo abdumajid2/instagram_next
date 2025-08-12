@@ -1,17 +1,12 @@
 
-"use client";
-
-import { useEffect, useState, useMemo } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import BottomNavigation from "@/components/layout/bottom-navigation/bottom-navigation";
-import MiniSideBar from "@/components/layout/mini-side-bar/mini-side-bar";
-import SideBar from "@/components/layout/side-bar/side-bar";
+// app/layout.jsx
 import TranslatorProvider from "@/components/providers/translator-provider";
 import ThemeWrapper from "@/components/providers/theme-provider";
-import "./globals.css";
 import ReduxProvider from "@/components/providers/redux-toolkit";
+import "./globals.css";
 
 export default function RootLayout({ children }) {
+
   const [windowWidth, setWindowWidth] = useState(0);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const pathname = usePathname();
@@ -68,5 +63,18 @@ export default function RootLayout({ children }) {
         </body>
       </html>
     </TranslatorProvider>
+
+  return (
+    <html lang="en">
+      <body className="h-full">
+        <ReduxProvider>
+          <TranslatorProvider>
+            <ThemeWrapper>{children}</ThemeWrapper>
+          </TranslatorProvider>
+        </ReduxProvider>
+      </body>
+    </html>
+
   );
 }
+
