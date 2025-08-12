@@ -81,10 +81,13 @@ export default function SideBar({ children }) {
             </div>
 
             <div className="flex items-center gap-4 w-[90%] m-auto rounded-md h-[52px] px-4 hover:bg-gray-100">
+              
+              <Link href={'/setting'} prefetch>
               <button onClick={handleClick} className="flex gap-5">
                 {setting}
                 <p className="text-lg">{t('layout.more')}</p>
               </button>
+              </Link>
               <Menu
                 anchorEl={anchorEl}
                 open={open}
