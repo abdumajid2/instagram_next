@@ -15,7 +15,7 @@ export default function RootLayout({ children }) {
   const pathname = usePathname();
   const router = useRouter();
 
-  // ✅ Проверка токена в localStorage
+  // Проверка токена в localStorage
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -60,7 +60,12 @@ export default function RootLayout({ children }) {
     <TranslatorProvider>
       <html lang="en">
         <body className="h-full">
-          <ThemeWrapper>{wrapWithBar(children)}</ThemeWrapper>
+          <ThemeWrapper>
+            {/* Если на странице регистрации — без баров */}
+            {pathname === "/registration"
+              ? children
+              : wrapWithBar(children)}
+          </ThemeWrapper>
         </body>
       </html>
     </TranslatorProvider>
