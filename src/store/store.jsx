@@ -7,8 +7,6 @@ import { settingApi } from './pages/setting/settingApi'
 import { muslimApi } from "./pages/home/muslimApi";
 
 
-
-
 export const store = configureStore({
   reducer: {
     [storeApi.reducerPath]: storeApi.reducer,
