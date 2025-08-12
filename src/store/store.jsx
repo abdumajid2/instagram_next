@@ -5,6 +5,7 @@ import { authApi } from "./pages/auth/registration/registerApi";
 import { settingApi } from './pages/setting/settingApi'
 
 import { muslimApi } from "./pages/home/muslimApi";
+import { notificationApi } from "./pages/notification/notification";
 
 
 
@@ -15,6 +16,7 @@ export const store = configureStore({
     [authApi.reducerPath]: authApi.reducer,
     [muslimApi.reducerPath]: muslimApi.reducer,
     [settingApi.reducerPath]: settingApi.reducer,
+    [notificationApi.reducerPath]: notificationApi.reducer,
 
   },
 
@@ -27,5 +29,6 @@ export const store = configureStore({
       .concat(authApi.middleware)
       .concat(muslimApi.middleware)
       .concat(settingApi.middleware)
+      .concat(notificationApi.middleware)
 
 });
