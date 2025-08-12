@@ -13,8 +13,6 @@ export const store = configureStore({
     [ReelsApi.reducerPath]: ReelsApi.reducer,
     [settingApi.reducerPath]: settingApi.reducer,
   },
-
- 
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
       .concat(storeApi.middleware)
@@ -22,6 +20,4 @@ export const store = configureStore({
       .concat(muslimApi.middleware)
       .concat(ReelsApi.middleware)
       .concat(settingApi.middleware)
-
-
 });
