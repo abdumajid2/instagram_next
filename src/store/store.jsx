@@ -12,11 +12,10 @@ export const store = configureStore({
     [muslimApi.reducerPath]: muslimApi.reducer,
 
     [ReelsApi.reducerPath]: ReelsApi.reducer,
-  },
-
-  middleware: (getDefaultMiddleware) =>
     [settingApi.reducerPath]: settingApi.reducer,
   },
+
+ 
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
       .concat(storeApi.middleware)
