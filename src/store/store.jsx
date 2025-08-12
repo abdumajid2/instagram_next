@@ -1,7 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { storeApi } from "@/store/pages/chat/pages/storeApi";
 import { authApi } from "./pages/auth/registration/registerApi";
-import { muslimApi } from "./pages/home/muslimApi";
 import { ReelsApi } from "./pages/reels/ReelsApi";
 import { settingApi } from './pages/setting/settingApi'
 import { muslimApi } from "./pages/home/muslimApi";
