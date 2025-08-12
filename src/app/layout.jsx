@@ -62,7 +62,11 @@ export default function RootLayout({ children }) {
       
       <html lang="en">
         <body className="h-full">
+
+          
+
           <ReduxProvider>
+
 
           <ThemeWrapper>
             {/* Если на странице регистрации — без баров */}
