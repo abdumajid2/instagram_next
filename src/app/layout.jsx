@@ -60,6 +60,7 @@ export default function RootLayout({ children }) {
     <TranslatorProvider>
       <html lang="en">
         <body className="h-full">
+          
           <ThemeWrapper>
             {/* Если на странице регистрации — без баров */}
             {pathname === "/registration"
