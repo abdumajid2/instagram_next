@@ -14,6 +14,7 @@ const Reals = () => {
               <video className="w-full h-[95vh]" controls muted autoPlay loop src={`http://37.27.29.18:8003/images/${e.images}`}></video>
               <div className="">
                 <img src="" alt="" />
+                
               </div>
             </div>
 
