@@ -231,43 +231,7 @@ export default function Setting() {
 
 					{/* ------- */}
 
-					<p className='text-gray-600 mb-4'>Что вы видите</p>
-
-					<div className='flex items-center gap-3 text-gray-800 hover:text-blue-600 cursor-pointer'>
-						<svg
-							xmlns='http://www.w3.org/2000/svg'
-							fill='none'
-							viewBox='0 0 24 24'
-							strokeWidth={1.5}
-							stroke='currentColor'
-							className='size-6'
-						>
-							<path
-								strokeLinecap='round'
-								strokeLinejoin='round'
-								d='M9.143 17.082a24.248 24.248 0 0 0 3.844.148m-3.844-.148a23.856 23.856 0 0 1-5.455-1.31 8.964 8.964 0 0 0 2.3-5.542m3.155 6.852a3 3 0 0 0 5.667 1.97m1.965-2.277L21 21m-4.225-4.225a23.81 23.81 0 0 0 3.536-1.003A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6.53 6.53m10.245 10.245L6.53 6.53M3 3l3.53 3.53'
-							/>
-						</svg>
-						<p>Скрытые аккаунты</p>
-					</div>
-
-					<div className='flex items-center gap-3 text-gray-800 hover:text-blue-600 cursor-pointer'>
-						<svg
-							xmlns='http://www.w3.org/2000/svg'
-							fill='none'
-							viewBox='0 0 24 24'
-							strokeWidth={1.5}
-							stroke='currentColor'
-							className='size-6'
-						>
-							<path
-								strokeLinecap='round'
-								strokeLinejoin='round'
-								d='M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z'
-							/>
-						</svg>
-						<p>Настройки контента</p>
-					</div>
+					<p className='text-gray-600 mb-4'>Ваши проиложения и медиафайлы</p>
 
 					<div className='flex items-center gap-3 text-gray-800 hover:text-blue-600 cursor-pointer'>
 						<svg
@@ -299,86 +263,10 @@ export default function Setting() {
 							<path
 								strokeLinecap='round'
 								strokeLinejoin='round'
-								d='M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z'
-							/>
-						</svg>
-						<p>Платные подписки</p>
-					</div>
-
-					<p className='text-gray-600 mb-4'>Ваши проиложения и медиафайлы</p>
-
-					<div className='flex items-center gap-3 text-gray-800 hover:text-blue-600 cursor-pointer'>
-						<svg
-							xmlns='http://www.w3.org/2000/svg'
-							fill='none'
-							viewBox='0 0 24 24'
-							strokeWidth={1.5}
-							stroke='currentColor'
-							className='size-6'
-						>
-							<path
-								strokeLinecap='round'
-								strokeLinejoin='round'
-								d='M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3'
-							/>
-						</svg>
-						<p>Скаченные</p>
-					</div>
-
-					<div className='flex items-center gap-3 text-gray-800 hover:text-blue-600 cursor-pointer'>
-						<svg
-							xmlns='http://www.w3.org/2000/svg'
-							fill='none'
-							viewBox='0 0 24 24'
-							strokeWidth={1.5}
-							stroke='currentColor'
-							className='size-6'
-						>
-							<path
-								strokeLinecap='round'
-								strokeLinejoin='round'
 								d='m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802'
 							/>
 						</svg>
 						<p>Язык</p>
-					</div>
-
-					<div className='flex items-center gap-3 text-gray-800 hover:text-blue-600 cursor-pointer'>
-						<svg
-							xmlns='http://www.w3.org/2000/svg'
-							fill='none'
-							viewBox='0 0 24 24'
-							strokeWidth={1.5}
-							stroke='currentColor'
-							className='size-6'
-						>
-							<path
-								strokeLinecap='round'
-								strokeLinejoin='round'
-								d='M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25'
-							/>
-						</svg>
-						<p>Разрешение</p>
-					</div>
-
-					<p className='text-gray-600 mb-4'>Семьям</p>
-
-					<div className='flex items-center gap-3 text-gray-800 hover:text-blue-600 cursor-pointer'>
-						<svg
-							xmlns='http://www.w3.org/2000/svg'
-							fill='none'
-							viewBox='0 0 24 24'
-							strokeWidth={1.5}
-							stroke='currentColor'
-							className='size-6'
-						>
-							<path
-								strokeLinecap='round'
-								strokeLinejoin='round'
-								d='m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25'
-							/>
-						</svg>
-						<p>Родительский контроль</p>
 					</div>
 
 					<p className='text-gray-600 mb-4'>Для профисиональных аккаунтов</p>
@@ -944,7 +832,6 @@ export default function Setting() {
 							</div>
 						</div>
 					)}
-
 				</div>
 			</div>
 		</>

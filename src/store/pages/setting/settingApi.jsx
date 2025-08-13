@@ -7,7 +7,7 @@ export const settingApi = createApi({
     prepareHeaders: (headers) => {
       headers.set(
         "Authorization",
-        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaWQiOiJjOGZmNDU3OC0wYzM5LTQxOTgtYmVjYy1jZjU3YTIzYzA4MzMiLCJuYW1lIjoidmp4aW5nIiwiZW1haWwiOiJBbGlha2JhckBnbWFpbC5jb20iLCJzdWIiOiIiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJVc2VyIiwiZXhwIjoxNzU1MTUwMDcwLCJpc3MiOiJpbnN0YWdyYW0tZ3JvdXAiLCJhdWQiOiJpbnN0YWdyYW0tYXBpIn0.G0DVjYa0X-KVvWFHC4rxt0F49wBr-4_UwLfk6MaLt7A" // вставь сюда токен
+        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaWQiOiJjOGZmNDU3OC0wYzM5LTQxOTgtYmVjYy1jZjU3YTIzYzA4MzMiLCJuYW1lIjoidmp4aW5nIiwiZW1haWwiOiJBbGlha2JhckBnbWFpbC5jb20iLCJzdWIiOiIiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJVc2VyIiwiZXhwIjoxNzU1MTUwMDcwLCJpc3MiOiJpbnN0YWdyYW0tZ3JvdXAiLCJhdWQiOiJpbnN0YWdyYW0tYXBpIn0.G0DVjYa0X-KVvWFHC4rxt0F49wBr-4_UwLfk6MaLt7A"
       );
       return headers;
     },
@@ -23,7 +23,22 @@ export const settingApi = createApi({
         },
       }),
     }),
+
+    getSubscribers: builder.query({
+      query: (id) => ({
+        url: `/FollowingRelationShip/get-subscribers?UserId=${id}`,
+        method: "GET",
+      })
+    }),
+
+    followToUser: builder.mutation({
+      query: (id) => ({
+        url: `/FollowingRelationShip/add-following-relation-ship?followingUserId=${id}`,
+        method: "POST"
+      })
+    })
+
   }),
 });
 
-export const { useGetUsersForSearchQuery } = settingApi;
+export const { useGetUsersForSearchQuery, useGetSubscribersQuery, useFollowToUserMutation } = settingApi;
