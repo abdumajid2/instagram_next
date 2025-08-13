@@ -114,7 +114,10 @@ const Search = () => {
 						<div className='mt-8'>
 							<h2 className='text-xl font-semibold mb-4'>Подписчики</h2>
 							<div className='grid grid-cols-2 gap-4'>
-								{subscribersData?.data?.map(el => (
+								{subscribersData?.data?.map(el => { 
+									console.log(el);
+									
+								return (
 									<div
 										key={el.userShortInfo.id}
 										className='flex items-center gap-3 bg-gray-50 p-3 rounded-lg shadow-sm hover:shadow-md transition'
@@ -133,9 +136,10 @@ const Search = () => {
 											<p className='text-sm text-gray-500'>
 												{el.userShortInfo.fullname}
 											</p>
+											<p>{el.userShortInfo.id}</p>
 										</div>
 									</div>
-								))}
+								)})}
 							</div>
 						</div>
 					</div>
