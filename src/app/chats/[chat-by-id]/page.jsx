@@ -133,8 +133,8 @@ export default function ChatByIdPage() {
                 <div
                   className={`max-w-xs px-4 py-3 rounded-2xl shadow ${
                     msg.userId === CURRENT_USER_ID
-                      ? "bg-blue-600 text-white"
-                      : "bg-white text-gray-800"
+                      ? "bg-blue-600 rounded-br-xs text-white"
+                      : "bg-white rounded-tl-xs text-gray-800"
                   }`}
                 >
                   <p className="text-base">{msg.messageText}</p>
