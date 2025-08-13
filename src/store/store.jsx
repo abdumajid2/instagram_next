@@ -1,5 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { storeApi } from "@/store/pages/chat/pages/storeApi";
+import { chatApi } from "@/store/pages/chat/pages/storeApi";
 import { authApi } from "./pages/auth/registration/registerApi";
 import { ReelsApi } from "./pages/reels/ReelsApi";
 import { settingApi } from './pages/setting/settingApi'
@@ -10,7 +10,7 @@ import { profileApi } from "./pages/profile/ProfileApi";
 
 export const store = configureStore({
   reducer: {
-    [storeApi.reducerPath]: storeApi.reducer,
+    [chatApi.reducerPath]: chatApi.reducer,
     [authApi.reducerPath]: authApi.reducer,
     [muslimApi.reducerPath]: muslimApi.reducer,
 
@@ -27,7 +27,7 @@ export const store = configureStore({
   
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
-      .concat(storeApi.middleware)
+      .concat(chatApi.middleware)
       .concat(authApi.middleware)
       .concat(muslimApi.middleware)
 
