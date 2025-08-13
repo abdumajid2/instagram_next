@@ -88,9 +88,9 @@ export default function Login() {
               aria-label={showPassword ? "Скрыть пароль" : "Показать пароль"}
             >
               {showPassword ? (
-				<h1>Hide</h1>
+                <h1>Hide</h1>
               ) : (
-				<h1>Open</h1>
+                <h1>Open</h1>
               )}
             </button>
           </div>
