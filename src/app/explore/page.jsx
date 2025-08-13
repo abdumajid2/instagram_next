@@ -1,7 +1,6 @@
 "use client"
 import { useState } from "react"
 import { useGetPostsQuery } from "@/store/pages/explore/exploreApi"
-import notImg from "./Без названия.jpg"
 import { MdSlowMotionVideo } from "react-icons/md"
 import { FaHeart, FaComment } from "react-icons/fa"
 
@@ -9,7 +8,23 @@ export default function ExplorePage() {
   const { data, isLoading } = useGetPostsQuery()
   const [selectedPost, setSelectedPost] = useState(null)
 
-  if (isLoading) return <div>Loading...</div>
+  if (isLoading) return <div className="grid grid-cols-3 gap-1 sm:grid-cols-2 md:grid-cols-3 p-[2vh]">
+      {Array.from({ length: 9 }).map((_, i) => {
+        const isVideo = i % 3 === 0;
+        return (
+          <div
+            key={i}
+            className="relative w-full aspect-square bg-gray-300 dark:bg-gray-700 animate-pulse rounded-sm"
+          >
+            {isVideo && (
+              <div className="absolute top-2 right-2 bg-white/60 p-1 rounded-full text-gray-800">
+                <MdSlowMotionVideo size={18} />
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
 
   return (
     <>
@@ -24,9 +39,8 @@ export default function ExplorePage() {
             <div
               key={post.postId}
               onClick={() => setSelectedPost(post)}
-              className={`relative overflow-hidden bg-gray-200 group cursor-pointer ${
-                isTall ? "row-span-3" : "row-span-2"
-              }`}
+              className={`relative overflow-hidden bg-gray-200 group cursor-pointer ${isTall ? "row-span-3" : "row-span-2"
+                }`}
             >
               {isVideo ? (
                 <video
@@ -36,13 +50,11 @@ export default function ExplorePage() {
                   loop
                   autoPlay
                   playsInline
-                  onError={(e) => (e.target.poster = notImg)}
                 />
               ) : (
                 <img
                   src={src}
                   alt="Post"
-                  onError={(e) => (e.target.src = notImg)}
                   className="w-full h-full object-cover"
                 />
               )}
