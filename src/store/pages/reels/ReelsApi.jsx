@@ -16,8 +16,16 @@ export const ReelsApi = createApi({
     getReels: builder.query({
       query: () => "Post/get-reels",
     }),
+    addLike: builder.mutation({
+      query: (id) => ({
+        url: `Post/like-post?postId=${id}`,
+        method: "POST"
+      }),
+    }),
   }),
 });
 export const {
   useGetReelsQuery,
+  useAddLikeMutation,
+
 } = ReelsApi;

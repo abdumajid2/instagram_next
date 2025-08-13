@@ -1,14 +1,14 @@
+// src/store/pages/chat/pages/storeApi.jsx
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://37.27.29.18:8003/";
-
-export const storeApi = createApi({
-  reducerPath: "storeApi",
+export const chatApi = createApi({
+  reducerPath: "chatApi",
   baseQuery: fetchBaseQuery({
-    baseUrl,
+    baseUrl: "http://37.27.29.18:8003/",
     prepareHeaders: (headers) => {
       const authToken = localStorage.getItem("authToken");
       console.log("Token из localStorage:", authToken);
+
       if (authToken) {
         headers.set("authorization", `Bearer ${authToken}`);
       }
@@ -16,20 +16,42 @@ export const storeApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    registerUser: builder.mutation({
-      query: (body) => ({
-        url: "Account/register",
-        method: "POST",
-        body,
-      }),
+    getChats: builder.query({
+      query: () => "Chat/get-chats",
     }),
-    getChat: builder.query({
-      query: () => ({
-        url: "Chat/get-chats",
-        method: "GET",
-      }),
+
+    
+    getChatById: builder.query({
+      query: (id) => `Chat/get-chat-by-id?chatId=${id}`,
+    }),
+
+    getUsers: builder.query({
+        query: () => "User/get-users",
+
+    }),
+
+    sendMessage: builder.mutation({
+      query: ({ chatId, message, file }) => {
+        const formData = new FormData();
+        formData.append("ChatId", chatId);
+        formData.append("MessageText", message);
+        if (file) {
+          formData.append("File", file);
+        }
+
+        return {
+          url: "Chat/send-message",
+          method: "PUT",
+          body: formData,
+        };
+      },
     }),
   }),
 });
 
-export const { useRegisterUserMutation, useGetChatQuery } = storeApi;
+export const {
+  useGetChatsQuery,
+  useGetChatByIdQuery,
+  useSendMessageMutation,
+  useGetUsersQuery,
+} = chatApi;
