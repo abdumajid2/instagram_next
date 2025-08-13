@@ -12,7 +12,7 @@ const Posts = () => {
   if (posts.length === 0) return <p>Нет постов</p>
 
   return (
-    <div className='w-full flex flex-wrap items-start justify-between gap-y-[30px]'>
+    <div className='w-full  flex flex-wrap items-start justify-between gap-y-[10px]'>
       {posts.map((post) => (
         <div key={post.postId} >
          
@@ -24,7 +24,7 @@ const Posts = () => {
                 alt="post image"
                 width={200}
                 height={200}
-                className="rounded-md"
+                className="rounded-xl"
               />
             ))}
        
