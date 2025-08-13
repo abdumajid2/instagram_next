@@ -4,7 +4,6 @@ import { authApi } from "./pages/auth/registration/registerApi";
 import { ReelsApi } from "./pages/reels/ReelsApi";
 import { settingApi } from './pages/setting/settingApi'
 import { muslimApi } from "./pages/home/muslimApi";
-
 import { profileApi } from "./pages/profile/ProfileApi";
 
 export const store = configureStore({
@@ -12,7 +11,6 @@ export const store = configureStore({
     [storeApi.reducerPath]: storeApi.reducer,
     [authApi.reducerPath]: authApi.reducer,
     [muslimApi.reducerPath]: muslimApi.reducer,
-
     [profileApi.reducerPath]: profileApi.reducer,
     [ReelsApi.reducerPath]: ReelsApi.reducer,
     [settingApi.reducerPath]: settingApi.reducer,
@@ -25,9 +23,7 @@ export const store = configureStore({
       .concat(storeApi.middleware)
       .concat(authApi.middleware)
       .concat(muslimApi.middleware)
-
       .concat(profileApi.middleware)
-
       .concat(ReelsApi.middleware)
       .concat(settingApi.middleware)
 
