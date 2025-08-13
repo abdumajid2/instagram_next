@@ -20,9 +20,14 @@ export const chatApi = createApi({
       query: () => "Chat/get-chats",
     }),
 
-    // Исправленный запрос (по Swagger)
+    
     getChatById: builder.query({
       query: (id) => `Chat/get-chat-by-id?chatId=${id}`,
+    }),
+
+    getUsers: builder.query({
+        query: () => "User/get-users",
+
     }),
 
     sendMessage: builder.mutation({
@@ -48,4 +53,5 @@ export const {
   useGetChatsQuery,
   useGetChatByIdQuery,
   useSendMessageMutation,
+  useGetUsersQuery,
 } = chatApi;

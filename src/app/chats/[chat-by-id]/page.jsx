@@ -19,7 +19,6 @@ export default function ChatByIdPage() {
     ? `http://37.27.29.18:8003/images/${searchParams.get("avatar")}`
     : `https://ui-avatars.com/api/?name=${userName}`;
 
-  // Получаем сообщения с автообновлением каждые 3 секунды
   const { data: messagesData, isLoading } = useGetChatByIdQuery(chatId, {
     pollingInterval: 2000,
   });
@@ -32,7 +31,6 @@ export default function ChatByIdPage() {
 
   const messages = messagesData?.data || [];
 
-  // Скролл вниз при появлении новых сообщений
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -96,7 +94,7 @@ export default function ChatByIdPage() {
 
   return (
     <div className="flex flex-col h-screen md:w-280 bg-gray-100 antialiased text-gray-800">
-      {/* Header */}
+
       <div className="flex items-center p-4 bg-white shadow space-x-4">
         <img
           src={avatar}
@@ -109,7 +107,6 @@ export default function ChatByIdPage() {
         </div>
       </div>
 
-      {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
         {messages.map((msg) => {
           const msgDate = formatDate(msg.sendMassageDate);
