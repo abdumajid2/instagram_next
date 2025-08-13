@@ -174,7 +174,6 @@ export default function ChatByIdPage() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
       <div className="flex items-center p-4 bg-white border-t border-gray-200">
         <input
           value={messageText}
