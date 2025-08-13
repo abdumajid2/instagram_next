@@ -1,12 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { chatApi } from "@/store/pages/chat/pages/storeApi";
 import { authApi } from "./pages/auth/registration/registerApi";
-import { ReelsApi } from "./pages/reels/ReelsApi";
-import { settingApi } from './pages/setting/settingApi'
+import { exploreApi } from "./pages/explore/exploreApi"; 
 import { muslimApi } from "./pages/home/muslimApi";
 import { notificationApi } from "./pages/notification/notification";
 
 import { profileApi } from "./pages/profile/ProfileApi";
+import { ReelsApi } from "./pages/reels/ReelsApi";
+import { settingApi } from './pages/setting/settingApi';
 
 export const store = configureStore({
   reducer: {
@@ -21,18 +22,14 @@ export const store = configureStore({
     [profileApi.reducerPath]: profileApi.reducer,
     [ReelsApi.reducerPath]: ReelsApi.reducer,
     [settingApi.reducerPath]: settingApi.reducer,
+    [exploreApi.reducerPath]: exploreApi.reducer,  
   },
-
-
-  
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
       .concat(chatApi.middleware)
       .concat(authApi.middleware)
       .concat(muslimApi.middleware)
-
       .concat(profileApi.middleware)
-
       .concat(ReelsApi.middleware)
       .concat(settingApi.middleware)
       .concat(notificationApi.middleware)
