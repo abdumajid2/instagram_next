@@ -11,6 +11,9 @@ export default function Notification() {
   if (isLoading) return <p>Загрузка...</p>;
   if (error) return <p>Ошибка при загрузке</p>;
 
+
+
+  
   return (
     <>
       {data?.map((e) => (
