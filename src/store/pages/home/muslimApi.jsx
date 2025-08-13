@@ -21,7 +21,25 @@ export const muslimApi = createApi({
     getPostById: builder.query({
       query: (id) => `Post/get-post-by-id?id=${id}`,
     }),
+    addComment: builder.mutation({
+      query: ({ postId, comment }) => ({
+        url: "Post/add-comment",
+        method: "POST",
+        body: { postId, comment },
+      }),
+    }),
+    addLikePost: builder.mutation({
+      query: (postId) => ({
+        url: `Post/like-post?postId=${postId}`,
+        method: "POST",
+      }),
+    }),
   }),
 });
 
-export const { useGetPostsQuery, useGetPostByIdQuery } = muslimApi;
+export const {
+  useGetPostsQuery,
+  useGetPostByIdQuery,
+  useAddCommentMutation,
+  useAddLikePostMutation,
+} = muslimApi;
