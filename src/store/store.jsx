@@ -5,7 +5,6 @@ import { ReelsApi } from "./pages/reels/ReelsApi";
 import { settingApi } from './pages/setting/settingApi'
 import { muslimApi } from "./pages/home/muslimApi";
 import { notificationApi } from "./pages/notification/notification";
-
 import { profileApi } from "./pages/profile/ProfileApi";
 
 export const store = configureStore({
@@ -13,18 +12,13 @@ export const store = configureStore({
     [chatApi.reducerPath]: chatApi.reducer,
     [authApi.reducerPath]: authApi.reducer,
     [muslimApi.reducerPath]: muslimApi.reducer,
-
     [settingApi.reducerPath]: settingApi.reducer,
     [notificationApi.reducerPath]: notificationApi.reducer,
-
-
     [profileApi.reducerPath]: profileApi.reducer,
     [ReelsApi.reducerPath]: ReelsApi.reducer,
     [settingApi.reducerPath]: settingApi.reducer,
   },
 
-
-  
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
       .concat(chatApi.middleware)
@@ -34,5 +28,4 @@ export const store = configureStore({
       .concat(ReelsApi.middleware)
       .concat(settingApi.middleware)
       .concat(notificationApi.middleware)
-
 });
