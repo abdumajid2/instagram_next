@@ -19,7 +19,13 @@ export const exploreApi = createApi({
         `/Post/get-posts?pageNumber=${pageNumber}&pageSize=${pageSize}`,
       method: "GET"
     }),
+    likePost: builder.mutation({
+      query: (postId) => ({
+        url: `/Post/like-post?postId=${postId}`,
+        method: 'POST'
+      }),
+    }),
   }),
 })
 
-export const { useGetPostsQuery } = exploreApi
+export const { useGetPostsQuery,useLikePostMutation } = exploreApi
