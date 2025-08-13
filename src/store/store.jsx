@@ -1,11 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { chatApi } from "@/store/pages/chat/pages/storeApi";
 import { authApi } from "./pages/auth/registration/registerApi";
-import { ReelsApi } from "./pages/reels/ReelsApi";
-import { settingApi } from './pages/setting/settingApi'
+import { exploreApi } from "./pages/explore/exploreApi"; 
 import { muslimApi } from "./pages/home/muslimApi";
 import { notificationApi } from "./pages/notification/notification";
 import { profileApi } from "./pages/profile/ProfileApi";
+import { ReelsApi } from "./pages/reels/ReelsApi";
+import { settingApi } from './pages/setting/settingApi';
 
 export const store = configureStore({
   reducer: {
@@ -16,7 +17,7 @@ export const store = configureStore({
     [notificationApi.reducerPath]: notificationApi.reducer,
     [profileApi.reducerPath]: profileApi.reducer,
     [ReelsApi.reducerPath]: ReelsApi.reducer,
-    [settingApi.reducerPath]: settingApi.reducer,
+    [exploreApi.reducerPath]: exploreApi.reducer,  
   },
 
   middleware: (getDefaultMiddleware) =>
@@ -28,4 +29,7 @@ export const store = configureStore({
       .concat(ReelsApi.middleware)
       .concat(settingApi.middleware)
       .concat(notificationApi.middleware)
+
+      .concat(exploreApi.middleware) // 🔹 добавили exploreApi middleware
+
 });
