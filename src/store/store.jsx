@@ -19,6 +19,7 @@ export const store = configureStore({
     [ReelsApi.reducerPath]: ReelsApi.reducer,
     [exploreApi.reducerPath]: exploreApi.reducer,  
   },
+
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
       .concat(chatApi.middleware)
@@ -28,5 +29,7 @@ export const store = configureStore({
       .concat(ReelsApi.middleware)
       .concat(settingApi.middleware)
       .concat(notificationApi.middleware)
+
       .concat(exploreApi.middleware) // 🔹 добавили exploreApi middleware
+
 });
