@@ -5,6 +5,8 @@ const nextConfig = {
     defaultLocale: "en", // Default locale
     localeDetection: false, // Automatically detect user language
   },
+  images: {
+    domains: ["37.27.29.18"],
+  },
 };
-
 export default nextConfig;

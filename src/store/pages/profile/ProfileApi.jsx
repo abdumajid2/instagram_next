@@ -22,9 +22,12 @@ getMyProfile:builder.query({
 }),
 getMyStories:builder.query({
       query: () => `/Story/get-my-stories`
+}),
+getMyPosts:builder.query({
+      query: () => `/Post/get-my-posts`
 })
     })
 
 })
-export const {useGetMyProfileQuery,useGetMyStoriesQuery}=profileApi
+export const {useGetMyProfileQuery,useGetMyStoriesQuery,useGetMyPostsQuery}=profileApi
 
