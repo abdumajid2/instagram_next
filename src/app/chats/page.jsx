@@ -99,7 +99,7 @@ export default function MessengerApp() {
       
       <aside className="hidden md:flex flex-col w-100 bg-white border-r border-gray-200 p-4 overflow-y-auto shadow-md">
         <h2 className="text-xl font-semibold mb-4 text-center text-gray-700">
-          Чаты
+          Chats
         </h2>
         <ul className="space-y-2">
           {isLoading
