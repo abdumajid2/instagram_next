@@ -6,7 +6,6 @@ export const exploreApi = createApi({
     baseUrl: 'http://37.27.29.18:8003',
     prepareHeaders: headers => {
       const authToken = localStorage.getItem('authToken')
-      console.log('Token из localStorage:', authToken)
 
       if (authToken) {
         headers.set('authorization', `Bearer ${authToken}`)
@@ -16,8 +15,9 @@ export const exploreApi = createApi({
   }),
   endpoints: builder => ({
     getPosts: builder.query({
-      query: ({ pageNumber = 1, pageSize = 10 } = {}) =>
+      query: ({ pageNumber = 1, pageSize = 999 } = {}) =>
         `/Post/get-posts?pageNumber=${pageNumber}&pageSize=${pageSize}`,
+      method: "GET"
     }),
   }),
 })
