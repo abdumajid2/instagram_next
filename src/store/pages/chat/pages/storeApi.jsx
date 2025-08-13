@@ -6,9 +6,11 @@ export const chatApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: "http://37.27.29.18:8003/",
     prepareHeaders: (headers) => {
-      const token = localStorage.getItem("token");
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
+      const authToken = localStorage.getItem("authToken");
+      console.log("Token из localStorage:", authToken);
+
+      if (authToken) {
+        headers.set("authorization", `Bearer ${authToken}`);
       }
       return headers;
     },
