@@ -34,6 +34,7 @@ export default function ExplorePage() {
                   className="w-full h-full object-cover"
                   muted
                   loop
+                  autoPlay
                   playsInline
                   onError={(e) => (e.target.poster = notImg)}
                 />
@@ -45,7 +46,6 @@ export default function ExplorePage() {
                   className="w-full h-full object-cover"
                 />
               )}
-
               {isVideo && (
                 <div className="absolute top-2 right-2 bg-black/50 p-1.5 rounded-full text-white">
                   <MdSlowMotionVideo size={18} />
