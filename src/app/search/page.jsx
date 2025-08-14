@@ -20,7 +20,7 @@ const Search = () => {
 	let [findUserModal, setFindUserModal] = useState(false)
 	let [findUserImg, setFindUserImg] = useState(null)
 	let [findUserName, setFindUserName] = useState('')
-	let [findUserFullName, setFindUserFullName] = useState('')
+	let [findUserFullName, setFindUserFullName] = useState("")
 	let [findUserFollow, setFindUserFollow] = useState(null)
 	let [findUserId, setFindUserId] = useState(null)
 
