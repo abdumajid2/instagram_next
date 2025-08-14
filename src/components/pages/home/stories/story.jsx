@@ -41,7 +41,7 @@ const Story = () => {
         onCancel={handleCancel}
         footer={null}
         className="!w-[80%] !h-[100vh] !m-0 !p-0 !absolute !top-1/2 !left-1/2 !-translate-x-1/2 !-translate-y-1/2 overflow-hidden"
-      >
+      > 
         {storyById?.data?.stories && storyById.data.stories.length > 0 && (
           <Swiper
             modules={[Navigation, Pagination]}
