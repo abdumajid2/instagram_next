@@ -231,43 +231,7 @@ export default function Setting() {
 
 					{/* ------- */}
 
-					<p className='text-gray-600 mb-4'>Что вы видите</p>
-
-					<div className='flex items-center gap-3 text-gray-800 hover:text-blue-600 cursor-pointer'>
-						<svg
-							xmlns='http://www.w3.org/2000/svg'
-							fill='none'
-							viewBox='0 0 24 24'
-							strokeWidth={1.5}
-							stroke='currentColor'
-							className='size-6'
-						>
-							<path
-								strokeLinecap='round'
-								strokeLinejoin='round'
-								d='M9.143 17.082a24.248 24.248 0 0 0 3.844.148m-3.844-.148a23.856 23.856 0 0 1-5.455-1.31 8.964 8.964 0 0 0 2.3-5.542m3.155 6.852a3 3 0 0 0 5.667 1.97m1.965-2.277L21 21m-4.225-4.225a23.81 23.81 0 0 0 3.536-1.003A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6.53 6.53m10.245 10.245L6.53 6.53M3 3l3.53 3.53'
-							/>
-						</svg>
-						<p>Скрытые аккаунты</p>
-					</div>
-
-					<div className='flex items-center gap-3 text-gray-800 hover:text-blue-600 cursor-pointer'>
-						<svg
-							xmlns='http://www.w3.org/2000/svg'
-							fill='none'
-							viewBox='0 0 24 24'
-							strokeWidth={1.5}
-							stroke='currentColor'
-							className='size-6'
-						>
-							<path
-								strokeLinecap='round'
-								strokeLinejoin='round'
-								d='M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z'
-							/>
-						</svg>
-						<p>Настройки контента</p>
-					</div>
+					<p className='text-gray-600 mb-4'>Ваши проиложения и медиафайлы</p>
 
 					<div className='flex items-center gap-3 text-gray-800 hover:text-blue-600 cursor-pointer'>
 						<svg
@@ -299,86 +263,10 @@ export default function Setting() {
 							<path
 								strokeLinecap='round'
 								strokeLinejoin='round'
-								d='M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z'
-							/>
-						</svg>
-						<p>Платные подписки</p>
-					</div>
-
-					<p className='text-gray-600 mb-4'>Ваши проиложения и медиафайлы</p>
-
-					<div className='flex items-center gap-3 text-gray-800 hover:text-blue-600 cursor-pointer'>
-						<svg
-							xmlns='http://www.w3.org/2000/svg'
-							fill='none'
-							viewBox='0 0 24 24'
-							strokeWidth={1.5}
-							stroke='currentColor'
-							className='size-6'
-						>
-							<path
-								strokeLinecap='round'
-								strokeLinejoin='round'
-								d='M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3'
-							/>
-						</svg>
-						<p>Скаченные</p>
-					</div>
-
-					<div className='flex items-center gap-3 text-gray-800 hover:text-blue-600 cursor-pointer'>
-						<svg
-							xmlns='http://www.w3.org/2000/svg'
-							fill='none'
-							viewBox='0 0 24 24'
-							strokeWidth={1.5}
-							stroke='currentColor'
-							className='size-6'
-						>
-							<path
-								strokeLinecap='round'
-								strokeLinejoin='round'
 								d='m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802'
 							/>
 						</svg>
 						<p>Язык</p>
-					</div>
-
-					<div className='flex items-center gap-3 text-gray-800 hover:text-blue-600 cursor-pointer'>
-						<svg
-							xmlns='http://www.w3.org/2000/svg'
-							fill='none'
-							viewBox='0 0 24 24'
-							strokeWidth={1.5}
-							stroke='currentColor'
-							className='size-6'
-						>
-							<path
-								strokeLinecap='round'
-								strokeLinejoin='round'
-								d='M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25'
-							/>
-						</svg>
-						<p>Разрешение</p>
-					</div>
-
-					<p className='text-gray-600 mb-4'>Семьям</p>
-
-					<div className='flex items-center gap-3 text-gray-800 hover:text-blue-600 cursor-pointer'>
-						<svg
-							xmlns='http://www.w3.org/2000/svg'
-							fill='none'
-							viewBox='0 0 24 24'
-							strokeWidth={1.5}
-							stroke='currentColor'
-							className='size-6'
-						>
-							<path
-								strokeLinecap='round'
-								strokeLinejoin='round'
-								d='m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25'
-							/>
-						</svg>
-						<p>Родительский контроль</p>
 					</div>
 
 					<p className='text-gray-600 mb-4'>Для профисиональных аккаунтов</p>
@@ -416,7 +304,7 @@ export default function Setting() {
 								d='M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z'
 							/>
 						</svg>
-						<p>Покажите что ваш профиль подтверждён</p>
+						<Link href={'/login'}>Покажите что ваш профиль подтверждён</Link>
 					</div>
 
 					<p className='text-gray-600 mb-4'>Инфформация и поддержка</p>
@@ -436,7 +324,7 @@ export default function Setting() {
 								d='M16.712 4.33a9.027 9.027 0 0 1 1.652 1.306c.51.51.944 1.064 1.306 1.652M16.712 4.33l-3.448 4.138m3.448-4.138a9.014 9.014 0 0 0-9.424 0M19.67 7.288l-4.138 3.448m4.138-3.448a9.014 9.014 0 0 1 0 9.424m-4.138-5.976a3.736 3.736 0 0 0-.88-1.388 3.737 3.737 0 0 0-1.388-.88m2.268 2.268a3.765 3.765 0 0 1 0 2.528m-2.268-4.796a3.765 3.765 0 0 0-2.528 0m4.796 4.796c-.181.506-.475.982-.88 1.388a3.736 3.736 0 0 1-1.388.88m2.268-2.268 4.138 3.448m0 0a9.027 9.027 0 0 1-1.306 1.652c-.51.51-1.064.944-1.652 1.306m0 0-3.448-4.138m3.448 4.138a9.014 9.014 0 0 1-9.424 0m5.976-4.138a3.765 3.765 0 0 1-2.528 0m0 0a3.736 3.736 0 0 1-1.388-.88 3.737 3.737 0 0 1-.88-1.388m2.268 2.268L7.288 19.67m0 0a9.024 9.024 0 0 1-1.652-1.306 9.027 9.027 0 0 1-1.306-1.652m0 0 4.138-3.448M4.33 16.712a9.014 9.014 0 0 1 0-9.424m4.138 5.976a3.765 3.765 0 0 1 0-2.528m0 0c.181-.506.475-.982.88-1.388a3.736 3.736 0 0 1 1.388-.88m-2.268 2.268L4.33 7.288m6.406 1.18L7.288 4.33m0 0a9.024 9.024 0 0 0-1.652 1.306A9.025 9.025 0 0 0 4.33 7.288'
 							/>
 						</svg>
-						<p>Помощь</p>
+						<p onClick={() => alert("Сам разберайся")}>Помощь</p>
 					</div>
 
 					<div className='flex items-center gap-3 text-gray-800 hover:text-blue-600 cursor-pointer'>
@@ -454,7 +342,7 @@ export default function Setting() {
 								d='M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z'
 							/>
 						</svg>
-						<p>Конфидециальность</p>
+						<Link href={'https://privacycenter.instagram.com/?entry_point=instagram_settings_page'}>Конфидециальность</Link>
 					</div>
 
 					<div className='flex items-center gap-3 text-gray-800 hover:text-blue-600 cursor-pointer'>
@@ -472,7 +360,7 @@ export default function Setting() {
 								d='M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z'
 							/>
 						</svg>
-						<p>Статус аккаунта</p>
+						<Link href={'/profile'}>Статус аккаунта</Link>
 					</div>
 				</div>
 
@@ -944,7 +832,6 @@ export default function Setting() {
 							</div>
 						</div>
 					)}
-
 				</div>
 			</div>
 		</>
