@@ -11,22 +11,23 @@ import {
 import { useState } from "react";
 
 export default function Notification() {
-  // const userId = "da937ebd-9342-43fb-a6a0-01ccb2cf5bb2";
+  const userId = "da937ebd-9342-43fb-a6a0-01ccb2cf5bb2";
 
 
-  function parseJwt(token) {
-    try {
-      const base64Payload = token.split(".")[1];
-      const payload = atob(base64Payload);
-      return JSON.parse(payload);
-    } catch (e) {
-      return null;
-    }
-  }
+  // function parseJwt(token) {
+  //   try {
+  //     const base64Payload = token.split(".")[1];
+  //     const payload = atob(base64Payload);
+  //     return JSON.parse(payload);
+  //   } catch (e) {
+  //     return null;
+  //   }
+  // }
+ 
 
-  const authToken = localStorage.getItem("authToken");
-  const payload = parseJwt(authToken);
-  const userId = payload?.sub || ""; // или как называется поле в вашем токене
+  // const authToken = localStorage.getItem("authToken");
+  // const payload = parseJwt(authToken);
+  // const userId = payload?.sub || ""; // или как называется поле в вашем токене
 
 
 
