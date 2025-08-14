@@ -22,10 +22,25 @@ export const ReelsApi = createApi({
         method: "POST"
       }),
     }),
+    follow: builder.mutation({
+      query: (id) => ({
+        url: `FollowingRelationShip/add-following-relation-ship?followingUserId=${id}`,
+        method: "POST"
+      }),
+    }),
+    addToFavorite: builder.mutation({
+      query: (reels) => ({
+        url: `Post/add-post-favorite`,
+        method: "POST",
+        body: reels
+      }),
+    }),
   }),
 });
 export const {
   useGetReelsQuery,
   useAddLikeMutation,
+  useFollowMutation,
+  useAddToFavoriteMutation,
 
 } = ReelsApi;
