@@ -34,6 +34,18 @@ export const muslimApi = createApi({
         method: "POST",
       }),
     }),
+    getStories: builder.query({
+      query: () => "Story/get-stories",
+    }),
+    addFollow: builder.mutation({
+      query: (followingUserId) => ({
+        url: `FollowingRelationShip/add-following-relation-ship?followingUserId=${followingUserId}`,
+        method: "POST",
+      }),
+    }),
+    getStoryById: builder.query({
+      query: (userId) => `Story/get-user-stories/${userId}`,
+    }),
   }),
 });
 
@@ -42,4 +54,7 @@ export const {
   useGetPostByIdQuery,
   useAddCommentMutation,
   useAddLikePostMutation,
+  useGetStoriesQuery,
+  useAddFollowMutation,
+  useGetStoryByIdQuery,
 } = muslimApi;
