@@ -11,9 +11,26 @@ import {
 import { useState } from "react";
 
 export default function Notification() {
-  const userId = "da937ebd-9342-43fb-a6a0-01ccb2cf5bb2";
+  // const userId = "da937ebd-9342-43fb-a6a0-01ccb2cf5bb2";
 
-  // API hooks
+
+  function parseJwt(token) {
+    try {
+      const base64Payload = token.split(".")[1];
+      const payload = atob(base64Payload);
+      return JSON.parse(payload);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  const authToken = localStorage.getItem("authToken");
+  const payload = parseJwt(authToken);
+  const userId = payload?.sub || ""; // или как называется поле в вашем токене
+
+
+
+
   const { data: subscribersData, isLoading: loadingSubs, refetch: refetchSubs } =
     useGetSubscribersQuery(userId);
 
@@ -53,10 +70,10 @@ export default function Notification() {
           subscribers.map((sub) => (
             <div key={sub.id} className="border p-2 rounded mb-2 flex justify-between">
               <div>
-              <p className="font-medium">
-                {sub.userShortInfo.fullname} (@{sub.userShortInfo.userName})
-              </p>
-              <p className="text-[gray]">Folowed you</p>
+                <p className="font-medium">
+                  {sub.userShortInfo.userName}
+                </p>
+                <p className="text-[gray]">Folowed you</p>
               </div>
               <div className="flex gap-[20px]">
 
@@ -68,7 +85,6 @@ export default function Notification() {
         )}
       </section>
 
-      {/* Новые посты */}
       <section>
         <h2 className="text-lg font-bold mb-2">Новые посты от подписок</h2>
         {posts.length === 0 ? (<p>Нет новых постов</p>) : (

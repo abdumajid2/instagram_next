@@ -36,6 +36,7 @@ export const notificationApi = createApi({
       }),
       invalidatesTags: ["Subscribers"], // агар истифода баред
     }),
+    
 
     // Лайк поста
     likePost: builder.mutation({
@@ -77,5 +78,6 @@ export const {
   useAddCommentMutation,
   useGetFollowingPostsQuery,
   useAddStoryViewMutation,
-  useDeleteSubscriberMutation
+  useDeleteSubscriberMutation,
+  
 } = notificationApi;
