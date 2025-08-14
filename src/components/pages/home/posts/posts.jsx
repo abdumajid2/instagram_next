@@ -1,6 +1,7 @@
 "use client";
 import {
   useAddCommentMutation,
+  useAddFollowMutation,
   useAddLikePostMutation,
   useGetPostByIdQuery,
   useGetPostsQuery,
@@ -15,6 +16,7 @@ import { FaRegComment, FaRegHeart } from "react-icons/fa";
 import { IoSendOutline } from "react-icons/io5";
 import { FaRegFaceSmileWink } from "react-icons/fa6";
 import { video } from "@/assets/icon/layout/svg";
+import Story from "../stories/story";
 
 const Posts = () => {
   const { data, isLoading, isError, refetch } = useGetPostsQuery();
@@ -23,6 +25,7 @@ const Posts = () => {
   const [addComment] = useAddCommentMutation();
   const [addLikedPost] = useAddLikePostMutation();
   const posts = data?.data || [];
+  const [addFollow] = useAddFollowMutation();
   const imgUrl = "http://37.27.29.18:8003/images/";
 
   const videoRef = useRef(null);
@@ -36,7 +39,6 @@ const Posts = () => {
     }
     setIsModalOpen(false);
   };
-  console.log(infoId);
 
   function openComment(e) {
     setInfoId(e.postId);
@@ -101,6 +103,15 @@ const Posts = () => {
     }
   }
 
+  // addFollow
+  async function addNewFollower(id) {
+    try {
+      await addFollow(id);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   if (isLoading)
     return (
       <Flex
@@ -115,6 +126,7 @@ const Posts = () => {
   if (isError) return <ErrorAnimation />;
   return (
     <div className="md:max-w-[50%] mx-auto border flex flex-col gap-7">
+      <Story />
       <Modal
         className="!w-[80%] !h-[90vh] !m-0 !p-0 !absolute !top-1/2 !left-1/2 !-translate-x-1/2 !-translate-y-1/2 overflow-hidden"
         title=""
@@ -271,9 +283,17 @@ const Posts = () => {
                 <p className="text-[#475569]">Profile</p>
               </div>
             </section>
-            <HiOutlineDotsHorizontal />
+            <div className="flex items-center gap-3 ">
+              <button
+                onClick={() => addNewFollower(e.userId)}
+                className={`text-blue-900 text-[16px] font-semibold hover:opacity-65 transition-colors delay-75 py-2 px-10 rounded bg-white`}
+              >
+                Subscribe
+              </button>
+              <HiOutlineDotsHorizontal />
+            </div>
           </div>
-          <div className="mt-5">
+          <div className="mt-4">
             {e.images.slice(0, 1).map((file, i) => {
               const isVideo =
                 file.toLowerCase().endsWith(".mp4") ||
@@ -281,18 +301,17 @@ const Posts = () => {
               return (
                 <div
                   key={i}
-                  className="w-full h-full flex items-center justify-center bg-black rounded"
+                  className="w-full h-full flex items-center justify-center bg-black rounded-xl"
                 >
                   {isVideo ? (
                     <video
                       src={`${imgUrl}${file}`}
-                      autoPlay
                       controls
-                      className="w-full md:h-[500px] object-contain"
+                      className="w-full md:h-[500px] object-contain rounded-xl"
                     />
                   ) : (
                     <img
-                      className="w-full md:h-[500px] bg-gray-200"
+                      className="w-full md:h-[500px] bg-gray-200 rounded-xl"
                       src={`${imgUrl}${file}`}
                       alt="image"
                     />

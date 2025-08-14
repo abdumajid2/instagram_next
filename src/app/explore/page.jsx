@@ -1,55 +1,5 @@
-<<<<<<< HEAD
-"use client"
-import { useState } from "react"
-import { useGetPostsQuery, useLikePostMutation } from "@/store/pages/explore/exploreApi"
-import { MdSlowMotionVideo } from "react-icons/md"
-import { FaHeart, FaComment } from "react-icons/fa"
-
-export default function ExplorePage() {
-  const { data, isLoading, refetch } = useGetPostsQuery()
-  const [likePost] = useLikePostMutation()
-  const [selectedPost, setSelectedPost] = useState(null)
-
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-3 gap-1 sm:grid-cols-2 md:grid-cols-3 p-[2vh]">
-        {Array.from({ length: 9 }).map((_, i) => {
-          const isVideo = i % 3 === 0
-          return (
-            <div
-              key={i}
-              className="relative w-full aspect-square bg-gray-300 dark:bg-gray-700 animate-pulse rounded-sm"
-            >
-              {isVideo && (
-                <div className="absolute top-2 right-2 bg-white/60 p-1 rounded-full text-gray-800">
-                  <MdSlowMotionVideo size={18} />
-                </div>
-              )}
-            </div>
-          )
-        })}
-      </div>
-    )
-  }
-
-  const handleLike = async (postId, inModal = false) => {
-    try {
-      await likePost(postId).unwrap()
-      await refetch()
-
-      if (inModal && selectedPost?.postId === postId) {
-        const updated = data.data.find((p) => p.postId === postId)
-        if (updated) {
-          setSelectedPost(updated)
-        }
-      }
-    } catch (err) {
-      console.error("Like error:", err)
-    }
-  }
-=======
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   useGetPostsQuery, 
   useLikePostMutation, 
@@ -63,51 +13,76 @@ export default function ExplorePage() {
   const { data, isLoading, refetch } = useGetPostsQuery();
   const [selectedPost, setSelectedPost] = useState(null);
   const [commentText, setCommentText] = useState("");
+  const [likedPosts, setLikedPosts] = useState({});
+  const [postLikes, setPostLikes] = useState({});
   const [likePost] = useLikePostMutation();
   const [addComment] = useAddCommentMutation();
   const [deleteComment] = useDeleteCommentMutation();
 
-  if (isLoading) return <div>Loading...</div>;
+  // Initialize like counts from fetched data
+  useEffect(() => {
+    if (data?.data) {
+      const likes = {};
+      const liked = {};
+      data.data.forEach(post => {
+        likes[post.postId] = post.postLikeCount || 0;
+        liked[post.postId] = !!post.postLike; // assuming API returns boolean
+      });
+      setPostLikes(likes);
+      setLikedPosts(liked);
+    }
+  }, [data]);
+
+  if (isLoading) return <div>Loading...</div>
 
   const handleLike = async (postId) => {
     try {
       await likePost(postId).unwrap();
-      await refetch();
+
+      // Toggle liked state
+      setLikedPosts(prev => ({
+        ...prev,
+        [postId]: !prev[postId],
+      }));
+
+      // Update like count instantly
+      setPostLikes(prev => ({
+        ...prev,
+        [postId]: likedPosts[postId] ? prev[postId] - 1 : prev[postId] + 1,
+      }));
     } catch (err) {
-      console.error(err);
+      console.error(err)
     }
-  };
+  }
 
   const handleAddComment = async () => {
-    if (!commentText.trim()) return;
+    if (!commentText.trim()) return
     try {
-      await addComment({ postId: selectedPost.postId, text: commentText }).unwrap();
-      setCommentText("");
-      await refetch();
+      await addComment({ postId: selectedPost.postId, text: commentText }).unwrap()
+      setCommentText("")
+      await refetch()
     } catch (err) {
-      console.error(err);
+      console.error(err)
     }
-  };
+  }
 
   const handleDeleteComment = async (commentId) => {
     try {
-      await deleteComment(commentId).unwrap();
-      await refetch();
+      await deleteComment(commentId).unwrap()
+      await refetch()
     } catch (err) {
-      console.error(err);
+      console.error(err)
     }
   };
->>>>>>> ac9876079e2bb1549d08b2c49190b598bb36b688
 
   return (
     <>
-      {/* GRID */}
       <div className="grid grid-cols-3 p-[5vh] gap-[2px] auto-rows-[150px]">
         {data?.data?.map((post, index) => {
-          const firstImage = post.images?.[0];
-          const isVideo = /\.(mp4)$/i.test(firstImage);
-          const src = `http://37.27.29.18:8003/images/${firstImage}`;
-          const isTall = (index + 1) % 3 === 0;
+          const firstImage = post.images?.[0]
+          const isVideo = /\.(mp4)$/i.test(firstImage)
+          const src = `http://37.27.29.18:8003/images/${firstImage}`
+          const isTall = (index + 1) % 3 === 0
 
           return (
             <div
@@ -120,31 +95,36 @@ export default function ExplorePage() {
               ) : (
                 <img src={src} alt="Post" className="w-full h-full object-cover" />
               )}
-
               {isVideo && (
                 <div className="absolute top-2 right-2 bg-black/50 p-1.5 rounded-full text-white">
                   <MdSlowMotionVideo size={18} />
                 </div>
               )}
+
+              {/* Heart and comment overlay */}
+              <div className="absolute bottom-2 left-2 flex gap-3 bg-black/30 px-2 py-1 rounded">
+                <div
+                  className="flex items-center gap-1 cursor-pointer"
+                  onClick={(e) => { e.stopPropagation(); handleLike(post.postId); }}
+                >
+                  <FaHeart className={likedPosts[post.postId] ? "text-red-500" : "text-white"} />
+                  <span className="text-white text-sm">{postLikes[post.postId]}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <FaComment className="text-white" />
+                  <span className="text-white text-sm">{post.commentCount || 0}</span>
+                </div>
+              </div>
             </div>
-          );
+          )
         })}
       </div>
 
-      {/* MODAL */}
+      {/* Modal */}
       {selectedPost && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-<<<<<<< HEAD
-          <div
-            className="bg-white w-[90%] h-[90%] flex"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Image/Video */}
-            <div className="flex-1 w-full bg-black flex items-center justify-center">
-=======
           <div className="bg-white w-[90%] h-[90%] flex">
             <div className="flex-1 bg-black flex items-center justify-center">
->>>>>>> ac9876079e2bb1549d08b2c49190b598bb36b688
               {/\.(mp4)$/i.test(selectedPost.images?.[0]) ? (
                 <video
                   src={`http://37.27.29.18:8003/images/${selectedPost.images[0]}`}
@@ -161,30 +141,17 @@ export default function ExplorePage() {
               )}
             </div>
 
-            {/* Info */}
             <div className="w-[350px] flex flex-col border-l">
-              {/* Like & Comment */}
               <div className="p-4 flex items-center gap-4 border-b">
-<<<<<<< HEAD
-                <div
-                  className="flex items-center gap-2 cursor-pointer"
-                  onClick={() => handleLike(selectedPost.postId, true)}
-                >
-=======
                 <div className="flex items-center gap-2 cursor-pointer" onClick={() => handleLike(selectedPost.postId)}>
->>>>>>> ac9876079e2bb1549d08b2c49190b598bb36b688
-                  <FaHeart className={selectedPost.postLike ? "text-red-500" : ""} />
-                  {selectedPost.postLikeCount || 0}
+                  <FaHeart className={likedPosts[selectedPost.postId] ? "text-red-500" : ""} />
+                  <span>{postLikes[selectedPost.postId]}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <FaComment className="text-gray-500" /> {selectedPost.commentCount || 0}
                 </div>
               </div>
 
-<<<<<<< HEAD
-              {/* Comments list */}
-=======
->>>>>>> ac9876079e2bb1549d08b2c49190b598bb36b688
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {selectedPost.comments?.map((c) => (
                   <div key={c.commentId} className="flex items-start gap-2">
@@ -195,7 +162,9 @@ export default function ExplorePage() {
                         className="w-8 h-8 rounded-full object-cover"
                       />
                     ) : (
-                      <FaUserCircle className="w-8 h-8 text-gray-500" />
+                      <div className={`w-8 h-8 rounded-full ${instagramGradient} flex items-center justify-center`}>
+                        <span className="text-white font-bold">U</span>
+                      </div>
                     )}
 
                     <div className="flex-1">
@@ -211,18 +180,13 @@ export default function ExplorePage() {
                 ))}
               </div>
 
-<<<<<<< HEAD
-              {/* Comment input */}
-              <div className="p-4 border-t">
-=======
               <div className="p-4 border border-[gainsboro] flex gap-2">
->>>>>>> ac9876079e2bb1549d08b2c49190b598bb36b688
                 <input
                   type="text"
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
                   placeholder="Add a comment..."
-                  className="flex-1 border border-[gainsboro] p-2 rounded"
+                  className="flex-1 border p-2 rounded"
                 />
                 <button onClick={handleAddComment} className="bg-blue-500 text-white px-3 rounded">
                   Post
@@ -231,7 +195,6 @@ export default function ExplorePage() {
             </div>
           </div>
 
-          {/* Close button */}
           <button
             onClick={() => setSelectedPost(null)}
             className="absolute top-4 right-4 text-white text-3xl"
@@ -241,5 +204,5 @@ export default function ExplorePage() {
         </div>
       )}
     </>
-  );
+  )
 }

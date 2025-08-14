@@ -1,4 +1,5 @@
 'use client'
+import { useGetFavoritePostQuery } from '@/store/pages/setting/settingApi'
 import { Switch } from 'antd'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -10,6 +11,7 @@ export default function Setting() {
 	let [enemyModal, setEnemyModal] = useState(false)
 	let [comentModal, setComentModal] = useState(false)
 	let [repostModal, setRepostModal] = useState(false)
+	let [likeModal, setLikeModal] = useState(false)
 
 	function showNotificationsModal() {
 		setNotificationsModal(true)
@@ -18,6 +20,7 @@ export default function Setting() {
 		setEnemyModal(false)
 		setComentModal(false)
 		setRepostModal(false)
+		setLikeModal(false)
 	}
 
 	function showConfidentialityModal() {
@@ -27,6 +30,7 @@ export default function Setting() {
 		setEnemyModal(false)
 		setComentModal(false)
 		setRepostModal(false)
+		setLikeModal(false)
 	}
 
 	function showFriendModal() {
@@ -36,6 +40,7 @@ export default function Setting() {
 		setEnemyModal(false)
 		setComentModal(false)
 		setRepostModal(false)
+		setLikeModal(false)
 	}
 
 	function showEnemyModal() {
@@ -45,6 +50,7 @@ export default function Setting() {
 		setEnemyModal(true)
 		setComentModal(false)
 		setRepostModal(false)
+		setLikeModal(false)
 	}
 
 	function showComentModal() {
@@ -54,6 +60,7 @@ export default function Setting() {
 		setEnemyModal(false)
 		setComentModal(true)
 		setRepostModal(false)
+		setLikeModal(false)
 	}
 
 	function showRepostModal() {
@@ -63,7 +70,20 @@ export default function Setting() {
 		setEnemyModal(false)
 		setComentModal(false)
 		setRepostModal(true)
+		setLikeModal(false)
 	}
+
+	function showLikeModal() {
+		setNotificationsModal(false)
+		setConfidentialityModal(false)
+		setFriendModal(false)
+		setEnemyModal(false)
+		setComentModal(false)
+		setRepostModal(false)
+		setLikeModal(true)
+	}
+
+	let { data: favoritePostData } = useGetFavoritePostQuery()
 
 	return (
 		<>
@@ -229,8 +249,6 @@ export default function Setting() {
 						<p onClick={() => showRepostModal()}>Настройки репостов</p>
 					</div>
 
-					{/* ------- */}
-
 					<p className='text-gray-600 mb-4'>Ваши проиложения и медиафайлы</p>
 
 					<div className='flex items-center gap-3 text-gray-800 hover:text-blue-600 cursor-pointer'>
@@ -248,8 +266,10 @@ export default function Setting() {
 								d='M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z'
 							/>
 						</svg>
-						<p>Отметки "Нравится"</p>
+						<p onClick={showLikeModal}>Избранные</p>
 					</div>
+
+					{/* ------- */}
 
 					<div className='flex items-center gap-3 text-gray-800 hover:text-blue-600 cursor-pointer'>
 						<svg
@@ -286,7 +306,7 @@ export default function Setting() {
 								d='M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0 0 20.25 18V6A2.25 2.25 0 0 0 18 3.75H6A2.25 2.25 0 0 0 3.75 6v12A2.25 2.25 0 0 0 6 20.25Z'
 							/>
 						</svg>
-						<p>Тип аккаунта и инструменты</p>
+						<Link href={'/profile'}>Тип аккаунта и инструменты</Link>
 					</div>
 
 					<div className='flex items-center gap-3 text-gray-800 hover:text-blue-600 cursor-pointer'>
@@ -324,7 +344,7 @@ export default function Setting() {
 								d='M16.712 4.33a9.027 9.027 0 0 1 1.652 1.306c.51.51.944 1.064 1.306 1.652M16.712 4.33l-3.448 4.138m3.448-4.138a9.014 9.014 0 0 0-9.424 0M19.67 7.288l-4.138 3.448m4.138-3.448a9.014 9.014 0 0 1 0 9.424m-4.138-5.976a3.736 3.736 0 0 0-.88-1.388 3.737 3.737 0 0 0-1.388-.88m2.268 2.268a3.765 3.765 0 0 1 0 2.528m-2.268-4.796a3.765 3.765 0 0 0-2.528 0m4.796 4.796c-.181.506-.475.982-.88 1.388a3.736 3.736 0 0 1-1.388.88m2.268-2.268 4.138 3.448m0 0a9.027 9.027 0 0 1-1.306 1.652c-.51.51-1.064.944-1.652 1.306m0 0-3.448-4.138m3.448 4.138a9.014 9.014 0 0 1-9.424 0m5.976-4.138a3.765 3.765 0 0 1-2.528 0m0 0a3.736 3.736 0 0 1-1.388-.88 3.737 3.737 0 0 1-.88-1.388m2.268 2.268L7.288 19.67m0 0a9.024 9.024 0 0 1-1.652-1.306 9.027 9.027 0 0 1-1.306-1.652m0 0 4.138-3.448M4.33 16.712a9.014 9.014 0 0 1 0-9.424m4.138 5.976a3.765 3.765 0 0 1 0-2.528m0 0c.181-.506.475-.982.88-1.388a3.736 3.736 0 0 1 1.388-.88m-2.268 2.268L4.33 7.288m6.406 1.18L7.288 4.33m0 0a9.024 9.024 0 0 0-1.652 1.306A9.025 9.025 0 0 0 4.33 7.288'
 							/>
 						</svg>
-						<p onClick={() => alert("Сам разберайся")}>Помощь</p>
+						<p onClick={() => alert('Сам разберайся')}>Помощь</p>
 					</div>
 
 					<div className='flex items-center gap-3 text-gray-800 hover:text-blue-600 cursor-pointer'>
@@ -342,7 +362,13 @@ export default function Setting() {
 								d='M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z'
 							/>
 						</svg>
-						<Link href={'https://privacycenter.instagram.com/?entry_point=instagram_settings_page'}>Конфидециальность</Link>
+						<Link
+							href={
+								'https://privacycenter.instagram.com/?entry_point=instagram_settings_page'
+							}
+						>
+							Конфидециальность
+						</Link>
 					</div>
 
 					<div className='flex items-center gap-3 text-gray-800 hover:text-blue-600 cursor-pointer'>
@@ -785,7 +811,11 @@ export default function Setting() {
 										<label className='flex items-center justify-between p-3 hover:bg-gray-100 rounded-lg cursor-pointer'>
 											<div className='flex items-center'>
 												<div className='relative'>
-													<input type='checkbox' className='sr-only peer' defaultChecked/>
+													<input
+														type='checkbox'
+														className='sr-only peer'
+														defaultChecked
+													/>
 													<div className='w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[""] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500'></div>
 												</div>
 												<span className='ml-3 text-gray-700'>
@@ -797,7 +827,11 @@ export default function Setting() {
 										<label className='flex items-center justify-between p-3 hover:bg-gray-100 rounded-lg cursor-pointer'>
 											<div className='flex items-center'>
 												<div className='relative'>
-													<input type='checkbox' className='sr-only peer' defaultChecked/>
+													<input
+														type='checkbox'
+														className='sr-only peer'
+														defaultChecked
+													/>
 													<div className='w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[""] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500'></div>
 												</div>
 												<span className='ml-3 text-gray-700'>
@@ -823,12 +857,81 @@ export default function Setting() {
 												/>
 												<div className='w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[""] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500'></div>
 											</div>
-											<span className='ml-3 text-gray-700'>
-												
-											</span>
+											<span className='ml-3 text-gray-700'></span>
 										</div>
 									</label>
 								</div>
+							</div>
+						</div>
+					)}
+
+					{likeModal && (
+						<div className='max-w-4xl mx-auto p-6'>
+							<h2 className='text-3xl font-bold text-center mb-8'>Избранные</h2>
+
+							<div className='grid sm:grid-cols-2 lg:grid-cols-3 gap-6'>
+								{favoritePostData?.data?.map(el => {
+									const file = el.images[0]
+									const url = `http://37.27.29.18:8003/images/${file}`
+									const isVideo = /\.(mp4)$/i.test(file)
+
+									return (
+										<div
+											key={el.postId}
+											className='bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300'
+										>
+											<div className='relative group'>
+												{isVideo ? (
+													<video
+														src={url}
+														className='w-full h-48 object-cover'
+														controls
+														/>
+												) : (
+													<img
+														src={url}
+														alt={el.title || 'Изображение'}
+														className='w-full h-48 object-cover'
+													/>
+												)}
+
+												{isVideo && (
+													<div className='absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 group-hover:bg-opacity-50 transition'>
+														<svg
+															xmlns='http://www.w3.org/2000/svg'
+															className='w-12 h-12 text-white opacity-80 group-hover:opacity-100'
+															fill='currentColor'
+															viewBox='0 0 24 24'
+														>
+															<path d='M8 5v14l11-7z' />
+														</svg>
+													</div>
+												)}
+											</div>
+
+											<div className='p-4'>
+												<h3 className='text-lg font-semibold truncate'>
+													{el.title && el.title !== 'null'
+														? el.title
+														: 'Без названия'}
+												</h3>
+												<p className='text-sm text-gray-500 mt-1 line-clamp-2'>
+													{el.content || 'Без описания'}
+												</p>
+												<div className='flex justify-between items-center mt-3 text-gray-600 text-sm'>
+													<span>
+														{new Date(el.datePublished).toLocaleDateString(
+															'ru-RU'
+														)}
+													</span>
+													<span className='flex items-center gap-1'>
+														❤️ {el.postLikeCount}
+													</span>
+												</div>
+											</div>
+										</div>
+									)
+								})}
 							</div>
 						</div>
 					)}
