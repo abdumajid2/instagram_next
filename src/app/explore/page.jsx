@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   useGetPostsQuery, 
   useLikePostMutation, 
@@ -13,16 +13,43 @@ export default function ExplorePage() {
   const { data, isLoading, refetch } = useGetPostsQuery();
   const [selectedPost, setSelectedPost] = useState(null);
   const [commentText, setCommentText] = useState("");
+  const [likedPosts, setLikedPosts] = useState({});
+  const [postLikes, setPostLikes] = useState({});
   const [likePost] = useLikePostMutation();
   const [addComment] = useAddCommentMutation();
   const [deleteComment] = useDeleteCommentMutation();
+
+  // Initialize like counts from fetched data
+  useEffect(() => {
+    if (data?.data) {
+      const likes = {};
+      const liked = {};
+      data.data.forEach(post => {
+        likes[post.postId] = post.postLikeCount || 0;
+        liked[post.postId] = !!post.postLike; // assuming API returns boolean
+      });
+      setPostLikes(likes);
+      setLikedPosts(liked);
+    }
+  }, [data]);
 
   if (isLoading) return <div>Loading...</div>;
 
   const handleLike = async (postId) => {
     try {
       await likePost(postId).unwrap();
-      await refetch();
+
+      // Toggle liked state
+      setLikedPosts(prev => ({
+        ...prev,
+        [postId]: !prev[postId],
+      }));
+
+      // Update like count instantly
+      setPostLikes(prev => ({
+        ...prev,
+        [postId]: likedPosts[postId] ? prev[postId] - 1 : prev[postId] + 1,
+      }));
     } catch (err) {
       console.error(err);
     }
@@ -73,11 +100,27 @@ export default function ExplorePage() {
                   <MdSlowMotionVideo size={18} />
                 </div>
               )}
+
+              {/* Heart and comment overlay */}
+              <div className="absolute bottom-2 left-2 flex gap-3 bg-black/30 px-2 py-1 rounded">
+                <div
+                  className="flex items-center gap-1 cursor-pointer"
+                  onClick={(e) => { e.stopPropagation(); handleLike(post.postId); }}
+                >
+                  <FaHeart className={likedPosts[post.postId] ? "text-red-500" : "text-white"} />
+                  <span className="text-white text-sm">{postLikes[post.postId]}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <FaComment className="text-white" />
+                  <span className="text-white text-sm">{post.commentCount || 0}</span>
+                </div>
+              </div>
             </div>
           );
         })}
       </div>
 
+      {/* Modal */}
       {selectedPost && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
           <div className="bg-white w-[90%] h-[90%] flex">
@@ -101,8 +144,8 @@ export default function ExplorePage() {
             <div className="w-[350px] flex flex-col border-l">
               <div className="p-4 flex items-center gap-4 border-b">
                 <div className="flex items-center gap-2 cursor-pointer" onClick={() => handleLike(selectedPost.postId)}>
-                  <FaHeart className={selectedPost.postLike ? "text-red-500" : ""} />
-                  {selectedPost.postLikeCount || 0}
+                  <FaHeart className={likedPosts[selectedPost.postId] ? "text-red-500" : ""} />
+                  <span>{postLikes[selectedPost.postId]}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <FaComment className="text-gray-500" /> {selectedPost.commentCount || 0}
