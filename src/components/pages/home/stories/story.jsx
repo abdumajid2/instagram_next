@@ -7,7 +7,6 @@ import {
 import React, { useState } from "react";
 import userImage from "../../../../components/pages/home/images/user.jpg";
 import Image from "next/image";
-import { Modal } from "antd";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
@@ -26,88 +25,151 @@ const Story = () => {
     setIsModalOpen(false);
   };
 
-  function openStory(story) {
+  const openStory = (story) => {
     setStoryId(story.userId);
     setIsModalOpen(true);
+  };
+
+  function formatData(data) {
+    const now = new Date();
+    const date = new Date(data);
+    const seconds = Math.floor((now - date) / 1000);
+
+    if (seconds < 60) return "только что";
+    if (seconds < 3600) return `${Math.floor(seconds / 60)} мин назад`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)} ч назад`;
+    if (seconds < 2592000) return `${Math.floor(seconds / 86400)} дн назад`;
+    if (seconds < 31536000) return `${Math.floor(seconds / 2592000)} мес назад`;
+
+    return `${Math.floor(seconds / 31536000)} г назад`;
   }
 
   return (
     <div className="w-full overflow-x-auto">
-      <Modal
-        title="Stories"
-        closable={{ "aria-label": "Custom Close Button" }}
-        open={isModalOpen}
-        onOk={handleCancel}
-        onCancel={handleCancel}
-        footer={null}
-        className="!w-[80%] !h-[100vh] !m-0 !p-0 !absolute !top-1/2 !left-1/2 !-translate-x-1/2 !-translate-y-1/2 overflow-hidden"
-      > 
-        {storyById?.data?.stories && storyById.data.stories.length > 0 && (
-          <Swiper
-            modules={[Navigation, Pagination]}
-            navigation
-            pagination={{ clickable: true }}
-            className="w-full h-[90vh] bg-black"
-          >
-            {storyById.data.stories.map((file) => {
-              const fileName = file.fileName || "";
-              const isVideo =
-                fileName.toLowerCase().endsWith(".mp4") ||
-                fileName.toLowerCase().endsWith(".mov");
+      {isModalOpen && storyById?.data && (
+        <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center">
+          <div className="relative w-full max-w-3xl h-[90vh] flex flex-col items-center justify-center">
+            <button
+              onClick={handleCancel}
+              className="absolute top-5 cursor-pointer right-5 z-50 bg-black/50 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-black/100 transition"
+            >
+              ✕
+            </button>
 
-              return (
-                <SwiperSlide
-                  key={file.id}
-                  className="flex items-center justify-center bg-black"
-                >
-                  {isVideo ? (
-                    <video
-                      src={`${imgUrl}${fileName}`}
-                      controls
-                      autoPlay
-                      className="max-h-full max-w-full rounded-xl w-full object-cover"
-                    />
-                  ) : (
-                    <img
-                      src={`${imgUrl}${fileName}`}
-                      alt="story"
-                      className="max-h-full max-w-full rounded-xl w-full object-cover"
-                    />
-                  )}
-                </SwiperSlide>
-              );
-            })}
-          </Swiper>
-        )}
-      </Modal>
+            <div className="absolute top-5 left-5 flex flex-col gap-1 z-50">
+              <div className="flex items-center gap-3">
+                {storyById?.data.userImage ? (
+                  <img
+                    src={`${imgUrl}${storyById?.data.userImage}`}
+                    alt="image"
+                    className="w-16 h-16 rounded-full border border-gray-300"
+                  />
+                ) : (
+                  <Image
+                    src={userImage}
+                    width={64}
+                    height={64}
+                    alt="image"
+                    className="rounded-full border border-gray-300"
+                  />
+                )}
+                <span className="text-gray-500 font-semibold">
+                  {storyById.data.userName}
+                </span>
+              </div>
+              <span className="text-xs text-gray-500">
+                {storyById.data.stories[0]?.createAt
+                  ? formatData(storyById.data.stories[0].createAt)
+                  : ""}
+              </span>
+            </div>
+
+            {storyById.data.stories.length > 0 && (
+              <Swiper
+                modules={[Navigation, Pagination]}
+                navigation
+                pagination={{ clickable: true }}
+                className="w-full h-full flex items-center justify-center"
+              >
+                {storyById.data.stories
+                  .filter((file) => {
+                    const storyTime = new Date(file.createAt);
+                    const now = new Date();
+                    return now - storyTime <= 86400 * 1000;
+                  })
+                  .map((file) => {
+                    const fileName = file.fileName || "";
+                    const isVideo =
+                      fileName.toLowerCase().endsWith(".mp4") ||
+                      fileName.toLowerCase().endsWith(".mov");
+                    return (
+                      <SwiperSlide
+                        key={file.id}
+                        className="flex items-center justify-center"
+                      >
+                        {isVideo ? (
+                          <video
+                            src={`${imgUrl}${fileName}`}
+                            controls
+                            autoPlay
+                            className="max-h-[85vh] max-w-[90%] rounded-xl object-contain shadow-lg"
+                          />
+                        ) : (
+                          <img
+                            src={`${imgUrl}${fileName}`}
+                            alt="story"
+                            className="max-h-[85vh] max-w-[90%] rounded-xl object-contain shadow-lg"
+                          />
+                        )}
+                      </SwiperSlide>
+                    );
+                  })}
+              </Swiper>
+            )}
+          </div>
+        </div>
+      )}
 
       <section className="flex flex-nowrap items-start gap-5">
-        {data?.map((story) => (
-          <article
-            key={story.userId}
-            onClick={() => openStory(story)}
-            className="flex-shrink-0"
-          >
-            <div className="flex flex-col items-center">
-              {story.userImage ? (
-                <img
-                  src={`${imgUrl}${story.userImage}`}
-                  alt="image"
-                  className="w-16 h-16 rounded-full"
-                />
-              ) : (
-                <Image
-                  src={userImage}
-                  width={64}
-                  height={64}
-                  alt="image"
-                  className="rounded-full"
-                />
-              )}
-              <h3>{story.userName}</h3>
-            </div>
-          </article>
-        ))}
+        {data?.map((story) => {
+          // Проверяем есть ли истории у пользователя
+          const hasStory = story.stories && story.stories.length > 0;
+
+          return (
+            <article
+              key={story.userId}
+              onClick={() => openStory(story)}
+              className="flex-shrink-0 cursor-pointer"
+            >
+              <div className="flex flex-col items-center">
+                <div
+                  className={`relative w-16 h-16 rounded-full p-1 ${
+                    hasStory
+                      ? "bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600"
+                      : ""
+                  }`}
+                >
+                  {story.userImage ? (
+                    <img
+                      src={`${imgUrl}${story.userImage}`}
+                      alt="image"
+                      className="w-full h-full rounded-full border border-black"
+                    />
+                  ) : (
+                    <Image
+                      src={userImage}
+                      width={64}
+                      height={64}
+                      alt="image"
+                      className="w-full h-full rounded-full border border-black"
+                    />
+                  )}
+                </div>
+                <h3 className="text-sm mt-1">{story.userName}</h3>
+              </div>
+            </article>
+          );
+        })}
       </section>
     </div>
   );

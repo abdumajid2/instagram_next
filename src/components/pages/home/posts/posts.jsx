@@ -125,7 +125,7 @@ const Posts = () => {
 
   if (isError) return <ErrorAnimation />;
   return (
-    <div className="md:max-w-[50%] mx-auto border flex flex-col gap-7">
+    <div className="md:max-w-[50%] mx-auto flex flex-col gap-7">
       <Story />
       <Modal
         className="!w-[80%] !h-[90vh] !m-0 !p-0 !absolute !top-1/2 !left-1/2 !-translate-x-1/2 !-translate-y-1/2 overflow-hidden"
