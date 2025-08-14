@@ -25,9 +25,20 @@ getMyStories:builder.query({
 }),
 getMyPosts:builder.query({
       query: () => `/Post/get-my-posts`
+}),
+getSubscribers: builder.query({
+  query: (userId) => `/FollowingRelationShip/get-subscribers?UserId=${userId}`,
+}),
+
+getSubscriptions: builder.query({
+  query: (userId) => `/FollowingRelationShip/get-subscriptions?UserId=${userId}`,
+}),
+getUsers:builder.query({
+      query:(userName)=>`User/get-users?UserName=${userName}`
 })
+
     })
 
 })
-export const {useGetMyProfileQuery,useGetMyStoriesQuery,useGetMyPostsQuery}=profileApi
+export const {useGetMyProfileQuery,useGetMyStoriesQuery,useGetMyPostsQuery,useGetSubscribersQuery,useGetSubscriptionsQuery,useGetUsersQuery}=profileApi
 
