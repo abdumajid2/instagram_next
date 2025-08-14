@@ -6,11 +6,14 @@ import { IoVolumeMuteSharp } from "react-icons/io5";
 import { GoUnmute } from "react-icons/go";
 import { PiPaperPlaneTiltBold } from "react-icons/pi";
 import { LiaBookmark } from "react-icons/lia";
-import { useGetReelsQuery, useAddLikeMutation } from "@/store/pages/reels/ReelsApi";
+import { useGetReelsQuery, useAddLikeMutation, useFollowMutation, useAddToFavoriteMutation } from "@/store/pages/reels/ReelsApi";
 import userimg from "./user.png"
+import { FaBookmark } from "react-icons/fa6";
 const Reals = () => {
   let { data, refetch } = useGetReelsQuery()
   let [ addLike ] = useAddLikeMutation()
+  let [ Folow ] = useFollowMutation()
+  let [ addToFavorite ] = useAddToFavoriteMutation()
   console.log(data?.data)
   const [mutedStates, setMutedStates] = useState({});
   const videoRefs = useRef([]);
@@ -59,10 +62,10 @@ const Reals = () => {
                 <div className="flex items-center gap-4">
                   <img className="w-12 h-12 rounded-[50%]" src={`http://37.27.29.18:8003/images/${e.userImage}`} alt="" />
                   <p>{e.userName}</p>
-                  <button className="border py-1 px-3 rounded-xl">{e.isSubscriber ? "Unsubscribe" : "Subscribe"}</button>
+                  {!e.isSubscriber && <button onClick={()=>{Folow(e.userId)}} className="border py-1 px-3 rounded-xl">Subscribe</button>}
                 </div>
-                <div className="flex justify-between items-center w-[170%]">
-                  <p>🎵 {e.userName} original audio</p>
+                <div className="flex justify-between items-center">
+                  <p className="w-95">🎵 {e.userName} original audio</p>
                   <img className="w-10 h-10 rounded-[10px]" src={`http://37.27.29.18:8003/images/${e.userImage}`} alt="" />
                 </div>
               </div>
@@ -78,8 +81,10 @@ const Reals = () => {
                   <FaRegComment className="w-8 h-8" />
                   <p>{e.commentCount}</p>
                 </div>
-                <PiPaperPlaneTiltBold className="w-7 h-7" />
-                <LiaBookmark className="w-10 h-10" />
+                <div className="flex flex-col gap-5">
+                  <PiPaperPlaneTiltBold className="w-7 h-7" />
+                  {e.postFavorite ? <FaBookmark className="w-8 h-8" /> : <LiaBookmark className="w-10 h-10" onClick={()=>{addToFavorite({"postId": e.postId})}} />}
+                </div>
               </div>
             </div>
           </div>
