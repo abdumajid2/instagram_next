@@ -12,6 +12,8 @@ import { Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import { LuPlus } from "react-icons/lu";
+import AddStory from "./addStory";
 
 const Story = () => {
   const { data } = useGetStoriesQuery();
@@ -45,13 +47,13 @@ const Story = () => {
   }
 
   return (
-    <div className="w-full overflow-x-auto">
+    <div className="w-full overflow-x-auto border-b-1 border-gray-300 pb-3">
       {isModalOpen && storyById?.data && (
         <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center">
           <div className="relative w-full max-w-3xl h-[90vh] flex flex-col items-center justify-center">
             <button
               onClick={handleCancel}
-              className="absolute top-5 cursor-pointer right-5 z-50 bg-black/50 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-black/100 transition"
+              className="absolute top-5 cursor-pointer right-5 z-50 bg-black/50 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-gray-700 transition"
             >
               ✕
             </button>
@@ -85,18 +87,18 @@ const Story = () => {
             </div>
 
             {storyById.data.stories.length > 0 && (
-              <Swiper
+              <Swiper 
                 modules={[Navigation, Pagination]}
                 navigation
                 pagination={{ clickable: true }}
                 className="w-full h-full flex items-center justify-center"
               >
                 {storyById.data.stories
-                  .filter((file) => {
-                    const storyTime = new Date(file.createAt);
-                    const now = new Date();
-                    return now - storyTime <= 86400 * 1000;
-                  })
+                  //   .filter((file) => {
+                  //     const storyTime = new Date(file.createAt);
+                  //     const now = new Date();
+                  //     return now - storyTime <= 86400 * 1000;
+                  //   })
                   .map((file) => {
                     const fileName = file.fileName || "";
                     const isVideo =
@@ -131,8 +133,9 @@ const Story = () => {
       )}
 
       <section className="flex flex-nowrap items-start gap-5">
+        <AddStory />
+
         {data?.map((story) => {
-          // Проверяем есть ли истории у пользователя
           const hasStory = story.stories && story.stories.length > 0;
 
           return (
@@ -143,7 +146,7 @@ const Story = () => {
             >
               <div className="flex flex-col items-center">
                 <div
-                  className={`relative w-16 h-16 rounded-full p-1 ${
+                  className={`relative w-18 h-18 rounded-full p-1 ${
                     hasStory
                       ? "bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600"
                       : ""
