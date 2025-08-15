@@ -6,8 +6,9 @@ import {
   useAddCommentMutation,
   useDeleteCommentMutation
 } from "@/store/pages/explore/exploreApi"
-import { MdSlowMotionVideo } from "react-icons/md"
 import { FaHeart, FaComment, FaTrash } from "react-icons/fa"
+import { MdSlowMotionVideo } from "react-icons/md";
+import { FaRegImage } from "react-icons/fa";
 
 export default function ExplorePage() {
   const { data, isLoading, refetch } = useGetPostsQuery()
@@ -18,8 +19,11 @@ export default function ExplorePage() {
   const [likePost] = useLikePostMutation()
   const [addComment] = useAddCommentMutation()
   const [deleteComment] = useDeleteCommentMutation()
+  const fakeData = [true, false, false, true, false, false, true, false, false];
 
   const instagramGradient = "bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600"
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     if (data?.data) {
@@ -34,7 +38,29 @@ export default function ExplorePage() {
     }
   }, [data])
 
-  if (isLoading) return <div>Loading...</div>
+  function openComment(e) {
+    setInfoId(e.postId);
+    setIsModalOpen(true);
+  }
+  let [inpAddComment, setInpAddComment] = useState("");
+  
+
+  if (isLoading) return <div className="grid grid-cols-3 gap-1 sm:grid-cols-2 md:grid-cols-3 p-[2vh]">
+    {fakeData.map((isVideo, i) => (
+      <div
+        key={i}
+        className="relative w-full aspect-square bg-gray-300 dark:bg-gray-700 animate-pulse rounded-sm"
+      >
+        <div className="absolute top-2 right-2 bg-white/60 p-1 rounded-full text-gray-800">
+          {isVideo ? (
+            <MdSlowMotionVideo size={18} />
+          ) : (
+            <FaRegImage size={16} />
+          )}
+        </div>
+      </div>
+    ))}
+  </div>
 
   const handleLike = async (postId) => {
     try {
@@ -129,14 +155,29 @@ export default function ExplorePage() {
               )}
             </div>
 
-            <div className="w-[350px] flex flex-col border-l">
-              <div className="p-4 flex items-center gap-4 border-b">
+            <div className="w-[350px] flex flex-col border border-[gainsboro]">
+              <div className="p-4 flex items-center gap-3 border-b border-[gainsboro]">
+                {selectedPost.userImage ? (
+                  <img
+                    src={`http://37.27.29.18:8003/${selectedPost.userImage}`}
+                    alt={selectedPost.userName}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className={`w-10 h-10 rounded-full ${instagramGradient} flex items-center justify-center`}>
+                    <span className="text-white font-bold">{selectedPost.userName?.[0] || "U"}</span>
+                  </div>
+                )}
+                <span className="font-semibold">{selectedPost.userName || "User"}</span>
+              </div>
+
+              <div className="p-4 flex items-center gap-4 border-b border-[gainsboro]">
                 <div className="flex items-center gap-2 cursor-pointer" onClick={() => handleLike(selectedPost.postId)}>
                   <FaHeart className={likedPosts[selectedPost.postId] ? "text-red-500" : ""} />
                   <span>{postLikes[selectedPost.postId]}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <FaComment className="text-gray-500" /> {selectedPost.commentCount || 0}
+                  <FaComment className="text-gray-300" /> {selectedPost.commentCount || 0}
                 </div>
               </div>
 
@@ -145,7 +186,7 @@ export default function ExplorePage() {
                   <div key={c.commentId} className="flex items-start gap-2">
                     {c.userImage ? (
                       <img
-                        src={`http://37.27.29.18:8003/${c.userImage}`}
+                        src={c.userImage ? `http://37.27.29.18:8003/${c.userImage}` : defaultAvatar}
                         alt={c.userName}
                         className="w-8 h-8 rounded-full object-cover"
                       />
@@ -168,7 +209,7 @@ export default function ExplorePage() {
                 ))}
               </div>
 
-              <div className="p-4 border border-[gainsboro] flex gap-2">
+              <div className="p-4 border-t border-[gainsboro] flex gap-2">
                 <input
                   type="text"
                   value={comment}
@@ -179,7 +220,6 @@ export default function ExplorePage() {
                 <button onClick={handleAddComment} className="bg-blue-500 text-white px-3 rounded">
                   Post
                 </button>
-
               </div>
             </div>
           </div>
@@ -192,6 +232,7 @@ export default function ExplorePage() {
           </button>
         </div>
       )}
+
     </>
   )
 }
