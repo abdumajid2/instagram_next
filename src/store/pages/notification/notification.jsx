@@ -1,13 +1,15 @@
-// src/redux/api/notificationApi.js
+
+"use client";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const notificationApi = createApi({
   reducerPath: "notificationApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://37.27.29.18:8003",
+    baseUrl: "http://37.27.29.18:8003/",
     prepareHeaders: (headers) => {
       const authToken = localStorage.getItem("authToken");
       console.log("Token из localStorage:", authToken);
+
       if (authToken) {
         headers.set("authorization", `Bearer ${authToken}`);
       }
@@ -15,69 +17,40 @@ export const notificationApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    // Чаты
-    getChats: builder.query({
-      query: () => `/Chat/get-chats`,
-    }),
-    getChatById: builder.query({
-      query: (chatId) => `/Chat/get-chat-by-id?ChatId=${chatId}`,
-    }),
+  getSubscribers: builder.query({
+    query: (userId) =>
+      `FollowingRelationShip/get-subscribers?UserId=${userId}`,
+  }),
+  getSubscriptions: builder.query({
+    query: (userId) =>
+      `FollowingRelationShip/get-subscriptions?UserId=${userId}`,
+  }),
 
-    // Подписчики
-    getSubscribers: builder.query({
-      query: (userId) =>
-        `/FollowingRelationShip/get-subscribers?UserId=${userId}`,
+  followUser: builder.mutation({
 
-    }),
-    deleteSubscriber: builder.mutation({
-      query: (id) => ({
-        url: `/FollowingRelationShip/delete-following-relation-ship?followingUserId=${id}`,
-        method: "DELETE", // ё POST, вобаста ба API
-      }),
-      invalidatesTags: ["Subscribers"], // агар истифода баред
-    }),
+    // POST /FollowingRelationShip/follow
     
-
-    // Лайк поста
-    likePost: builder.mutation({
-      query: (postId) => ({
-        url: `/Post/like-post?PostId=${postId}`,
-        method: "POST",
-      }),
-    }),
-
-    // Добавить комментарий
-    addComment: builder.mutation({
-      query: (body) => ({
-        url: `/Post/add-comment`,
-        method: "POST",
-        body,
-      }),
-    }),
-
-    // Посты от подписок
-    getFollowingPosts: builder.query({
-      query: () => `/Post/get-following-post`,
-    }),
-
-    // Просмотр сторис
-    addStoryView: builder.mutation({
-      query: (storyId) => ({
-        url: `/Story/add-story-view?StoryId=${storyId}`,
-        method: "POST",
-      }),
+    query: (userId) => ({
+      url: "FollowingRelationShip/follow",
+      method: "POST",
+      body: { UserId: userId },
     }),
   }),
+  unfollowUser: builder.mutation({
+    // POST /FollowingRelationShip/unfollow
+    query: (userId) => ({
+      url: "FollowingRelationShip/unfollow",
+      method: "POST",
+      body: { UserId: userId },
+    }),
+  }),
+}),
+
 });
 
 export const {
-  useGetChatsQuery,
-  useGetChatByIdQuery,
   useGetSubscribersQuery,
-  useLikePostMutation,
-  useAddCommentMutation,
-  useGetFollowingPostsQuery,
-  useAddStoryViewMutation,
-  useDeleteSubscriberMutation,
-  
+  useGetSubscriptionsQuery,
+  useFollowUserMutation,
+  useUnfollowUserMutation
 } = notificationApi;

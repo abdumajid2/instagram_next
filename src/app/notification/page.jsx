@@ -1,113 +1,190 @@
 "use client";
 
+import React, { useState, useEffect, useMemo } from "react";
 import {
-  useAddCommentMutation,
-  useAddStoryViewMutation,
-  useDeleteSubscriberMutation,
-  useGetFollowingPostsQuery,
   useGetSubscribersQuery,
-  useLikePostMutation
+  useGetSubscriptionsQuery,
+  useFollowUserMutation,
+  useUnfollowUserMutation,
 } from "@/store/pages/notification/notification";
-import { useState } from "react";
+import {jwtDecode} from "jwt-decode";
+import placeholder from "@/assets/img/pages/profile/profile/p.png";
+
+const API = "http://37.27.29.18:8003";
 
 export default function Notification() {
-  const userId = "da937ebd-9342-43fb-a6a0-01ccb2cf5bb2";
+  const [userId, setUserId] = useState(null);
+  const [tab, setTab] = useState("followers"); // "followers" | "following"
+  const [q, setQ] = useState("");
 
-
-  // function parseJwt(token) {
-  //   try {
-  //     const base64Payload = token.split(".")[1];
-  //     const payload = atob(base64Payload);
-  //     return JSON.parse(payload);
-  //   } catch (e) {
-  //     return null;
-  //   }
-  // }
- 
-
-  // const authToken = localStorage.getItem("authToken");
-  // const payload = parseJwt(authToken);
-  // const userId = payload?.sub || ""; // или как называется поле в вашем токене
-
-
-
-
-  const { data: subscribersData, isLoading: loadingSubs, refetch: refetchSubs } =
-    useGetSubscribersQuery(userId);
-
-  const { data: postsData, isLoading: loadingPosts } =
-    useGetFollowingPostsQuery();
-
-  const [likePost] = useLikePostMutation();
-  const [addComment] = useAddCommentMutation();
-  const [addStoryView] = useAddStoryViewMutation();
-  const [deleteSub] = useDeleteSubscriberMutation();
-
-  const [commentText, setCommentText] = useState("");
-
-  if (loadingSubs || loadingPosts) return <p>Загрузка...</p>;
-
-  const subscribers = subscribersData?.data || [];
-  const posts = postsData?.data || [];
-
-  // Функция удаления подписчика
-  async function deleteID(userIdToDelete) {
+  // Берём userId из токена
+  useEffect(() => {
     try {
-      await deleteSub(userIdToDelete).unwrap();
-      refetchSubs(); // Навсозии рӯйхат
-    } catch (err) {
-      console.error("Ошибка удаления подписчика:", err);
+      const token = localStorage.getItem("authToken");
+      if (!token) return;
+      const decoded = jwtDecode(token);
+      const uid =
+        decoded?.sid || decoded?.nameid || decoded?.userId || decoded?.id;
+      if (uid) setUserId(uid);
+    } catch (e) {
+      console.error("Ошибка декодирования токена", e);
     }
-  }
+  }, []);
+
+  // RTK Query хуки
+  const {
+  data: subscrData,
+  isLoading: loadingFollowers,
+  isError: errorFollowers,
+  refetch: refetchFollowers,
+} = useGetSubscribersQuery(userId, { skip: !userId });
+
+  const {
+    data: subscrsData,
+    isLoading: loadingFollowing,
+    isError: errorFollowing,
+    refetch: refetchFollowing,
+  } = useGetSubscriptionsQuery(userId, { skip: !userId });
+
+  // Мутации
+  const [followUser, { isLoading: followingInFlight }] = useFollowUserMutation();
+  const [unfollowUser, { isLoading: unfollowingInFlight }] =
+    useUnfollowUserMutation();
+
+  const followers = subscrData?.data || [];
+  const following = subscrsData?.data || [];
+
+  // set из id, на кого уже подписан
+  const subscribedIds = useMemo(
+    () => new Set(following.map((u) => u?.userShortInfo?.userId)),
+    [following]
+  );
+
+  const list = tab === "followers" ? followers : following;
+
+  const filtered = useMemo(() => {
+    const s = q.trim().toLowerCase();
+    if (!s) return list;
+    return list.filter((item) =>
+      (item?.userShortInfo?.userName || "").toLowerCase().includes(s)
+    );
+  }, [list, q]);
+
+  const onFollow = async (targetId) => {
+    try {
+      await followUser(targetId).unwrap();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const onUnfollow = async (targetId) => {
+    try {
+      await unfollowUser(targetId).unwrap();
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   return (
-    <div className="p-4 space-y-6">
-      {/* Новые подписчики */}
-      <section>
-        <h2 className="text-lg font-bold mb-2">Новые подписчики</h2>
-        {subscribers.length === 0 ? (
-          <p>Нет новых подписчиков</p>
-        ) : (
-          subscribers.map((sub) => (
-            <div key={sub.id} className="border p-2 rounded mb-2 flex justify-between">
-              <div>
-                <p className="font-medium">
-                  {sub.userShortInfo.userName}
-                </p>
-                <p className="text-[gray]">Folowed you</p>
-              </div>
-              <div className="flex gap-[20px]">
-
-                <button onClick={() => deleteID(sub.userShortInfo.userId)} className="bg-red-500 text-white rounded-[5px] px-[20px] py-[5px]">Delete</button>
-                <button className="px-[20px] py-[5px] rounded-[5px] bg-blue-300 text-blue-700">Follow</button>
-              </div>
+    <div className="w-full max-w-xl bg-white rounded-2xl border border-gray-200">
+      {!userId ? (
+        <p className="p-4">Идёт загрузка токена…</p>
+      ) : (
+        <>
+          {/* Заголовок и табы */}
+          <div className="flex items-center justify-between px-4 py-3 border-b">
+            <div className="font-semibold">Followers / Following</div>
+            <div className="flex gap-2">
+              <button className={`px-3 py-1 rounded ${ tab === "followers" ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-700" }`}
+                onClick={() => setTab("followers")}
+              >
+                Followers ({followers.length})
+              </button>
+              <button className={`px-3 py-1 rounded ${
+                  tab === "following" ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-700" }`}
+                onClick={() => setTab("following")}
+              >
+                Following ({following.length})
+              </button>
             </div>
-          ))
-        )}
-      </section>
+          </div>
 
-      <section>
-        <h2 className="text-lg font-bold mb-2">Новые посты от подписок</h2>
-        {posts.length === 0 ? (<p>Нет новых постов</p>) : (
-          posts.map((post) => (
-            <div key={post.id} className="border p-2 rounded mb-2">
-              <p className="font-medium">{post.description}</p>
-              <div className="flex gap-2 mt-2">
-                <button className="px-3 py-1 bg-blue-500 text-white rounded" onClick={() => likePost(post.id)}>Лайк</button>
-                <button className="px-3 py-1 bg-green-500 text-white rounded" onClick={() => addStoryView(post.storyId)}>Смотреть сторис</button>
-              </div>
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                addComment({ postId: post.id, text: commentText });
-                setCommentText("");
-              }} className="mt-2 flex gap-2">
-                <input type="text" placeholder="Комментарий..." value={commentText} onChange={(e) => setCommentText(e.target.value)} className="border p-1 flex-1" />
-                <button type="submit" className="px-3 py-1 bg-purple-500 text-white rounded">Отправить</button>
-              </form>
-            </div>
-          ))
-        )}
-      </section>
+          {/* Поиск */}
+          <div className="px-4 py-3 border-b">
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search…" className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+
+          {/* Список */}
+          <div className="max-h-[420px] overflow-y-auto p-3 space-y-3">
+            {(loadingFollowers && tab === "followers") ||
+            (loadingFollowing && tab === "following") ? (
+              <p className="text-gray-500 px-1">Загрузка…</p>
+            ) : (errorFollowers && tab === "followers") ||
+              (errorFollowing && tab === "following") ? (
+              <p className="text-red-600 px-1">Ошибка загрузки</p>
+            ) : filtered.length === 0 ? (
+              <p className="text-gray-500 px-1">Пусто</p>
+            ) : (
+              filtered.map((row) => {
+                const u = row?.userShortInfo || {};
+                const photo = u.userPhoto
+                  ? `${API}/images/${u.userPhoto}`
+                  : placeholder.src;
+                const isFollowing = subscribedIds.has(u.userId);
+
+                return (
+                  <div
+                    key={u.userId}
+                    className="flex items-center justify-between gap-3 px-1"
+                  >
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={photo}
+                        alt={u.userName}
+                        width={40}
+                        height={40}
+                        className="rounded-full object-cover"
+                      />
+                      <div className="leading-tight">
+                        <div className="font-medium">{u.userName}</div>
+                      </div>
+                    </div>
+
+                    {!isFollowing ? (
+                      <button  className="px-3 py-1.5 rounded bg-blue-600 text-white disabled:opacity-60"  onClick={() => onFollow(u.userId)}  disabled={followingInFlight}
+                      >
+                        Подписаться
+                      </button>
+                    ) : (
+                      <button
+                        className="px-3 py-1.5 rounded bg-gray-200 disabled:opacity-60"
+                        onClick={() => onUnfollow(u.userId)}
+                        disabled={unfollowingInFlight}
+                      >
+                        Отписаться
+                      </button>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="px-4 py-2 border-t flex justify-end gap-2">
+            <button
+              className="px-3 py-1.5 rounded bg-gray-100"
+              onClick={() => {
+                if (tab === "followers") refetchFollowers();
+                else refetchFollowing();
+              }}
+            >
+              Обновить
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }

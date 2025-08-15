@@ -1,3 +1,5 @@
+
+
 import { configureStore } from "@reduxjs/toolkit";
 import { chatApi } from "@/store/pages/chat/pages/storeApi";
 import { authApi } from "./pages/auth/registration/registerApi";
@@ -29,7 +31,6 @@ export const store = configureStore({
       .concat(ReelsApi.middleware)
       .concat(settingApi.middleware)
       .concat(notificationApi.middleware)
-
       .concat(exploreApi.middleware) // 🔹 добавили exploreApi middleware
 
 });
