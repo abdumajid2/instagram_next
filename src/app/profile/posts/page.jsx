@@ -7,13 +7,22 @@ import { Navigation, Scrollbar } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/scrollbar'
-import { FaRegComment, FaRegHeart, FaShare } from 'react-icons/fa6'
-import { Avatar, Input, Button } from 'antd'
+import { FaRegComment, FaRegHeart } from 'react-icons/fa6'
 import { LiaTelegramPlane } from "react-icons/lia";
+import { Avatar, Input, Button } from 'antd'
+import p from '../../../assets/img/pages/profile/profile/p.png' // дефолтный аватар
+
 const Posts = () => {
   const { data: postsData, isLoading, isError } = useGetMyPostsQuery()
   const posts = postsData || []
   const [selectedPost, setSelectedPost] = useState(null)
+
+const getImageUrl = (fileName) => {
+  if (!fileName) return p.src
+  if (fileName.startsWith('http')) return fileName
+  return `http://37.27.29.18:8003/images/${fileName}`
+}
+
 
   if (isLoading) return <p>Загрузка постов...</p>
   if (isError) return <p>Ошибка при загрузке постов</p>
@@ -22,7 +31,7 @@ const Posts = () => {
   return (
     <>
       {/* Сетка постов */}
-      <div className="w-full flex flex-wrap gap-2">
+      <div className="w-full flex flex-wrap gap-3">
         {posts.map((post) => (
           <div
             key={post.postId}
@@ -35,7 +44,7 @@ const Posts = () => {
                 alt="post preview"
                 width={200}
                 height={200}
-                className="rounded-lg object-cover"
+                className="rounded-lg object-cover w-[200px] h-[250px]"
               />
             )}
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-6 transition-opacity duration-300 text-white font-semibold text-lg">
@@ -54,7 +63,7 @@ const Posts = () => {
       {selectedPost && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center">
           <div className="bg-white w-[90%] h-[90%] flex rounded-xl overflow-hidden relative">
-            
+
             {/* Левая часть — фото/слайдер */}
             <div className="w-[60%] bg-black flex items-center justify-center">
               {selectedPost.images?.length > 1 ? (
@@ -69,9 +78,9 @@ const Posts = () => {
                       <Image
                         src={`http://37.27.29.18:8003/images/${img}`}
                         alt={`slide-${idx}`}
-                        width={800}
-                        height={800}
-                        className="object-contain max-h-full"
+                        width={600}
+                        height={600}
+                        className="object-contain w-[100%] h-[100%] max-h-[90vh] mx-auto"
                       />
                     </SwiperSlide>
                   ))}
@@ -81,9 +90,9 @@ const Posts = () => {
                   <Image
                     src={`http://37.27.29.18:8003/images/${selectedPost.images[0]}`}
                     alt="post"
-                    width={800}
-                    height={800}
-                    className="object-contain max-h-full"
+                    width={600}
+                    height={600}
+                    className="object-contain w-[100%] h-[100%] max-h-[90vh] mx-auto"
                   />
                 )
               )}
@@ -91,20 +100,19 @@ const Posts = () => {
 
             {/* Правая часть — инфо и комментарии */}
             <div className="w-[40%] flex flex-col border-l border-gray-200">
-              
-              {/* Заголовок с аватаром, именем и датой */}
+
+              {/* Заголовок с аватаром */}
               <div className="flex items-center gap-3 p-4 border-b border-gray-200">
-                <Avatar size={40} src={selectedPost.userImage} />
+                <Avatar size={40} src={getImageUrl(selectedPost.userImage)} />
                 <div className="flex flex-col">
                   <span className="font-semibold">{selectedPost.userName}</span>
-                  
                 </div>
               </div>
 
               {/* Комментарии и описание */}
               <div className="flex-1 overflow-y-auto p-4 space-y-3 text-sm">
                 <div className="flex items-start gap-2">
-                  <Avatar size={32} src={selectedPost.userImage} />
+                  <Avatar size={36} src={getImageUrl(selectedPost.userImage)} />
                   <div className="flex flex-col">
                     <span className="font-semibold">{selectedPost.userName}</span> {selectedPost.content}
                     <div className="text-xs text-gray-400">
@@ -114,14 +122,15 @@ const Posts = () => {
                 </div>
 
                 {selectedPost.comments.map((comment) => (
-                  <div key={comment.postCommentId} className="flex  items-start gap-2">
-                    <Avatar size={32} src={comment.userImage} />
-                    <div className="flex w-[90%]   flex-col">
-                      <div className="flex  items-center justify-between gap-1">
+                  <div key={comment.postCommentId} className="flex items-start gap-2">
+                 <Avatar size={36} src={getImageUrl(comment.userImage)} />
+
+                    <div className="flex w-[90%] flex-col">
+                      <div className="flex items-center justify-between gap-1">
                         <span className="font-bold">{comment.userName}</span>
                         <FaRegHeart className="text-red-500 cursor-pointer" size={14} />
                       </div>
-                      <div className='break-words  w-[90%]'>{comment.comment}</div>
+                      <div className='break-words'>{comment.comment}</div>
                       <div className="text-xs text-gray-400">
                         {new Date(comment.dateCommented).toLocaleString()}
                       </div>
@@ -131,15 +140,16 @@ const Posts = () => {
               </div>
 
               {/* Лайки и кнопки поста */}
-              <div className="p-4 border-t border-gray-200  flex flex-col items-start gap-[10px]">
-                <div className='flex items-start gap-[20px]'>  <FaRegHeart size={24} className="cursor-pointer" />
-                <FaRegComment size={24} className="cursor-pointer" />
-                <LiaTelegramPlane  size={24} className="cursor-pointer" /> </div>
-               
-                <span className=" font-semibold">{selectedPost.postLikeCount} отметок "Нравится"</span>
+              <div className="p-4 border-t border-gray-200 flex flex-col items-start gap-3">
+                <div className='flex items-center gap-4'>
+                  <FaRegHeart size={24} className="cursor-pointer" />
+                  <FaRegComment size={24} className="cursor-pointer" />
+                  <LiaTelegramPlane size={24} className="cursor-pointer" />
+                </div>
+                <span className="font-semibold">{selectedPost.postLikeCount} отметок "Нравится"</span>
                 <span className="text-xs text-gray-500">
-                    Posted on: {new Date(selectedPost.datePublished).toLocaleString()}
-                  </span>
+                  Posted on: {new Date(selectedPost.datePublished).toLocaleString()}
+                </span>
               </div>
 
               {/* Поле для ввода комментария */}
