@@ -1,10 +1,16 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
-import { useGetChatsQuery, useGetUsersQuery } from "@/store/pages/chat/pages/storeApi";
+import { useState } from "react";
+import { useDeleteChatMutation,useGetChatsQuery,useGetUsersQuery,} from "@/store/pages/chat/pages/storeApi";
 import mess from "@/assets/img/pages/chat/pages/default-chat/mess.svg";
 import Image from "next/image";
-import { BsPencilSquare } from "react-icons/bs";
+import {
+  BsPencilSquare,
+  BsThreeDotsVertical,
+  BsTrash,
+  BsCameraVideo,
+} from "react-icons/bs";
+import { FaChevronDown } from "react-icons/fa";
 
 function ChatSkeleton() {
   return (
@@ -18,11 +24,9 @@ function ChatSkeleton() {
   );
 }
 
-
 function getUserNameFromToken() {
   const token = localStorage.getItem("authToken");
   if (!token) return "User";
-
   try {
     const payload = token.split(".")[1];
     const decoded = JSON.parse(atob(payload));
@@ -31,6 +35,56 @@ function getUserNameFromToken() {
     console.error("Ошибка при декодировании токена", e);
     return "User";
   }
+}
+
+function ChatActionModal({ chatId, onDeleteChat }) {
+	const [showModal, setShowModal] = useState(false);
+	
+	
+	const [deleteChat] = useDeleteChatMutation();
+	const handleDelete = async () => {
+    try {
+      await deleteChat(chatId).unwrap(); 
+      setShowModal(false);
+      
+      if (onDeleteChat) onDeleteChat(chatId); 
+    } catch (err) {
+      console.error("Ошибка удаления:", err);
+      
+    }
+  };
+  const handleVideoCall = () => {
+   
+    setShowModal(false);
+  };
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setShowModal(!showModal)}
+        className="p-2 rounded-full hover:bg-gray-200"
+      >
+        <BsThreeDotsVertical size={20} />
+      </button>
+
+      {showModal && (
+        <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+          <button
+            onClick={handleDelete}
+            className="flex items-center w-full px-4 py-2 text-red-600 hover:bg-gray-100 rounded-t-lg"
+          >
+            <BsTrash className="mr-2" /> Удалить чат
+          </button>
+          <button
+            onClick={handleVideoCall}
+            className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-b-lg"
+          >
+            <BsCameraVideo className="mr-2" /> Видеозвонок
+          </button>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function MessengerApp() {
@@ -43,7 +97,6 @@ export default function MessengerApp() {
 
   const userName = getUserNameFromToken();
 
-
   const chatList = (chatsData?.data || []).map((chat) => ({
     ...chat,
     chatId: chat.chatId || chat.id,
@@ -52,10 +105,7 @@ export default function MessengerApp() {
   }));
 
   const handleChatClick = (chat) => {
-    if (!chat.chatId || !chat.receiveUserName) {
-      console.error("Некорректный ID или имя пользователя", chat);
-      return;
-    }
+    if (!chat.chatId || !chat.receiveUserName) return;
     const query = `?name=${encodeURIComponent(
       chat.receiveUserName
     )}&avatar=${encodeURIComponent(chat.receiveUserImage || "")}`;
@@ -70,9 +120,13 @@ export default function MessengerApp() {
     setShowModal(false);
   };
 
+  const handleDeleteChat = (chatId) => {
+    alert(`Чат ${chatId} удалён (сюда добавьте вызов deleteChat из RTK Query)`);
+  };
+
   return (
     <div className="flex h-screen bg-gray-100 antialiased text-gray-800">
-      
+     
       <button
         onClick={() => setShowSidebar(true)}
         className="md:hidden fixed top-4 left-4 z-50 bg-blue-600 text-white p-2 rounded-full shadow-lg"
@@ -101,10 +155,12 @@ export default function MessengerApp() {
                 : chatList.map((chat) => (
                     <li
                       key={chat.chatId}
-                      onClick={() => handleChatClick(chat)}
-                      className="flex items-center space-x-3 cursor-pointer p-3 rounded-lg hover:bg-gray-100"
+                      className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100"
                     >
-                      <div className="relative">
+                      <div
+                        className="flex items-center space-x-3 cursor-pointer"
+                        onClick={() => handleChatClick(chat)}
+                      >
                         <img
                           src={
                             chat.receiveUserImage
@@ -114,16 +170,17 @@ export default function MessengerApp() {
                           alt={chat.receiveUserName}
                           className="w-10 h-10 rounded-full object-cover ring-2 ring-gray-300"
                         />
-                        {chat.isOnline && (
-                          <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
-                        )}
+                        <div>
+                          <p className="font-medium text-gray-800">
+                            {chat.receiveUserName}
+                          </p>
+                          <p className="text-sm text-gray-500">Active Group</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-medium text-gray-800">
-                          {chat.receiveUserName}
-                        </p>
-                        <p className="text-sm text-gray-500">Active Group</p>
-                      </div>
+                      <ChatActionModal
+                        chatId={chat.chatId}
+                        onDeleteChat={handleDeleteChat}
+                      />
                     </li>
                   ))}
             </ul>
@@ -131,21 +188,28 @@ export default function MessengerApp() {
         </div>
       )}
 
-
+    
       <aside className="hidden md:flex flex-col w-80 bg-white border-r border-gray-200 p-4 overflow-y-auto shadow-md">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
-              {userName.slice(0, 2).toUpperCase()}
-            </div>
-            <span className="font-semibold text-gray-700 text-lg">{userName}</span>
+            <span className="font-semibold text-gray-700 text-lg">
+              {userName}
+            </span>
+            <FaChevronDown />
           </div>
           <button
             onClick={() => setShowModal(true)}
-            className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition"
+            className="p-2 rounded-full text-xl font-bold text-blue-700 transition"
             title="Создать чат"
           >
             <BsPencilSquare />
+          </button>
+        </div>
+
+        <div className="flex justify-between mb-6">
+          <p className="text-gray-500">Messages</p>
+          <button className="text-blue-700 hover:text-blue-500 transition font-semibold">
+            Requests
           </button>
         </div>
 
@@ -155,10 +219,12 @@ export default function MessengerApp() {
             : chatList.map((chat) => (
                 <li
                   key={chat.chatId}
-                  onClick={() => handleChatClick(chat)}
-                  className="flex items-center space-x-3 cursor-pointer p-3 rounded-lg hover:bg-gray-100"
+                  className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100"
                 >
-                  <div className="relative">
+                  <div
+                    className="flex items-center space-x-3 cursor-pointer"
+                    onClick={() => handleChatClick(chat)}
+                  >
                     <img
                       src={
                         chat.receiveUserImage
@@ -170,22 +236,32 @@ export default function MessengerApp() {
                       alt={chat.receiveUserName}
                       className="w-10 h-10 rounded-full object-cover ring-2 ring-gray-300"
                     />
-                    {chat.isOnline && (
-                      <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
-                    )}
+                    <div>
+                      <p className="font-medium text-gray-800">
+                        {chat.receiveUserName}
+                      </p>
+                      <p className="text-sm text-gray-500">Active Group</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium text-gray-800">
-                      {chat.receiveUserName}
-                    </p>
-                    <p className="text-sm text-gray-500">Active Group</p>
-                  </div>
+                  <ChatActionModal
+                    chatId={chat.chatId}
+                    onDeleteChat={handleDeleteChat}
+                  />
                 </li>
               ))}
         </ul>
       </aside>
 
-  
+      <div className="flex-1 flex flex-col gap-6 items-center md:w-180 h-screen justify-center text-gray-500">
+        <Image src={mess} width={150} height={150} alt="mess" />
+        <p className="text-xl font-bold">Your messages</p>
+        <p>Send private photos and messages to a friend or group</p>
+        <button className="rounded-lg bg-[#3B82F6] px-7 py-3 text-white font-bold">
+          Send message
+        </button>
+      </div>
+
+      
       {showModal && (
         <div
           className="fixed inset-0 flex items-center justify-center z-50"
@@ -195,7 +271,9 @@ export default function MessengerApp() {
             className="bg-white rounded-lg p-6 w-80 max-h-[80vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-lg font-semibold mb-4">Выберите пользователя</h3>
+            <h3 className="text-lg font-semibold mb-4">
+              Выберите пользователя
+            </h3>
             <ul className="space-y-2">
               {users.map((user) => (
                 <li
@@ -220,23 +298,15 @@ export default function MessengerApp() {
                     alt={user.fullName}
                     className="w-8 h-8 rounded-full object-cover ring-1 ring-gray-300"
                   />
-                  <span className="font-medium text-gray-800">{user.fullName}</span>
+                  <span className="font-medium text-gray-800">
+                    {user.fullName}
+                  </span>
                 </li>
               ))}
             </ul>
           </div>
         </div>
       )}
-
-
-      <div className="flex-1 flex flex-col gap-6 items-center md:w-180 h-screen justify-center text-gray-500">
-        <Image src={mess} width={150} height={150} alt="mess" />
-        <p className="text-xl font-bold">Your messages</p>
-        <p>Send private photos and messages to a friend or group</p>
-        <button className="rounded-lg bg-[#3B82F6] px-7 py-3 text-white font-bold">
-          Send message
-        </button>
-      </div>
     </div>
   );
 }

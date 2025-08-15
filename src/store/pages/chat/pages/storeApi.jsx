@@ -20,15 +20,35 @@ export const chatApi = createApi({
       query: () => "Chat/get-chats",
     }),
 
-    
     getChatById: builder.query({
       query: (id) => `Chat/get-chat-by-id?chatId=${id}`,
     }),
 
     getUsers: builder.query({
-        query: () => "User/get-users",
-
+      query: () => "User/get-users",
     }),
+
+    deleteMessage: builder.mutation({
+      query: (messageId) => ({
+        url: `Chat/delete-message?massageId=${messageId}`, // <-- исправлено на massageId
+        method: "DELETE",
+      }),
+    }),
+     createChat: builder.mutation({
+      // проверь по swagger, но чаще всего так:
+      // POST /Chat/add-chat?receiveUserId={id}
+      query: (receiveUserId) => ({
+        url: `Chat/add-chat?receiveUserId=${receiveUserId}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Chats"],
+    }),
+    deleteChat: builder.mutation({
+  query: (chatId) => ({
+    url: `Chat/delete-chat?chatId=${chatId}`,
+    method: "DELETE",
+  }),
+}),
 
     sendMessage: builder.mutation({
       query: ({ chatId, message, file }) => {
@@ -54,4 +74,7 @@ export const {
   useGetChatByIdQuery,
   useSendMessageMutation,
   useGetUsersQuery,
+  useDeleteMessageMutation,
+  useDeleteChatMutation,
+  useCreateChatMutation,
 } = chatApi;
