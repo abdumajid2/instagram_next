@@ -46,6 +46,13 @@ export const muslimApi = createApi({
     getStoryById: builder.query({
       query: (userId) => `Story/get-user-stories/${userId}`,
     }),
+    addStory: builder.mutation({
+      query: (  form ) => ({
+        url: `Story/AddStories`,
+        method: "POST",
+        body: form,
+      }),
+    }),
   }),
 });
 
@@ -57,4 +64,5 @@ export const {
   useGetStoriesQuery,
   useAddFollowMutation,
   useGetStoryByIdQuery,
+  useAddStoryMutation,
 } = muslimApi;
