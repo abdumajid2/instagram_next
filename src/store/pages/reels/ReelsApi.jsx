@@ -35,6 +35,19 @@ export const ReelsApi = createApi({
         body: reels
       }),
     }),
+    addComment: builder.mutation({
+      query: (comment) => ({
+        url: `Post/add-comment`,
+        method: "POST",
+        body: comment
+      }),
+    }),
+    deleteComment: builder.mutation({
+      query: (id) => ({
+        url: `Post/delete-comment?commentId=${id}`,
+        method: "DELETE"
+      }),
+    }),
   }),
 });
 export const {
@@ -42,5 +55,6 @@ export const {
   useAddLikeMutation,
   useFollowMutation,
   useAddToFavoriteMutation,
-
+  useAddCommentMutation,
+  useDeleteCommentMutation,
 } = ReelsApi;
