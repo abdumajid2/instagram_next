@@ -20,7 +20,7 @@ const Search = () => {
 	let [findUserModal, setFindUserModal] = useState(false)
 	let [findUserImg, setFindUserImg] = useState(null)
 	let [findUserName, setFindUserName] = useState('')
-	let [findUserFullName, setFindUserFullName] = useState("")
+	let [findUserFullName, setFindUserFullName] = useState('')
 	let [findUserFollow, setFindUserFollow] = useState(null)
 	let [findUserId, setFindUserId] = useState(null)
 
@@ -112,64 +112,65 @@ const Search = () => {
 			)}
 
 			{findUserModal && (
-				<div className='bg-white shadow-lg rounded-xl p-6 w-[600px] lg:ml-[35%]'>
-					<div className='flex flex-col items-center'>
-						<img
-							src={
-								findUserImg
-									? `http://37.27.29.18:8003/images/${findUserImg}`
-									: userImg.src
-							}
-							alt=''
-							className='w-32 h-32 rounded-full object-cover border-4 border-blue-100'
-						/>
-						<h1 className='text-2xl font-bold mt-4'>{findUserName}</h1>
-						<h3 className='text-lg text-gray-500'>{findUserFullName}</h3>
-						<p className='text-sm text-gray-400 mt-1'>
-							Подписчиков: <b>{findUserFollow}</b>
-						</p>
-						<div className='flex justify-between items-center'>
-							<button
-								onClick={() => subscribe(findUserId)}
-								className='mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition'
-							>
-								Подписаться
-							</button>
-							<button
-								onClick={() => unfollow(findUserId)}
-								className='mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition'
-							>
-								Отписаться
-							</button>
-						</div>
-					</div>
-
-					<div className='mt-8'>
-						<h2 className='text-xl font-semibold mb-4'>Подписчики</h2>
-						<div className='grid grid-cols-2 gap-4'>
-							{subscribersData?.data?.map(el => (
-								<div
-									key={el.userShortInfo.id}
-									className='flex items-center gap-3 bg-gray-50 p-3 rounded-lg shadow-sm hover:shadow-md transition'
+				<div className='fixed inset-0 flex justify-center items-center z-10'>
+					<div className='bg-gray-50 shadow-lg rounded-xl p-4 lg:p-6 w-[95%] max-w-[600px] max-h-screen overflow-y-auto'>
+						<div className='flex flex-col items-center'>
+							<img
+								src={
+									findUserImg
+										? `http://37.27.29.18:8003/images/${findUserImg}`
+										: userImg.src
+								}
+								alt=''
+								className='w-32 h-32 rounded-full object-cover border-4 border-blue-100'
+							/>
+							<h1 className='text-2xl font-bold mt-4'>{findUserName}</h1>
+							<h3 className='text-lg text-gray-500'>{findUserFullName}</h3>
+							<p className='text-sm text-gray-400 mt-1'>
+								Подписчиков: <b>{findUserFollow}</b>
+							</p>
+							<div className='flex gap-2 mt-4'>
+								<button
+									onClick={() => subscribe(findUserId)}
+									className='px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition'
 								>
-									<img
-										src={
-											el.userShortInfo.userPhoto
-												? `http://37.27.29.18:8003/images/${el.userShortInfo.userPhoto}`
-												: userImg.src
-										}
-										alt=''
-										className='w-12 h-12 rounded-full object-cover'
-									/>
-									<div>
-										<p className='font-medium'>{el.userShortInfo.userName}</p>
-										<p className='text-sm text-gray-500'>
-											{el.userShortInfo.fullname}
-										</p>
-										<p>{el.userShortInfo.id}</p>
+									Подписаться
+								</button>
+								<button
+									onClick={() => unfollow(findUserId)}
+									className='px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition'
+								>
+									Отписаться
+								</button>
+							</div>
+						</div>
+
+						<div className='mt-8'>
+							<h2 className='text-xl font-semibold mb-4'>Подписчики</h2>
+							<div className='grid grid-cols-2 gap-4'>
+								{subscribersData?.data?.map(el => (
+									<div
+										key={el.userShortInfo.id}
+										className='flex items-center gap-3 bg-gray-50 p-3 rounded-lg shadow-sm hover:shadow-md transition'
+									>
+										<img
+											src={
+												el.userShortInfo.userPhoto
+													? `http://37.27.29.18:8003/images/${el.userShortInfo.userPhoto}`
+													: userImg.src
+											}
+											alt=''
+											className='w-12 h-12 rounded-full object-cover'
+										/>
+										<div>
+											<p className='font-medium'>{el.userShortInfo.userName}</p>
+											<p className='text-sm text-gray-500'>
+												{el.userShortInfo.fullname}
+											</p>
+										</div>
 									</div>
-								</div>
-							))}
+								))}
+							</div>
 						</div>
 					</div>
 				</div>
