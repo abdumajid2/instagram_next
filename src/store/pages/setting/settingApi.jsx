@@ -5,13 +5,16 @@ export const settingApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: "http://37.27.29.18:8003",
     prepareHeaders: (headers) => {
-      headers.set(
-        "Authorization",
-        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaWQiOiJjOGZmNDU3OC0wYzM5LTQxOTgtYmVjYy1jZjU3YTIzYzA4MzMiLCJuYW1lIjoidmp4aW5nIiwiZW1haWwiOiJBbGlha2JhckBnbWFpbC5jb20iLCJzdWIiOiIiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJVc2VyIiwiZXhwIjoxNzU1MTUwMDcwLCJpc3MiOiJpbnN0YWdyYW0tZ3JvdXAiLCJhdWQiOiJpbnN0YWdyYW0tYXBpIn0.G0DVjYa0X-KVvWFHC4rxt0F49wBr-4_UwLfk6MaLt7A" // вставь сюда токен
-      );
+      if (typeof window !== "undefined") { // проверка, что мы в браузере
+        const token = localStorage.getItem("authToken");
+        if (token) {
+          headers.set("Authorization", `Bearer ${token}`);
+        }
+      }
       return headers;
     },
   }),
+
   endpoints: (builder) => ({
     getUsersForSearch: builder.query({
       query: ({ pageNumber = 1, pageSize = 9999 } = {}) => ({
@@ -23,7 +26,35 @@ export const settingApi = createApi({
         },
       }),
     }),
+
+    getSubscribers: builder.query({
+      query: (id) => ({
+        url: `/FollowingRelationShip/get-subscribers?UserId=${id}`,
+        method: "GET",
+      })
+    }),
+
+    followToUser: builder.mutation({
+      query: (id) => ({
+        url: `/FollowingRelationShip/add-following-relation-ship?followingUserId=${id}`,
+        method: "POST"
+      })
+    }),
+
+    getFavoritePost: builder.query({
+      query: () => ({
+        url: `/UserProfile/get-post-favorites?PageNumber=1&PageSize=999`,
+        method: "GET"
+      })
+    }),
+
+    unfollowToUser: builder.mutation({
+      query: (id) => ({
+        url: `/FollowingRelationShip/delete-following-relation-ship?followingUserId=${id}`,
+        method: "DELETE"
+      })
+    })
   }),
 });
 
-export const { useGetUsersForSearchQuery } = settingApi;
+export const { useGetUsersForSearchQuery, useGetSubscribersQuery, useFollowToUserMutation, useGetFavoritePostQuery, useUnfollowToUserMutation } = settingApi;

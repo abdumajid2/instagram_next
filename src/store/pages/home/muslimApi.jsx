@@ -43,14 +43,40 @@ export const muslimApi = createApi({
         method: "POST",
       }),
     }),
+    deleteFollow: builder.mutation({
+      query: (followingUserId) => ({
+        url: `FollowingRelationShip/delete-following-relation-ship?followingUserId=${followingUserId}`,
+        method: "DELETE",
+      }),
+    }),
     getStoryById: builder.query({
       query: (userId) => `Story/get-user-stories/${userId}`,
     }),
     addStory: builder.mutation({
-      query: (  form ) => ({
+      query: (form) => ({
         url: `Story/AddStories`,
         method: "POST",
         body: form,
+      }),
+    }),
+    isFollower: builder.query({
+      query: (followingUserId) =>
+        `UserProfile/get-is-follow-user-profile-by-id?followingUserId=${followingUserId}`,
+    }),
+    addPostFavorite: builder.mutation({
+      query: (postId) => ({
+        url: "Post/add-post-favorite",
+        method: "POST",
+        body: { postId },
+      }),
+    }),
+    getUsers: builder.query({
+      query: () => "User/get-users",
+    }),
+    deleteComment: builder.mutation({
+      query: (commentId) => ({
+        url: `Post/delete-comment?commentId=${commentId}`,
+        method: "DELETE",
       }),
     }),
   }),
@@ -63,6 +89,11 @@ export const {
   useAddLikePostMutation,
   useGetStoriesQuery,
   useAddFollowMutation,
+  useDeleteFollowMutation,
   useGetStoryByIdQuery,
   useAddStoryMutation,
+  useIsFollowerQuery,
+  useAddPostFavoriteMutation,
+  useGetUsersQuery,
+  useDeleteCommentMutation,
 } = muslimApi;
