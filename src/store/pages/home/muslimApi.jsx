@@ -53,12 +53,17 @@ export const muslimApi = createApi({
       query: (userId) => `Story/get-user-stories/${userId}`,
     }),
     addStory: builder.mutation({
+
       query: (form) => ({
+
+      query: (  form ) => ({
+
         url: `Story/AddStories`,
         method: "POST",
         body: form,
       }),
     }),
+
     isFollower: builder.query({
       query: (followingUserId) =>
         `UserProfile/get-is-follow-user-profile-by-id?followingUserId=${followingUserId}`,
@@ -79,6 +84,7 @@ export const muslimApi = createApi({
         method: "DELETE",
       }),
     }),
+
   }),
 });
 
@@ -92,8 +98,10 @@ export const {
   useDeleteFollowMutation,
   useGetStoryByIdQuery,
   useAddStoryMutation,
+
   useIsFollowerQuery,
   useAddPostFavoriteMutation,
   useGetUsersQuery,
   useDeleteCommentMutation,
+
 } = muslimApi;

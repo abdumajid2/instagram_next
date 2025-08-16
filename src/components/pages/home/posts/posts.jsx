@@ -30,6 +30,7 @@ import { video } from "@/assets/icon/layout/svg";
 import Story from "../stories/story";
 import { Navigation, Pagination } from "swiper/modules";
 import PendingAnimation from "./PendingAnimation";
+
 import { GoTrash } from "react-icons/go";
 
 const Posts = () => {
@@ -155,6 +156,7 @@ const Posts = () => {
     }
   }
 
+
   async function deleteOldFollower(id) {
     try {
       await deleteFollow(id);
@@ -183,11 +185,16 @@ const Posts = () => {
     }
   }
 
+
   if (isLoading) return <PendingAnimation />;
 
   if (isError) return <ErrorAnimation />;
   return (
+
     <div className="md:w-[50%] mx-auto flex flex-col gap-7">
+
+    <div className="md:w-[60%] mx-auto flex flex-col gap-7">
+
       <Story />
 
       {/* // modalComments  */}
@@ -417,12 +424,22 @@ const Posts = () => {
               </div>
             </section>
             <div className="flex items-center gap-3 ">
+
               <div>
                 <HiOutlineDotsHorizontal
                   onClick={() => followerModal(e)}
                   className="cursor-pointer hover:text-gray-600 text-xl"
                 />
               </div>
+
+              <button
+                onClick={() => addNewFollower(e.userId)}
+                className={`text-blue-900 text-[16px] font-semibold hover:opacity-65 transition-colors delay-75  rounded bg-white py-2 px-10 border-1 border-blue-600`}
+              >
+                Subscribe
+              </button>
+              {/* <HiOutlineDotsHorizontal /> */}
+
             </div>
           </div>
           <div className="mt-4">
@@ -440,17 +457,29 @@ const Posts = () => {
                   <SwiperSlide>
                     <div
                       key={i}
+
                       className="w-full md:max-h-[600px] min-h-[400px] h-full flex items-center justify-center bg-black "
+
+                      className="w-full h-full flex items-center justify-center bg-black rounded-xl"
+
                     >
                       {isVideo ? (
                         <video
                           src={`${imgUrl}${file}`}
                           controls
+
                           className="min-h-[200px] rounded"
                         />
                       ) : (
                         <img
                           className="min-h-[200px]  rounded"
+
+                          className="w-full md:max-h-[500px] object-contain rounded-xl"
+                        />
+                      ) : (
+                        <img
+                          className="w-full md:max-h-[500px] bg-gray-200 rounded-xl"
+
                           src={`${imgUrl}${file}`}
                           alt="image"
                         />

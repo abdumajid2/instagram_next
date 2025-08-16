@@ -59,6 +59,7 @@ const AddStory = () => {
   return (
     <div>
       <Modal
+
         title={null}
         closable={false}
         open={isModalOpen}
@@ -104,6 +105,33 @@ const AddStory = () => {
             disabled={!file}
           >
             Share to Story
+
+        title="Add Story"
+        closable={{ "aria-label": "Custom Close Button" }}
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer={null}
+      >
+        <form onSubmit={addNewStory} className="flex flex-col gap-3">
+          <input
+            type="file"
+            name="inpAddImage"
+            accept="image/*"
+            onChange={handleFileChange}
+          />
+
+          {preview && (
+            <img
+              src={preview}
+              alt="Preview"
+              className="max-h-60 object-contain rounded  p-1"
+            />
+          )}
+
+          <Button htmlType="submit" type="primary" disabled={!file}>
+            Add
+
           </Button>
         </form>
       </Modal>
