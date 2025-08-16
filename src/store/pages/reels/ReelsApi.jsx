@@ -1,5 +1,4 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-// let token = localStorage.getItem("authToken");
 export const ReelsApi = createApi({
   reducerPath: "ReelsApi",
   baseQuery: fetchBaseQuery({
@@ -26,6 +25,12 @@ export const ReelsApi = createApi({
       query: (id) => ({
         url: `FollowingRelationShip/add-following-relation-ship?followingUserId=${id}`,
         method: "POST"
+      }),
+    }),
+    unFollow: builder.mutation({
+      query: (id) => ({
+        url: `FollowingRelationShip/delete-following-relation-ship?followingUserId=${id}`,
+        method: "DELETE"
       }),
     }),
     addToFavorite: builder.mutation({
@@ -57,4 +62,5 @@ export const {
   useAddToFavoriteMutation,
   useAddCommentMutation,
   useDeleteCommentMutation,
+  useUnFollowMutation,
 } = ReelsApi;
