@@ -12,6 +12,7 @@ export const exploreApi = createApi({
       return headers
     },
   }),
+  tagTypes: ["Post", "Following", "Profile"], 
   endpoints: builder => ({
     getPosts: builder.query({
       query: ({ pageNumber = 1, pageSize = 999 } = {}) =>
@@ -33,11 +34,19 @@ export const exploreApi = createApi({
       invalidatesTags: (result, error, postId) => [{ type: "Post", id: postId }],
     }),
 
+    addPostFavorite: builder.mutation({
+      query: (id) => ({
+        url: `/Post/add-post-favorite`,
+        method: "POST",
+        body: id
+      })  
+    }),
+
     addComment: builder.mutation({
-      query: ({ postId, text }) => ({
+      query: ({ postId, comment }) => ({   
         url: `/Post/add-comment`,
         method: "POST",
-        body: { postId, text },
+        body: { postId, comment },
       }),
       invalidatesTags: (result, error, { postId }) => [{ type: "Post", id: postId }],
     }),
@@ -49,7 +58,45 @@ export const exploreApi = createApi({
       }),
       invalidatesTags: [{ type: "Post", id: "LIST" }],
     }),
+
+    getSubscribers: builder.query({
+      query: (userId) => `/FollowingRelationShip/get-subscribers?UserId=${userId}`,
+      providesTags: (_res, _err, userId) => [{ type: 'Following', id: `subs-${userId}` }],
+    }),
+
+    getSubscriptions: builder.query({
+      query: (userId) => `/FollowingRelationShip/get-subscriptions?UserId=${userId}`,
+      providesTags: (_res, _err, userId) => [{ type: 'Following', id: `foll-${userId}` }],
+    }),
+
+    addFollowing: builder.mutation({
+      query: (followingUserId) => ({
+        url: '/FollowingRelationShip/add-following-relation-ship',
+        method: 'POST',
+        params: { followingUserId },
+      }),
+      invalidatesTags: ['Following', 'Profile'],
+    }),
+
+    deleteFollowing: builder.mutation({
+      query: (followingUserId) => ({
+        url: '/FollowingRelationShip/delete-following-relation-ship',
+        method: 'DELETE',
+        params: { followingUserId },
+      }),
+      invalidatesTags: ['Following', 'Profile'],
+    }),
   }),
 })
 
-export const { useGetPostsQuery, useLikePostMutation, useAddCommentMutation, useDeleteCommentMutation } = exploreApi
+export const { 
+  useGetPostsQuery, 
+  useLikePostMutation, 
+  useAddCommentMutation, 
+  useDeleteCommentMutation,
+  useGetSubscribersQuery,
+  useGetSubscriptionsQuery,
+  useAddFollowingMutation,
+  useDeleteFollowingMutation,
+  useAddPostFavoriteMutation
+} = exploreApi
