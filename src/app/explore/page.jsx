@@ -4,7 +4,6 @@ import {
   useGetPostsQuery,
   useLikePostMutation,
   useAddCommentMutation,
-
   useDeleteCommentMutation,
   useAddFollowingMutation,
   useDeleteFollowingMutation,
@@ -15,13 +14,6 @@ import { FaHeart, FaComment, FaTrash, FaTimes } from "react-icons/fa"
 import { MdSlowMotionVideo } from "react-icons/md"
 import EmojiPicker from 'emoji-picker-react'
 
-  useDeleteCommentMutation
-} from "@/store/pages/explore/exploreApi"
-import { FaHeart, FaComment, FaTrash } from "react-icons/fa"
-import { MdSlowMotionVideo } from "react-icons/md";
-import { FaRegImage } from "react-icons/fa";
-
-
 export default function ExplorePage() {
   const { data, isLoading, refetch } = useGetPostsQuery()
   const [selectedPost, setSelectedPost] = useState(null)
@@ -31,7 +23,6 @@ export default function ExplorePage() {
   const [likePost] = useLikePostMutation()
   const [addComment] = useAddCommentMutation()
   const [deleteComment] = useDeleteCommentMutation()
-
   const [addFollowing] = useAddFollowingMutation()
   const [deleteFollowing] = useDeleteFollowingMutation()
   const currentUserId = 1
@@ -44,13 +35,6 @@ export default function ExplorePage() {
     : Array.isArray(subscriptions)
       ? subscriptions
       : []
-
-  const fakeData = [true, false, false, true, false, false, true, false, false];
-
-  const instagramGradient = "bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600"
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
 
   useEffect(() => {
     if (data?.data) {
@@ -65,7 +49,6 @@ export default function ExplorePage() {
     }
   }, [data])
 
-
   useEffect(() => {
     if (selectedPost) {
       const following = subscriptionList.some(
@@ -75,45 +58,16 @@ export default function ExplorePage() {
     }
   }, [selectedPost, subscriptionList])
 
-  function openComment(e) {
-    setInfoId(e.postId);
-    setIsModalOpen(true);
-  }
-  let [inpAddComment, setInpAddComment] = useState("");
-  
-
-  if (isLoading) return <div className="grid grid-cols-3 gap-1 sm:grid-cols-2 md:grid-cols-3 p-[2vh]">
-    {fakeData.map((isVideo, i) => (
-      <div
-        key={i}
-        className="relative w-full aspect-square bg-gray-300 dark:bg-gray-700 animate-pulse rounded-sm"
-      >
-        <div className="absolute top-2 right-2 bg-white/60 p-1 rounded-full text-gray-800">
-          {isVideo ? (
-            <MdSlowMotionVideo size={18} />
-          ) : (
-            <FaRegImage size={16} />
-          )}
-        </div>
-      </div>
-    ))}
-  </div>
-
-
   let [addPostFavorite] = useAddPostFavoriteMutation()
   const handleLike = async (postId) => {
     try {
       await likePost(postId).unwrap()
       setLikedPosts(prev => ({ ...prev, [postId]: !prev[postId] }))
-
       setPostLikes(prev => ({
         ...prev,
         [postId]: likedPosts[postId] ? prev[postId] - 1 : prev[postId] + 1
       }))
       await addPostFavorite(postId)
-
-      setPostLikes(prev => ({ ...prev, [postId]: likedPosts[postId] ? prev[postId] - 1 : prev[postId] + 1 }))
-
     } catch (err) {
       console.error(err)
     }
@@ -124,9 +78,7 @@ export default function ExplorePage() {
     try {
       await addComment({ postId: selectedPost.postId, comment }).unwrap()
       setComment("")
-
       setShowEmojiPicker(false)
-
       await refetch()
     } catch (err) {
       console.error(err)
@@ -137,7 +89,6 @@ export default function ExplorePage() {
     try {
       await deleteComment(commentId).unwrap()
       await refetch()
-
     } catch (err) {
       console.error(err)
     }
@@ -153,17 +104,14 @@ export default function ExplorePage() {
         await addFollowing(selectedPost.userId).unwrap()
         setIsFollowing(true)
       }
-
     } catch (err) {
       console.error(err)
     }
   }
 
-
   const onEmojiClick = (emojiData, event) => {
     setComment(emojiData.emoji)
   }
-
 
   return (
     <>
@@ -173,6 +121,7 @@ export default function ExplorePage() {
           const isVideo = /\.(mp4)$/i.test(firstImage)
           const src = `http://37.27.29.18:8003/images/${firstImage}`
           const isTall = (index + 1) % 3 === 0
+
 
           return (
             <div
@@ -209,26 +158,6 @@ export default function ExplorePage() {
               ) : (
                 <img src={src} alt="Post" className="w-full h-full object-cover" />
               )}
-
-              {isVideo && (
-                <div className="absolute top-2 right-2 bg-black/50 p-1.5 rounded-full text-white">
-                  <MdSlowMotionVideo size={18} />
-                </div>
-              )}
-              <div className="absolute bottom-2 left-2 flex gap-3 bg-black/30 px-2 py-1 rounded">
-                <div
-                  className="flex items-center gap-1 cursor-pointer"
-                  onClick={(e) => { e.stopPropagation(); handleLike(post.postId) }}
-                >
-                  <FaHeart className={likedPosts[post.postId] ? "text-red-500" : "text-white"} />
-                  <span className="text-white text-sm">{postLikes[post.postId]}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <FaComment className="text-white" />
-                  <span className="text-white text-sm">{post.commentCount || 0}</span>
-                </div>
-              </div>
-
             </div>
           )
         })}
@@ -241,11 +170,7 @@ export default function ExplorePage() {
               {/\.(mp4)$/i.test(selectedPost.images?.[0]) ? (
                 <video
                   src={`http://37.27.29.18:8003/images/${selectedPost.images[0]}`}
-
                   className="max-w-full w-[90%] h-[90%] max-h-full rounded-[5px]"
-
-                  className="max-h-full rounded-[5px] max-w-full object-cover"
-
                   controls
                   autoPlay
                 />
@@ -253,15 +178,10 @@ export default function ExplorePage() {
                 <img
                   src={`http://37.27.29.18:8003/images/${selectedPost.images[0]}`}
                   alt="Post"
-
                   className="max-w-full w-[90%] h-[90%] max-h-full rounded-[5px]"
-
-                  className="max-h-full rounded-[5px] max-w-full object-contain"
-
                 />
               )}
             </div>
-
 
 
 
@@ -290,21 +210,6 @@ export default function ExplorePage() {
                 </button>
               </div>
 
-            <div className="w-[350px] flex flex-col border border-[gainsboro]">
-              <div className="p-4 flex items-center gap-3 border-b border-[gainsboro]">
-                {selectedPost.userImage ? (
-                  <img
-                    src={`http://37.27.29.18:8003/${selectedPost.userImage}`}
-                    alt={selectedPost.userName}
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className={`w-10 h-10 rounded-full ${instagramGradient} flex items-center justify-center`}>
-                    <span className="text-white font-bold">{selectedPost.userName?.[0] || "U"}</span>
-                  </div>
-                )}
-                <span className="font-semibold">{selectedPost.userName || "User"}</span>
-              </div>
 
               <div className="p-4 flex items-center gap-4 border-b border-[gainsboro]">
                 <div className="flex items-center gap-2 cursor-pointer" onClick={() => handleLike(selectedPost.postId)}>
@@ -321,16 +226,12 @@ export default function ExplorePage() {
                   <div key={c.commentId} className="flex items-start gap-2">
                     {c.userImage ? (
                       <img
-                        src={c.userImage ? `http://37.27.29.18:8003/${c.userImage}` : defaultAvatar}
+                        src={`http://37.27.29.18:8003/${c.userImage}`}
                         alt={c.userName}
                         className="w-8 h-8 rounded-full object-cover"
                       />
                     ) : (
-
                       <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 flex items-center justify-center">
-
-                      <div className={`w-8 h-8 rounded-full ${instagramGradient} flex items-center justify-center`}>
-
                         <span className="text-white font-bold">{c.userName?.[0] || "U"}</span>
                       </div>
                     )}
@@ -346,11 +247,7 @@ export default function ExplorePage() {
                 ))}
               </div>
 
-
               <div className="p-4 border-t border-[gainsboro] flex gap-2 relative">
-
-              <div className="p-4 border-t border-[gainsboro] flex gap-2">
-
                 <input
                   type="text"
                   value={comment}
@@ -392,7 +289,6 @@ export default function ExplorePage() {
 
         </div>
       )}
-
     </>
   )
 }

@@ -89,7 +89,6 @@ export const exploreApi = createApi({
   }),
 })
 
-
 export const { 
   useGetPostsQuery, 
   useLikePostMutation, 
@@ -101,6 +100,3 @@ export const {
   useDeleteFollowingMutation,
   useAddPostFavoriteMutation
 } = exploreApi
-
-export const { useGetPostsQuery, useLikePostMutation, useAddCommentMutation, useDeleteCommentMutation } = exploreApi
-
