@@ -1,3 +1,4 @@
+import AsideOfHome from "@/components/pages/home/asidePartOfHome.jsx/asideOfHome";
 import Posts from "@/components/pages/home/posts/posts";
 
 export default function Main() {
@@ -6,7 +7,7 @@ export default function Main() {
       <main className="flex gap-7 justify-between ">
         
         <Posts />
-        <div className="w-[40%] bg-gray-300"></div>
+        <AsideOfHome/>
       </main>
     </div>
   );

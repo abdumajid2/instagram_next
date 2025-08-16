@@ -114,13 +114,21 @@ const Story = () => {
                             src={`${imgUrl}${fileName}`}
                             controls
                             autoPlay
+
+                            className="max-h-[85vh] min-h-[40vh] max-w-[90%] rounded-xl object-contain shadow-lg"
+
                             className="max-h-[85vh] max-w-[90%] rounded-xl object-contain shadow-lg"
+
                           />
                         ) : (
                           <img
                             src={`${imgUrl}${fileName}`}
                             alt="story"
+
+                            className="max-h-[85vh] min-h-[40vh] max-w-[90%] rounded-xl object-contain shadow-lg"
+
                             className="max-h-[85vh] max-w-[90%] rounded-xl object-contain shadow-lg"
+
                           />
                         )}
                       </SwiperSlide>
