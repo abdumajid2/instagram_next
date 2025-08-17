@@ -10,7 +10,7 @@ import {
   useGetSubscriptionsQuery,
 } from "@/store/pages/profile/ProfileApi";
 
-export default function FollowersMenu({ open, onClose }) {
+export default function FollowersMenu({ open, onClose, userId: propsUserId }) {
   const [decode, setDecode] = useState(null);
   const [localFollowers, setLocalFollowers] = useState([]);
     const API = "http://37.27.29.18:8003"
@@ -26,7 +26,8 @@ export default function FollowersMenu({ open, onClose }) {
     }
   }, []);
 
-  const userId = decode?.sid;
+const userId = propsUserId || decode?.sid;
+
 
   // тянем подписчиков и подписки текущего пользователя, когда открыт модал
   const {
@@ -101,6 +102,7 @@ export default function FollowersMenu({ open, onClose }) {
     }
   };
 
+if (!userId) return null; 
   return (
     <Modal open={open} onClose={onClose}>
       <div
