@@ -2,6 +2,7 @@
 'use client';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
+
 const BASE_URL = 'http://37.27.29.18:8003';
 
 export const profileApi = createApi({
@@ -151,6 +152,27 @@ export const profileApi = createApi({
         url:`/Post/delete-comment?commentId=${id}`,
         method:"DELETE",
       }),
+    }),
+    getUserProfileById:builder.query({
+      query:(id)=>  `/UserProfile/get-user-profile-by-id?id=${id}`
+    }),
+    getUserStoryById:builder.query({
+      query:(id)=>  `/Story/get-user-stories/${id}`
+    }),
+    getUsersPostById:builder.query({
+      query:(id)=>  `/Post/get-posts?UserId=${id}`
+    }),
+    chatById:builder.query({
+      query:(chatId)=>`/Chat/get-chat-by-id?chatId=${chatId}`
+    }),
+    getChats:builder.query({
+      query:()=>`/Chat/get-chats`
+    }),
+    createChat:builder.mutation({
+      query:(userId)=>({
+        url:`/Chat/create-chat?receiverUserId=${userId}`,
+        method:"POST"
+      })
     })
   }),
 });
@@ -182,5 +204,11 @@ useGetPostsQuery,
   useLazyGetSubscribersQuery,
   useLazyGetSubscriptionsQuery,
   useAddCommentMutation,
-  useDeleteCommentMutation
+  useDeleteCommentMutation,
+  useGetUserProfileByIdQuery,
+  useGetUserStoryByIdQuery,
+  useGetUsersPostByIdQuery,
+  useChatByIdQuery,
+  useGetChatsQuery,
+  useCreateChatMutation
 } = profileApi;

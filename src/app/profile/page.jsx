@@ -42,6 +42,7 @@ const API = "http://37.27.29.18:8003";
 const BASE_IMG = `${API}/images`;
 
 export default function Profile() {
+
   const router = useRouter();
 
   // ===== JWT decode =====
@@ -604,8 +605,18 @@ const localLikes = useMemo(() => {
       </div>
 
       {/* модалки подписчики/подписки */}
-      <FollowersMenu open={openFollowers} onClose={() => setOpenFollowers(false)} />
-      <FollowingMenu open={openFollowing} onClose={() => setOpenFollowing(false)} />
+      <FollowersMenu
+  open={openFollowers}
+  onClose={() => setOpenFollowers(false)}
+  userId={decode?.sid}
+/>
+
+<FollowingMenu
+  open={openFollowing}
+  onClose={() => setOpenFollowing(false)}
+  userId={decode?.sid}
+/>
+
     </div>
   );
 }

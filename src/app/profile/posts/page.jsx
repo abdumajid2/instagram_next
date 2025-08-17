@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react'
 import Image from 'next/image'
-import { useGetMyPostsQuery, useAddCommentMutation } from '@/store/pages/profile/ProfileApi'
+import { useGetMyPostsQuery, useAddCommentMutation, useGetUsersPostByIdQuery } from '@/store/pages/profile/ProfileApi'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Scrollbar } from 'swiper/modules'
 import 'swiper/css'
@@ -13,12 +13,17 @@ import { Avatar, Input, Button, message } from 'antd'
 import p from '../../../assets/img/pages/profile/profile/p.png'
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { useDeleteCommentMutation } from '@/store/pages/explore/exploreApi'
-const Posts = () => {
-  const { data: postsData, isLoading, isError, refetch } = useGetMyPostsQuery()
-  const posts = postsData || []
-  const [selectedPost, setSelectedPost] = useState(null)
-  const [addComment, { isLoading: isCommenting }] = useAddCommentMutation()
-  const [postComment, setPostComment] = useState('')
+const Posts = ({ userId }) => {
+  // Используем query по userId
+const { data: postsData, isLoading, isError, refetch } = userId
+  ? useGetUsersPostByIdQuery(userId)
+  : useGetMyPostsQuery();
+
+const posts = userId ? postsData?.data || [] : postsData || [];
+
+  const [selectedPost, setSelectedPost] = useState(null);
+  const [addComment, { isLoading: isCommenting }] = useAddCommentMutation();
+  const [postComment, setPostComment] = useState('');
 
   const getImageUrl = (fileName) => {
     if (!fileName) return p.src

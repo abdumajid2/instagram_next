@@ -10,7 +10,7 @@ import {
   useGetSubscriptionsQuery,
 } from "@/store/pages/profile/ProfileApi";
 
-export default function FollowingMenu({ open, onClose }) {
+export default function FollowingMenu({ open, onClose, userId: propsUserId }) {
   const [decode, setDecode] = useState(null);
   const [localFollowing, setLocalFollowing] = useState([]);
     const API = "http://37.27.29.18:8003"
@@ -25,7 +25,10 @@ export default function FollowingMenu({ open, onClose }) {
     }
   }, []);
 
-  const userId = decode?.sid;
+ const userId = propsUserId || decode?.sid;
+
+
+
 
   const {
     data: follResp,
@@ -89,6 +92,8 @@ export default function FollowingMenu({ open, onClose }) {
       );
     }
   };
+
+if (!userId) return null; 
 
   return (
     <Modal open={open} onClose={onClose}>
