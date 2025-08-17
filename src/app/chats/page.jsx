@@ -12,7 +12,7 @@ import mess from "@/assets/img/pages/chat/pages/default-chat/mess.svg";
 import { BsPencilSquare, BsThreeDotsVertical, BsTrash, BsCameraVideo } from "react-icons/bs";
 import { FaChevronDown } from "react-icons/fa";
 
-/** JWT helpers */
+
 function getAuthPayload() {
   if (typeof window === "undefined") return null;
   const token = localStorage.getItem("authToken");
@@ -21,7 +21,7 @@ function getAuthPayload() {
 }
 function getMyUserId() {
   const p = getAuthPayload();
-  // в ваших токенах userId в sid (см. примеры swagger)
+ 
   return p?.sid || p?.sub || p?.userId || p?.nameid || null;
 }
 function getMyName() {
@@ -67,13 +67,13 @@ function ChatActionModal({ chatId, onDeleted }) {
             disabled={isLoading}
             className="flex items-center w-full px-4 py-2 text-red-600 hover:bg-gray-100 rounded-t-lg disabled:opacity-60"
           >
-            <BsTrash className="mr-2" /> Удалить чат
+            <BsTrash className="mr-2" /> Delete Chat
           </button>
           <button
             onClick={() => setOpen(false)}
             className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-b-lg"
           >
-            <BsCameraVideo className="mr-2" /> Видеозвонок
+            <BsCameraVideo className="mr-2" /> Video Call
           </button>
         </div>
       )}
@@ -89,7 +89,7 @@ export default function MessengerApp() {
   const userName = getMyName();
   const myId = getMyUserId();
 
-  // делаем «как в инсте»: показываем именно собеседника
+
   const chatList = (chatsData?.data || []).map((c) => {
     const iAmSender = String(c.sendUserId) === String(myId);
     const partnerId = iAmSender ? c.receiveUserId : c.sendUserId;
@@ -107,20 +107,20 @@ export default function MessengerApp() {
   const [showModal, setShowModal] = useState(false);
 
   const openChat = (item) => {
-    const q = `?name=${encodeURIComponent(item.partnerName)}&avatar=${encodeURIComponent(item.partnerImage || "")}`;
-    router.push(`/chats/${item.chatId}${q}`);
-    setShowSidebar(false);
+    const q = `?name=${encodeURIComponent(item.partnerName)}&avatar=${encodeURIComponent(item.partnerImage || "")}&partnerId=${encodeURIComponent(item.partnerId)}`;
+  router.push(`/chats/${item.chatId}${q}`);
+  setShowSidebar(false);
   };
 
   const handleUserSelect = (u) => {
-    // /chats/new создаст чат и сделает replace на /chats/{id}
+  
     router.push(`/chats/new?userId=${u.id}&name=${encodeURIComponent(u.fullName)}&avatar=${encodeURIComponent(u.avatar || "")}`);
     setShowModal(false);
   };
 
   return (
     <div className="flex h-screen bg-gray-100 antialiased text-gray-800">
-      {/* mobile toggler */}
+    
       <button
         onClick={() => setShowSidebar(true)}
         className="md:hidden fixed top-4 left-4 z-50 bg-blue-600 text-white p-2 rounded-full shadow-lg"
@@ -128,14 +128,14 @@ export default function MessengerApp() {
         ☰
       </button>
 
-      {/* sidebar (mobile) */}
+
       {showSidebar && (
         <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setShowSidebar(false)}>
           <aside
             className="absolute left-0 top-0 w-64 h-full bg-white p-4 shadow-lg z-50 overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-xl font-semibold mb-4 text-center text-gray-700">Чаты</h2>
+            <h2 className="text-xl font-semibold mb-4 text-center text-gray-700">Chats</h2>
             <ul className="space-y-2">
               {isLoading
                 ? Array.from({ length: 5 }).map((_, i) => <ChatSkeleton key={i} />)
@@ -164,7 +164,6 @@ export default function MessengerApp() {
         </div>
       )}
 
-      {/* sidebar (desktop) */}
       <aside className="hidden md:flex flex-col w-80 bg-white border-r border-gray-200 p-4 overflow-y-auto shadow-md">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
@@ -211,7 +210,6 @@ export default function MessengerApp() {
         </ul>
       </aside>
 
-      {/* empty state */}
       <div className="flex-1 flex flex-col gap-6 items-center md:w-180 h-screen justify-center text-gray-500">
         <Image src={mess} width={150} height={150} alt="mess" />
         <p className="text-xl font-bold">Your messages</p>
@@ -219,11 +217,10 @@ export default function MessengerApp() {
         <button className="rounded-lg bg-[#3B82F6] px-7 py-3 text-white font-bold">Send message</button>
       </div>
 
-      {/* modal: users */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center z-50" onClick={() => setShowModal(false)}>
           <div className="bg-white rounded-lg p-6 w-80 max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-lg font-semibold mb-4">Выберите пользователя</h3>
+            <h3 className="text-lg font-semibold mb-4">New chat</h3>
             <ul className="space-y-2">
               {users.map((u) => (
                 <li
