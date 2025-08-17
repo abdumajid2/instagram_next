@@ -14,11 +14,16 @@ import { FaChevronDown } from "react-icons/fa";
 
 
 function getAuthPayload() {
-  if (typeof window === "undefined") return null;
+  if (typeof window === "undefined") return null; // защита от SSR
   const token = localStorage.getItem("authToken");
   if (!token) return null;
-  try { return JSON.parse(atob(token.split(".")[1])); } catch { return null; }
+  try {
+    return JSON.parse(atob(token.split(".")[1]));
+  } catch {
+    return null;
+  }
 }
+
 function getMyUserId() {
   const p = getAuthPayload();
  

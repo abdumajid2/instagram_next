@@ -10,18 +10,33 @@ import {
   useCreateChatMutation,
 } from "@/store/pages/chat/pages/storeApi";
 import { BsTelephone, BsCameraVideo, BsInfoCircle } from "react-icons/bs";
-import { FiPaperclip, FiTrash, FiSmile, FiMic, FiImage, FiPhoneOff, FiMicOff, FiVideoOff, FiVideo } from "react-icons/fi";
+import {
+  FiPaperclip,
+  FiTrash,
+  FiSmile,
+  FiMic,
+  FiImage,
+  FiPhoneOff,
+  FiMicOff,
+  FiVideoOff,
+  FiVideo,
+} from "react-icons/fi";
 import { Spin } from "antd";
 import Peer from "peerjs";
 
 const FILE_BASE = "http://37.27.29.18:8003/StaticFiles";
+const API_BASE = "http://37.27.29.18:8003";
 
-/* ==== helpers ==== */
+// ===== JWT helpers =====
 function getAuthPayload() {
   if (typeof window === "undefined") return null;
   const token = localStorage.getItem("authToken");
   if (!token) return null;
-  try { return JSON.parse(atob(token.split(".")[1])); } catch { return null; }
+  try {
+    return JSON.parse(atob(token.split(".")[1]));
+  } catch {
+    return null;
+  }
 }
 function getMyUserId() {
   const p = getAuthPayload();
@@ -31,6 +46,8 @@ function getMyName() {
   const p = getAuthPayload();
   return p?.name || p?.fullName || "User";
 }
+
+// ===== message utils =====
 const getSenderId = (m) => m?.userId ?? m?.senderUserId ?? m?.fromUserId ?? null;
 const getStamp = (m) => {
   const t = new Date(m?.sendMassageDate || m?.sendMessageDate || m?.createdAt || 0).getTime();
@@ -38,19 +55,86 @@ const getStamp = (m) => {
 };
 const toTime = (s) => {
   const d = new Date(s || "");
-  return Number.isNaN(d.getTime()) ? "" : d.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
+  return Number.isNaN(d.getTime())
+    ? ""
+    : d.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
 };
 const toDay = (s) => {
   const d = new Date(s || "");
-  return Number.isNaN(d.getTime()) ? "" : d.toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit", year: "numeric" });
+  return Number.isNaN(d.getTime())
+    ? ""
+    : d.toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit", year: "numeric" });
 };
 
-/* ==== UI для звонка ==== */
+// ===== file type helpers =====
+const isImage = (f) => /\.(jpg|jpeg|png|gif|webp|avif|svg)$/i.test(f || "");
+const isVideo = (f) => /\.(mp4|webm|mov|m4v|ogg|ogv)$/i.test(f || "");
+const isAudio = (f) => /\.(mp3|wav|ogg|m4a|aac|flac)$/i.test(f || "");
+const isDoc = (f) =>
+  /\.(pdf|docx?|xlsx?|pptx?|txt|csv|zip|rar|7z|tar|gz)$/i.test(f || "");
+
+// ====== Reels (full-screen) overlay ======
+function ReelOverlay({ src, onClose }) {
+  const videoRef = useRef(null);
+  const [paused, setPaused] = useState(false);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.play().catch(() => {});
+  }, []);
+
+  const togglePlay = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) {
+      v.play();
+      setPaused(false);
+    } else {
+      v.pause();
+      setPaused(true);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[120] bg-black/95 flex items-center justify-center">
+      <div className="relative w-full h-full max-w-[480px] mx-auto">
+        <video
+          ref={videoRef}
+          src={`${FILE_BASE}/${src}`}
+          className="absolute inset-0 w-full h-full object-contain"
+          playsInline
+          autoPlay
+          loop
+          muted
+          onClick={togglePlay}
+        />
+        <button
+          onClick={onClose}
+          className="absolute top-6 right-6 p-3 rounded-full bg-white/10 text-white hover:bg-white/20"
+          title="Закрыть"
+        >
+          ✕
+        </button>
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/80 text-sm bg-white/10 px-3 py-1.5 rounded-full">
+          {paused ? "Пауза — нажмите для воспроизведения" : "Идёт воспроизведение — нажмите для паузы"}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ====== Video Call overlay (оставляем как было) ======
 function VideoCallOverlay({
-  avatar, userName,
-  localStream, remoteStream,
-  micMuted, camOff,
-  onToggleMic, onToggleCam, onClose
+  avatar,
+  userName,
+  localStream,
+  remoteStream,
+  micMuted,
+  camOff,
+  onToggleMic,
+  onToggleCam,
+  onClose,
 }) {
   const localRef = useRef(null);
   const remoteRef = useRef(null);
@@ -72,7 +156,6 @@ function VideoCallOverlay({
 
   return (
     <div className="fixed inset-0 z-[100] bg-black flex items-center justify-center">
-      {/* основной фон — удалённое видео */}
       <video
         ref={remoteRef}
         className="absolute inset-0 w-full h-full object-cover opacity-90"
@@ -88,7 +171,6 @@ function VideoCallOverlay({
         </div>
       )}
 
-      {/* мини-превью локального видео */}
       <div className="absolute bottom-8 right-8 w-72 h-40 bg-white/5 border border-white/10 rounded-xl overflow-hidden flex items-center justify-center">
         {camOff || !localStream ? (
           <div className="flex flex-col items-center gap-2 text-white/80">
@@ -99,8 +181,6 @@ function VideoCallOverlay({
           <video ref={localRef} className="w-full h-full object-cover" playsInline />
         )}
       </div>
-
-      {/* панель управления */}
       <div className="absolute bottom-16 left-0 right-0 flex items-center justify-center gap-6">
         <button
           onClick={onToggleCam}
@@ -130,7 +210,97 @@ function VideoCallOverlay({
   );
 }
 
-/* ==== СТРАНИЦА ЧАТА ==== */
+// ====== Пост превью по post:ID ======
+function useAuthToken() {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem("authToken");
+}
+
+function PostPreview({ postId }) {
+  const token = useAuthToken();
+  const [post, setPost] = useState(null);
+  const [err, setErr] = useState("");
+
+  useEffect(() => {
+    let abort = false;
+    async function load() {
+      try {
+        const res = await fetch(`${API_BASE}/Post/get-post-by-id?id=${postId}`, {
+          headers: {
+            accept: "*/*",
+            authorization: token ? `Bearer ${token}` : "",
+          },
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        if (!abort) setPost(json?.data || null);
+      } catch (e) {
+        if (!abort) setErr("Не удалось загрузить пост");
+        console.error(e);
+      }
+    }
+    if (postId) load();
+    return () => {
+      abort = true;
+    };
+  }, [postId, token]);
+
+  if (err) return <div className="text-xs text-red-500">{err}</div>;
+  if (!post) return <div className="text-xs text-gray-500">Загрузка поста…</div>;
+
+  const firstImg = post.images?.[0] || "";
+  const isVid = isVideo(firstImg);
+
+  return (
+    <a
+      href="#"
+      onClick={(e) => e.preventDefault()}
+      className="block w-56 sm:w-64 bg-white border rounded-xl overflow-hidden shadow hover:shadow-md transition"
+      title={post.title || "Пост"}
+    >
+      <div className="relative w-full aspect-[9/16] bg-gray-100 flex items-center justify-center">
+        {firstImg ? (
+          isVid ? (
+            <video
+              src={`${FILE_BASE}/${firstImg}`}
+              className="w-full h-full object-cover"
+              muted
+              playsInline
+              preload="metadata"
+            />
+          ) : (
+            <img
+              src={`${FILE_BASE}/${firstImg}`}
+              alt={post.title || "post"}
+              className="w-full h-full object-cover"
+            />
+          )
+        ) : (
+          <div className="text-gray-400 text-sm">Без медиа</div>
+        )}
+      </div>
+      <div className="p-3">
+        <div className="text-sm font-semibold line-clamp-1">
+          {post.title || "Без названия"}
+        </div>
+        {post.content && (
+          <div className="text-xs text-gray-600 line-clamp-2 mt-1">{post.content}</div>
+        )}
+        <div className="text-[11px] text-gray-500 mt-2">
+          ❤️ {post.postLikeCount ?? 0} · 💬 {post.commentCount ?? 0}
+        </div>
+      </div>
+    </a>
+  );
+}
+
+function extractPostId(text) {
+  if (!text) return null;
+  const m = String(text).match(/(?:^|\s)post:(\d+)(?:\s|$)/i);
+  return m ? Number(m[1]) : null;
+}
+
+// ================== MAIN PAGE ==================
 export default function ChatByIdPage() {
   const params = useParams();
   const searchParams = useSearchParams();
@@ -143,12 +313,13 @@ export default function ChatByIdPage() {
   const myName = getMyName();
 
   const targetUserId = searchParams.get("userId") || "";
-  const partnerId = String(searchParams.get("partnerId") || ""); // <— добавили
+  const partnerId = String(searchParams.get("partnerId") || "");
   const userName = searchParams.get("name") || "Пользователь";
   const avatar = searchParams.get("avatar")
     ? `http://37.27.29.18:8003/images/${searchParams.get("avatar")}`
     : `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}`;
 
+  // If route is /chats/new?userId=..
   const { data: chatsData } = useGetChatsQuery(undefined, { skip: !isNew });
   const [createChat, { isLoading: isCreating }] = useCreateChatMutation();
 
@@ -163,9 +334,11 @@ export default function ChatByIdPage() {
       });
       if (existing?.chatId) {
         router.replace(
-          `/chats/${existing.chatId}?name=${encodeURIComponent(userName)}&avatar=${encodeURIComponent(
-            searchParams.get("avatar") || ""
-          )}&partnerId=${encodeURIComponent(targetUserId)}`
+          `/chats/${existing.chatId}?name=${encodeURIComponent(
+            userName
+          )}&avatar=${encodeURIComponent(searchParams.get("avatar") || "")}&partnerId=${encodeURIComponent(
+            targetUserId
+          )}`
         );
         return;
       }
@@ -174,9 +347,11 @@ export default function ChatByIdPage() {
         const newChatId = res?.data ?? res?.chatId ?? res?.id;
         if (newChatId) {
           router.replace(
-            `/chats/${newChatId}?name=${encodeURIComponent(userName)}&avatar=${encodeURIComponent(
-              searchParams.get("avatar") || ""
-            )}&partnerId=${encodeURIComponent(targetUserId)}`
+            `/chats/${newChatId}?name=${encodeURIComponent(
+              userName
+            )}&avatar=${encodeURIComponent(searchParams.get("avatar") || "")}&partnerId=${encodeURIComponent(
+              targetUserId
+            )}`
           );
         }
       } catch (e) {
@@ -202,50 +377,63 @@ export default function ChatByIdPage() {
   const [file, setFile] = useState(null);
   const [hoveredId, setHoveredId] = useState(null);
 
+  const [reelSrc, setReelSrc] = useState(""); // для полноэкранного видео
+
   const endRef = useRef(null);
   const fileInputRef = useRef(null);
 
   const items = messagesData?.data || [];
-  const sorted = useMemo(() => [...items].sort((a, b) => getStamp(a) - getStamp(b) || (a.messageId ?? 0) - (b.messageId ?? 0)), [items]);
+  const sorted = useMemo(
+    () => [...items].sort((a, b) => getStamp(a) - getStamp(b) || (a.messageId ?? 0) - (b.messageId ?? 0)),
+    [items]
+  );
 
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [sorted.length]);
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [sorted.length]);
 
   const handleSend = async () => {
     if (!chatId || (!messageText.trim() && !file)) return;
     try {
       await sendMessage({ chatId, message: messageText.trim(), file }).unwrap();
-      setMessageText(""); setFile(null);
+      setMessageText("");
+      setFile(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
-      await refetch(); endRef.current?.scrollIntoView({ behavior: "smooth" });
-    } catch (err) { console.error("Ошибка отправки:", err); }
-  };
-  const handleDelete = async (messageId) => {
-    try { await deleteMessage(messageId).unwrap(); await refetch(); endRef.current?.scrollIntoView({ behavior: "smooth" }); }
-    catch (err) { console.error("Ошибка удаления:", err); }
+      await refetch();
+      endRef.current?.scrollIntoView({ behavior: "smooth" });
+    } catch (err) {
+      console.error("Ошибка отправки:", err);
+    }
   };
 
-  /* ==== ВИДЕОЗВОНОК (PeerJS) ==== */
+  const handleDelete = async (messageId) => {
+    try {
+      await deleteMessage(messageId).unwrap();
+      await refetch();
+      endRef.current?.scrollIntoView({ behavior: "smooth" });
+    } catch (err) {
+      console.error("Ошибка удаления:", err);
+    }
+  };
+
+  // ===== Video-call state (как было) =====
   const [showCall, setShowCall] = useState(false);
   const [peer, setPeer] = useState(null);
   const [callConnection, setCallConnection] = useState(null);
-
   const [localStream, setLocalStream] = useState(null);
   const [remoteStream, setRemoteStream] = useState(null);
-
   const [micMuted, setMicMuted] = useState(false);
   const [camOff, setCamOff] = useState(false);
 
   const myPeerId = chatId && myId ? `chat-${chatId}-${myId}` : "";
   const partnerPeerId = chatId && partnerId ? `chat-${chatId}-${partnerId}` : "";
 
-  // Создаём Peer, слушаем входящий звонок (callee)
   useEffect(() => {
     if (!myPeerId) return;
-    const p = new Peer(myPeerId, { debug: 0 }); // можно настроить host/port/path при необходимости
+    const p = new Peer(myPeerId, { debug: 0 });
     setPeer(p);
 
     p.on("call", async (incoming) => {
-      // Отвечаем входящему
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         setLocalStream(stream);
@@ -267,7 +455,6 @@ export default function ChatByIdPage() {
       p.destroy();
       setPeer(null);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [myPeerId]);
 
   const startCall = async () => {
@@ -289,8 +476,13 @@ export default function ChatByIdPage() {
   };
 
   const endCall = () => {
-    try { callConnection?.close(); } catch {}
-    try { peer?.disconnect(); peer?.reconnect(); } catch {}
+    try {
+      callConnection?.close();
+    } catch {}
+    try {
+      peer?.disconnect();
+      peer?.reconnect();
+    } catch {}
     setCallConnection(null);
     setShowCall(false);
     if (localStream) {
@@ -305,7 +497,7 @@ export default function ChatByIdPage() {
   const toggleMic = () => {
     if (!localStream) return;
     const enabled = !micMuted;
-    localStream.getAudioTracks().forEach((t) => (t.enabled = !enabled)); // если-muted => выключаем
+    localStream.getAudioTracks().forEach((t) => (t.enabled = !enabled));
     setMicMuted(!micMuted);
   };
   const toggleCam = () => {
@@ -315,25 +507,29 @@ export default function ChatByIdPage() {
     setCamOff(!camOff);
   };
 
-  /* ==== Render ==== */
+  // ===== RENDER =====
   if (isNew) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-50">
-        <p className="text-gray-600"><Spin/></p>
+        <p className="text-gray-600">
+          <Spin />
+        </p>
       </div>
     );
   }
   if (!chatId || Number.isNaN(chatId)) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-100">
-        <p className="text-lg text-red-500"></p>
+        <p className="text-lg text-red-500">Неверный chatId</p>
       </div>
     );
   }
   if (isLoading && !messagesData) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-100">
-        <p className="text-lg text-gray-600 animate-pulse"><Spin/></p>
+        <p className="text-lg text-gray-600 animate-pulse">
+          <Spin />
+        </p>
       </div>
     );
   }
@@ -341,34 +537,42 @@ export default function ChatByIdPage() {
   return (
     <>
       <div className="flex flex-col h-screen w-[1000px] bg-white text-gray-900">
-
-        {/* Header */}
+        {/* топбар */}
         <div className="flex items-center justify-between px-5 py-3 border-b bg-white">
           <div className="flex items-center gap-3">
-            <img src={avatar} alt={userName} className="w-10 h-10 rounded-full object-cover ring-2 ring-gray-200" />
+            <img
+              src={avatar}
+              alt={userName}
+              className="w-10 h-10 rounded-full object-cover ring-2 ring-gray-200"
+            />
             <div className="font-medium">{userName}</div>
           </div>
           <div className="flex items-center gap-5 text-gray-600">
-            <button className="hover:text-black" title="Call"><BsTelephone size={18} /></button>
+            <button className="hover:text-black" title="Call">
+              <BsTelephone size={18} />
+            </button>
             <button
               className="hover:text-black"
               title="Video"
-              onClick={startCall} // ← запускаем
+              onClick={startCall}
               disabled={!partnerPeerId || !myPeerId || !peer}
             >
               <BsCameraVideo size={18} />
             </button>
-            <button className="hover:text-black" title="Info"><BsInfoCircle size={18} /></button>
+            <button className="hover:text-black" title="Info">
+              <BsInfoCircle size={18} />
+            </button>
           </div>
         </div>
 
-        {/* Messages */}
+        {/* сообщения */}
         <div className="flex-1 overflow-y-auto px-3 sm:px-6 py-6">
           <div className="mx-auto max-w-6xl space-y-4">
             {sorted.map((m, i) => {
               const mine = String(getSenderId(m)) === String(myId);
               const prev = sorted[i - 1];
-              const rawPrev = prev && (prev.sendMassageDate || prev.sendMessageDate || prev.createdAt);
+              const rawPrev =
+                prev && (prev.sendMassageDate || prev.sendMessageDate || prev.createdAt);
               const rawCur = m?.sendMassageDate || m?.sendMessageDate || m?.createdAt;
               const curDay = toDay(rawCur);
               const prevDay = rawPrev ? toDay(rawPrev) : null;
@@ -377,16 +581,25 @@ export default function ChatByIdPage() {
               const prevTime = rawPrev ? toTime(rawPrev) : null;
               const showTime = i === 0 || curTime !== prevTime;
 
+              const filePath = m?.file || "";
+              const hasFile = !!filePath;
+
+              const postId = extractPostId(m?.messageText);
+
               return (
                 <div key={m.messageId ?? `${getStamp(m)}-${i}`} className="space-y-2">
                   {showDay && (
                     <div className="flex justify-center">
-                      <span className="text-[11px] text-gray-500 bg-gray-100 px-2 py-1 rounded-full">{curDay}</span>
+                      <span className="text-[11px] text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                        {curDay}
+                      </span>
                     </div>
                   )}
                   {showTime && (
                     <div className="flex justify-center">
-                      <span className="text-[11px] text-gray-500 bg-gray-100/80 px-2 py-0.5 rounded-full">{curTime}</span>
+                      <span className="text-[11px] text-gray-500 bg-gray-100/80 px-2 py-0.5 rounded-full">
+                        {curTime}
+                      </span>
                     </div>
                   )}
 
@@ -401,24 +614,103 @@ export default function ChatByIdPage() {
                         (mine ? "bg-[#1b74e4] text-white pr-7" : "bg-white text-gray-900")
                       }
                     >
+                      {/* текст */}
                       {!!m?.messageText && (
-                        <p className="whitespace-pre-wrap break-words text-[15px] leading-snug">{m.messageText}</p>
+                        <p className="whitespace-pre-wrap break-words text-[15px] leading-snug">
+                          {m.messageText}
+                        </p>
                       )}
 
-                      {!!m?.file && (
-                        <div className={`${m?.messageText ? "mt-2" : ""}`}>
-                          {/\.(jpg|jpeg|png|gif|webp)$/i.test(m.file) ? (
-                            <img src={`${FILE_BASE}/${m.file}`} alt="attachment" className="rounded-lg max-h-64 object-contain" />
-                          ) : (
+                      {/* вложение */}
+                      {hasFile && (
+                        <div className={`${m?.messageText ? "mt-2" : ""} space-y-2`}>
+                          {isImage(filePath) && (
+                            <img
+                              src={`${FILE_BASE}/${filePath}`}
+                              alt="attachment"
+                              className="rounded-lg max-h-64 object-contain"
+                              loading="lazy"
+                            />
+                          )}
+
+                          {isVideo(filePath) && (
+                            <div className="w-full">
+                              {/* мини-«reels» превью 9:16 */}
+                              <div
+                                className="relative w-full max-w-[280px] sm:max-w-[340px] aspect-[9/16] bg-black/5 rounded-xl overflow-hidden cursor-pointer"
+                                onClick={() => setReelSrc(filePath)}
+                                title="Открыть"
+                              >
+                                <video
+                                  src={`${FILE_BASE}/${filePath}#t=0.1`}
+                                  className="w-full h-full object-cover"
+                                  muted
+                                  playsInline
+                                  loop
+                                  autoPlay
+                                  preload="metadata"
+                                />
+                                <div className="absolute bottom-2 right-2 text-white text-xs bg-black/40 px-2 py-1 rounded">
+                                  ▶ Открыть
+                                </div>
+                              </div>
+
+                              {/* обычный плеер под превью (по желанию) */}
+                              <details className="mt-2">
+                                <summary className="text-xs opacity-80 cursor-pointer">
+                                  Показать плеер
+                                </summary>
+                                <video
+                                  src={`${FILE_BASE}/${filePath}`}
+                                  className="mt-2 w-full max-w-sm rounded-lg"
+                                  controls
+                                  playsInline
+                                  preload="metadata"
+                                />
+                              </details>
+                            </div>
+                          )}
+
+                          {isAudio(filePath) && (
+                            <audio
+                              className="w-full max-w-sm"
+                              src={`${FILE_BASE}/${filePath}`}
+                              controls
+                            />
+                          )}
+
+                          {isDoc(filePath) && (
                             <a
-                              href={`${FILE_BASE}/${m.file}`}
+                              href={`${FILE_BASE}/${filePath}`}
                               target="_blank"
                               rel="noreferrer"
                               className={mine ? "underline text-white/90" : "underline text-blue-600"}
                             >
-                              📎 Файл
+                              📎 Скачать файл
                             </a>
                           )}
+
+                          {/* на всякий случай универсальная ссылка */}
+                          {!isImage(filePath) &&
+                            !isVideo(filePath) &&
+                            !isAudio(filePath) &&
+                            !isDoc(filePath) && (
+                              <a
+                                href={`${FILE_BASE}/${filePath}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className={mine ? "underline text-white/90" : "underline text-blue-600"}
+                              >
+                                📎 Вложение
+                              </a>
+                            )}
+                        </div>
+                      )}
+
+                      {/* превью поста по шаблону post:ID */}
+                      {postId && (
+                        <div className={`${m?.messageText || hasFile ? "mt-3" : ""}`}>
+                          <PostPreview postId={postId} />
                         </div>
                       )}
 
@@ -440,7 +732,7 @@ export default function ChatByIdPage() {
           </div>
         </div>
 
-        {/* Input */}
+        {/* инпут */}
         <div className="border-t bg-white px-3 sm:px-6 py-3">
           <div className="mx-auto max-w-6xl flex items-center gap-2">
             <button className="p-2 rounded-full text-gray-600 hover:bg-gray-100" title="Emoji">
@@ -451,24 +743,42 @@ export default function ChatByIdPage() {
                 value={messageText}
                 onChange={(e) => setMessageText(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                placeholder="Message…"
+                placeholder="Message… (например: post:47)"
                 className="flex-1 bg-transparent px-4 py-2.5 outline-none text-[15px]"
               />
-              <button onClick={() => fileInputRef.current?.click()} className="p-2 rounded-full text-gray-600 hover:bg-gray-100" title="Attach file">
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="p-2 rounded-full text-gray-600 hover:bg-gray-100"
+                title="Attach file"
+              >
                 <FiPaperclip size={20} />
               </button>
-              <button onClick={() => fileInputRef.current?.click()} className="p-2 rounded-full text-gray-600 hover:bg-gray-100" title="Add image">
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="p-2 rounded-full text-gray-600 hover:bg-gray-100"
+                title="Add image/video"
+              >
                 <FiImage size={20} />
               </button>
               <button className="p-2 rounded-full text-gray-600 hover:bg-gray-100" title="Voice">
                 <FiMic size={20} />
               </button>
             </div>
-            <input type="file" ref={fileInputRef} onChange={(e) => setFile(e.target.files?.[0] || null)} className="hidden" />
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={(e) => setFile(e.target.files?.[0] || null)}
+              className="hidden"
+              accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip,.rar,.7z"
+            />
             <button
               onClick={handleSend}
               disabled={isSending || (!messageText.trim() && !file) || !chatId}
-              className={`ml-2 px-4 py-2 rounded-full font-semibold text-white ${isSending || (!messageText.trim() && !file) || !chatId ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
+              className={`ml-2 px-4 py-2 rounded-full font-semibold text-white ${
+                isSending || (!messageText.trim() && !file) || !chatId
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700"
+              }`}
               title="Send"
             >
               ➤
@@ -477,6 +787,7 @@ export default function ChatByIdPage() {
         </div>
       </div>
 
+      {/* видеозвонок */}
       {showCall && (
         <VideoCallOverlay
           avatar={avatar}
@@ -490,6 +801,9 @@ export default function ChatByIdPage() {
           onClose={endCall}
         />
       )}
+
+    
+      {!!reelSrc && <ReelOverlay src={reelSrc} onClose={() => setReelSrc("")} />}
     </>
   );
 }

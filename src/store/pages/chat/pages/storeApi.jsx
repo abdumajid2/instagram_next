@@ -5,7 +5,10 @@ export const chatApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: "http://37.27.29.18:8003/",
     prepareHeaders: (headers) => {
-      const authToken = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
+      const authToken =
+        typeof window !== "undefined"
+          ? localStorage.getItem("authToken")
+          : null;
       if (authToken) headers.set("authorization", `Bearer ${authToken}`);
       return headers;
     },
@@ -18,7 +21,10 @@ export const chatApi = createApi({
       providesTags: (res) =>
         res?.data
           ? [
-              ...res.data.map(({ chatId }) => ({ type: "Messages", id: chatId })),
+              ...res.data.map(({ chatId }) => ({
+                type: "Messages",
+                id: chatId,
+              })),
               { type: "Chats", id: "LIST" },
             ]
           : [{ type: "Chats", id: "LIST" }],
@@ -32,10 +38,12 @@ export const chatApi = createApi({
 
     // Поиск пользователей (можно расширить параметрами при необходимости)
     getUsers: builder.query({
-      query: (q = "") => (q ? `User/get-users?UserName=${encodeURIComponent(q)}` : "User/get-users"),
+      query: (q = "") =>
+        q
+          ? `User/get-users?UserName=${encodeURIComponent(q)}`
+          : "User/get-users",
     }),
 
-    // Создать чат — по Swagger: POST /Chat/create-chat?receiverUserId=...
     createChat: builder.mutation({
       query: (receiverUserId) => ({
         url: `Chat/create-chat?receiverUserId=${receiverUserId}`,
@@ -44,29 +52,29 @@ export const chatApi = createApi({
       invalidatesTags: [{ type: "Chats", id: "LIST" }],
     }),
 
-    // Отправить сообщение — PUT multipart
+    
     sendMessage: builder.mutation({
       query: ({ chatId, message, file }) => {
-        const form = new FormData();
-        form.append("ChatId", chatId);
-        form.append("MessageText", message ?? "");
-        if (file) form.append("File", file);
-        return { url: "Chat/send-message", method: "PUT", body: form };
+        const fd = new FormData();
+        fd.append("chatId", chatId);
+        if (message) fd.append("messageText", message);
+        if (file) fd.append("file", file); // имя поля — как на бэке
+        return { url: "Chat/send-message", method: "PUT", body: fd };
       },
-      invalidatesTags: (_res, _err, arg) => [{ type: "Messages", id: arg.chatId }],
+      invalidatesTags: (_res, _err, arg) => [
+        { type: "Messages", id: arg.chatId },
+      ],
     }),
 
-    // Удалить сообщение — по API: Chat/delete-message?massageId=...
     deleteMessage: builder.mutation({
       query: (messageId) => ({
         url: `Chat/delete-message?massageId=${messageId}`,
         method: "DELETE",
       }),
-      // сервер сам знает chatId? если нет — просто перечитаем список чатов
       invalidatesTags: [{ type: "Chats", id: "LIST" }],
     }),
 
-    // Удалить чат
+    
     deleteChat: builder.mutation({
       query: (chatId) => ({
         url: `Chat/delete-chat?chatId=${chatId}`,
