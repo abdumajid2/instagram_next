@@ -13,6 +13,7 @@ import { Avatar, Input, Button, message } from 'antd'
 import p from '../../../assets/img/pages/profile/profile/p.png'
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { useDeleteCommentMutation } from '@/store/pages/explore/exploreApi'
+import Link from 'next/link'
 const Posts = ({ userId }) => {
   // Используем query по userId
 const { data: postsData, isLoading, isError, refetch } = userId
@@ -169,15 +170,16 @@ const handleDeleteComment = async (commentId) => {
             <div className="w-[40%] flex flex-col border-l border-gray-200">
               <div className="flex items-center gap-3 p-4 border-b border-gray-200">
                 <Avatar size={40} src={getImageUrl(selectedPost.userImage)} />
-                <div className="flex flex-col">
+                <div className="flex flex-col ">
                   <span className="font-semibold">{selectedPost.userName}</span>
                 </div>
               </div>
 
               <div className="flex-1 overflow-y-auto p-4 space-y-3 text-sm">
-                <div className="flex items-start gap-2">
-                  <Avatar size={36} src={getImageUrl(selectedPost.userImage)} />
+                <div className="flex    items-start gap-2">
+                  <Avatar size={36}  src={getImageUrl(selectedPost.userImage)} />
                   <div className="flex w-[90%] flex-col">
+                      
                     <span className="font-semibold">{selectedPost.userName}</span> {selectedPost.content}
                     <div className="text-xs text-gray-400">
                       {new Date(selectedPost.datePublished).toLocaleString()}
@@ -190,7 +192,8 @@ const handleDeleteComment = async (commentId) => {
                     <Avatar size={36} src={getImageUrl(comment.userImage)} />
                     <div className="flex w-[90%] flex-col">
                       <div className="flex items-center justify-between gap-1">
-                        <span className="font-bold">{comment.userName}</span>
+                         <Link href={`/profile/${comment.userId}`}>  
+                        <span className="font-bold">{comment.userName}</span></Link>
                            <FaRegHeart className="text-red-500 cursor-pointer mr-[5px]" size={14} />
                                                       
                       </div>
