@@ -1,18 +1,20 @@
-// src/store/pages/notification/notification.js
 "use client";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+
+const BASE = "http://37.27.29.18:8003/";
 
 export const notificationApi = createApi({
   reducerPath: "notificationApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://37.27.29.18:8003/",
+    baseUrl: BASE,
     prepareHeaders: (headers) => {
-      const authToken = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
+      const authToken =
+        typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
       if (authToken) headers.set("authorization", `Bearer ${authToken}`);
       return headers;
     },
   }),
-  tagTypes: ["Subscribers", "Subscriptions"],
+  tagTypes: ["Subscribers", "Subscriptions", "MyPosts"],
   endpoints: (builder) => ({
     // кто подписан НА МЕНЯ
     getSubscribers: builder.query({
@@ -28,6 +30,26 @@ export const notificationApi = createApi({
       transformResponse: (res) => res?.data ?? [],
     }),
 
+    // мои посты (для лайков/комментариев)
+    getMyPosts: builder.query({
+      query: () => `Post/get-my-posts`,
+      providesTags: [{ type: "MyPosts", id: "LIST" }],
+      transformResponse: (res) => res ?? [],
+    }),
+
+    // список пользователей (для рекомендаций). Параметры опциональны
+    getUsers: builder.query({
+      query: ({ userName = "", pageNumber = 1, pageSize = 20 } = {}) => {
+        const qs = new URLSearchParams();
+        if (userName) qs.set("UserName", userName);
+        qs.set("PageNumber", pageNumber);
+        qs.set("PageSize", pageSize);
+        return `User/get-users?${qs.toString()}`;
+      },
+      transformResponse: (res) => res?.data ?? [],
+    }),
+
+    // follow / unfollow
     followUser: builder.mutation({
       query: (followingUserId) => ({
         url: `FollowingRelationShip/add-following-relation-ship?followingUserId=${followingUserId}`,
@@ -41,7 +63,6 @@ export const notificationApi = createApi({
 
     unfollowUser: builder.mutation({
       query: (followingUserId) => ({
-        // ВАЖНО: без ведущего пробела!
         url: `FollowingRelationShip/delete-following-relation-ship?followingUserId=${followingUserId}`,
         method: "DELETE",
       }),
@@ -56,6 +77,8 @@ export const notificationApi = createApi({
 export const {
   useGetSubscribersQuery,
   useGetSubscriptionsQuery,
+  useGetMyPostsQuery,
+  useGetUsersQuery,
   useFollowUserMutation,
   useUnfollowUserMutation,
 } = notificationApi;
