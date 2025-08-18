@@ -33,6 +33,7 @@ import { GoTrash } from "react-icons/go";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import Link from "next/link";
 
 const Posts = () => {
   const { data, isLoading, isError } = useGetPostsQuery();
@@ -182,7 +183,7 @@ const Posts = () => {
   if (isError) return <ErrorAnimation />;
 
   return (
-    <div className="md:w-[45%] mx-auto"> 
+    <div className="md:w-[45%] w-full mx-auto"> 
       <Story />
       <div className="md:w-[80%] mx-auto flex flex-col gap-7 max-w-full mt-7">
         {/* Modal Comments */}
@@ -260,7 +261,7 @@ const Posts = () => {
 
                 <hr className="border-1 border-gray-200 my-2 sm:my-3" />
 
-                <section className="flex flex-col gap-2 sm:gap-4 max-h-[30vh] sm:h-[60vh] overflow-y-auto">
+                <section className="flex flex-col gap-2 sm:gap-4 h-[30vh] sm:h-[60vh] overflow-y-auto no-scrollbar">
                   {postInfo?.data?.comments.map((comment) => (
                     <article
                       key={comment.postCommentId}
@@ -392,9 +393,9 @@ const Posts = () => {
         </Modal>
 
         {localPosts.map((e) => (
-          <article key={e.postId} className="w-full px-2 sm:px-0">
+          <article key={e.postId} className="w-full pb-4 border-b-1 border-gray-300">
             <div className="flex items-center justify-between">
-              <section className="flex items-center gap-3">
+              <Link href={`/profile/${e.userId}`} className="flex items-center gap-3">
                 {e.userImage ? (
                   <img
                     className="w-9 h-9 sm:w-10 sm:h-10 rounded-full"
@@ -417,7 +418,7 @@ const Posts = () => {
                     {formatTimeAgo(e.datePublished)}
                   </p>
                 </div>
-              </section>
+              </Link>
               <HiOutlineDotsHorizontal
                 onClick={() => followerModal(e)}
                 className="cursor-pointer hover:text-gray-600 text-lg sm:text-xl"
@@ -442,13 +443,13 @@ const Posts = () => {
                           <video
                             src={`${imgUrl}${file}`}
                             controls
-                            className="w-full max-h-[400px] sm:max-h-[450px] md:min-h-[400px] min-h-[350px] object-contain"
+                            className="w-full max-h-[400px] sm:max-h-[450px] md:min-h-[500px] min-h-[350px] object-contain"
                           />
                         ) : (
                           <img
                             src={`${imgUrl}${file}`}
                             alt="image"
-                            className="w-full max-h-[400px] sm:max-h-[450px] md:min-h-[400px] min-h-[350px] object-contain"
+                            className="w-full max-h-[400px] sm:max-h-[450px] md:min-h-[500px] min-h-[350px] object-contain"
                           />
                         )}
                       </div>
@@ -457,7 +458,7 @@ const Posts = () => {
                 })}
               </Swiper>
             </div>
-            <div className="flex flex-col gap-3 mt-3">
+            <div className="flex flex-col gap-2 mt-3">
               <div className="flex items-center justify-between text-2xl">
                 <div className="flex items-center gap-4">
                   {e.postLike ? (
@@ -489,7 +490,7 @@ const Posts = () => {
                   />
                 )}
               </div>
-              <h3 className="text-sm font-semibold text-gray-900">
+              <h3 className="text-sm font-semibold text-gray-900 mt-2">
                 {e.postLikeCount} likes
               </h3>
               <div

@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react'
 import Image from 'next/image'
-import { useGetMyPostsQuery } from '@/store/pages/profile/ProfileApi'
+import { useGetMyPostsQuery, useAddCommentMutation, useGetUsersPostByIdQuery } from '@/store/pages/profile/ProfileApi'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Scrollbar } from 'swiper/modules'
 import 'swiper/css'
@@ -9,19 +9,65 @@ import 'swiper/css/navigation'
 import 'swiper/css/scrollbar'
 import { FaRegComment, FaRegHeart } from 'react-icons/fa6'
 import { LiaTelegramPlane } from "react-icons/lia";
-import { Avatar, Input, Button } from 'antd'
-import p from '../../../assets/img/pages/profile/profile/p.png' // дефолтный аватар
+import { Avatar, Input, Button, message } from 'antd'
+import p from '../../../assets/img/pages/profile/profile/p.png'
+import { MdOutlineDeleteForever } from "react-icons/md";
+import { useDeleteCommentMutation } from '@/store/pages/explore/exploreApi'
+const Posts = ({ userId }) => {
+  // Используем query по userId
+const { data: postsData, isLoading, isError, refetch } = userId
+  ? useGetUsersPostByIdQuery(userId)
+  : useGetMyPostsQuery();
 
-const Posts = () => {
-  const { data: postsData, isLoading, isError } = useGetMyPostsQuery()
-  const posts = postsData || []
-  const [selectedPost, setSelectedPost] = useState(null)
+const posts = userId ? postsData?.data || [] : postsData || [];
 
-const getImageUrl = (fileName) => {
-  if (!fileName) return p.src
-  if (fileName.startsWith('http')) return fileName
-  return `http://37.27.29.18:8003/images/${fileName}`
-}
+  const [selectedPost, setSelectedPost] = useState(null);
+  const [addComment, { isLoading: isCommenting }] = useAddCommentMutation();
+  const [postComment, setPostComment] = useState('');
+
+  const getImageUrl = (fileName) => {
+    if (!fileName) return p.src
+    if (fileName.startsWith('http')) return fileName
+    return `http://37.27.29.18:8003/images/${fileName}`
+  }
+
+  const getMediaType = (fileName) => {
+    if (!fileName) return "image"
+    const ext = fileName.split('.').pop().toLowerCase()
+    if (["mp4", "mov", "webm"].includes(ext)) return "video"
+    return "image"
+  }
+
+  const handleAddComment = async () => {
+    if (!postComment.trim() || !selectedPost) return
+    try {
+      await addComment({
+        postId: selectedPost.postId,
+        comment: postComment,
+      }).unwrap()
+
+      setPostComment('')
+      message.success('Комментарий добавлен ✅')
+      refetch()
+    } catch (err) {
+      console.error(err)
+      message.error('Ошибка при добавлении комментария')
+    }
+  }
+
+const [deleteComment] = useDeleteCommentMutation();
+
+const handleDeleteComment = async (commentId) => {
+  try {
+    await deleteComment(commentId).unwrap();
+    message.success('Комментарий удалён ✅');
+    alert('Комментарий удалён ✅');
+    refetch();
+  } catch (err) {
+    console.error(err);
+    message.error('Ошибка при удалении комментария');
+  }
+};
 
 
   if (isLoading) return <p>Загрузка постов...</p>
@@ -30,7 +76,6 @@ const getImageUrl = (fileName) => {
 
   return (
     <>
-      {/* Сетка постов */}
       <div className="w-full flex flex-wrap gap-3">
         {posts.map((post) => (
           <div
@@ -39,13 +84,21 @@ const getImageUrl = (fileName) => {
             onClick={() => setSelectedPost(post)}
           >
             {post.images?.[0] && (
-              <Image
-                src={`http://37.27.29.18:8003/images/${post.images[0]}`}
-                alt="post preview"
-                width={200}
-                height={200}
-                className="rounded-lg object-cover w-[200px] h-[250px]"
-              />
+              getMediaType(post.images[0]) === "image" ? (
+                <Image
+                  src={getImageUrl(post.images[0])}
+                  alt="post preview"
+                  width={200}
+                  height={200}
+                  className="rounded-lg object-cover w-[200px] h-[250px]"
+                />
+              ) : (
+                <video
+                  src={getImageUrl(post.images[0])}
+                  className="rounded-lg object-cover w-[200px] h-[250px]"
+                  muted
+                />
+              )
             )}
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-6 transition-opacity duration-300 text-white font-semibold text-lg">
               <div className="flex items-center gap-2">
@@ -59,49 +112,61 @@ const getImageUrl = (fileName) => {
         ))}
       </div>
 
-      {/* Модалка Instagram-стиля */}
       {selectedPost && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center">
           <div className="bg-white w-[90%] h-[90%] flex rounded-xl overflow-hidden relative">
 
-            {/* Левая часть — фото/слайдер */}
+            {/* Левый блок - медиа */}
             <div className="w-[60%] bg-black flex items-center justify-center">
               {selectedPost.images?.length > 1 ? (
-                <Swiper
-                  modules={[Navigation, Scrollbar]}
-                  navigation
-                  scrollbar={{ draggable: true }}
-                  className="w-full h-full"
-                >
-                  {selectedPost.images.map((img, idx) => (
+                <Swiper modules={[Navigation, Scrollbar]} navigation scrollbar={{ draggable: true }} className="w-full h-full">
+                  {selectedPost.images.map((file, idx) => (
                     <SwiperSlide key={idx} className="flex justify-center items-center bg-black">
-                      <Image
-                        src={`http://37.27.29.18:8003/images/${img}`}
-                        alt={`slide-${idx}`}
-                        width={600}
-                        height={600}
-                        className="object-contain w-[100%] h-[100%] max-h-[90vh] mx-auto"
-                      />
+                      {getMediaType(file) === "image" ? (
+                        <Image
+                          src={getImageUrl(file)}
+                          alt={`slide-${idx}`}
+                          width={600}
+                          height={600}
+                          className="object-contain w-[100%] h-[100%] max-h-[90vh] mx-auto"
+                        />
+                      ) : (
+                        <video
+                          controls
+                          autoPlay
+                          className="object-contain w-[100%] h-[100%] max-h-[90vh] mx-auto"
+                        >
+                          <source src={getImageUrl(file)} type="video/mp4" />
+                        </video>
+                      )}
                     </SwiperSlide>
                   ))}
                 </Swiper>
               ) : (
                 selectedPost.images?.[0] && (
-                  <Image
-                    src={`http://37.27.29.18:8003/images/${selectedPost.images[0]}`}
-                    alt="post"
-                    width={600}
-                    height={600}
-                    className="object-contain w-[100%] h-[100%] max-h-[90vh] mx-auto"
-                  />
+                  getMediaType(selectedPost.images[0]) === "image" ? (
+                    <Image
+                      src={getImageUrl(selectedPost.images[0])}
+                      alt="post"
+                      width={600}
+                      height={600}
+                      className="object-contain w-[100%] h-[100%] max-h-[90vh] mx-auto"
+                    />
+                  ) : (
+                    <video
+                      controls
+                      autoPlay
+                      className="object-contain w-[100%] h-[100%] max-h-[90vh] mx-auto"
+                    >
+                      <source src={getImageUrl(selectedPost.images[0])} type="video/mp4" />
+                    </video>
+                  )
                 )
               )}
             </div>
 
-            {/* Правая часть — инфо и комментарии */}
+            {/* Правый блок - инфо и комментарии */}
             <div className="w-[40%] flex flex-col border-l border-gray-200">
-
-              {/* Заголовок с аватаром */}
               <div className="flex items-center gap-3 p-4 border-b border-gray-200">
                 <Avatar size={40} src={getImageUrl(selectedPost.userImage)} />
                 <div className="flex flex-col">
@@ -109,11 +174,10 @@ const getImageUrl = (fileName) => {
                 </div>
               </div>
 
-              {/* Комментарии и описание */}
               <div className="flex-1 overflow-y-auto p-4 space-y-3 text-sm">
                 <div className="flex items-start gap-2">
                   <Avatar size={36} src={getImageUrl(selectedPost.userImage)} />
-                  <div className="flex flex-col">
+                  <div className="flex w-[90%] flex-col">
                     <span className="font-semibold">{selectedPost.userName}</span> {selectedPost.content}
                     <div className="text-xs text-gray-400">
                       {new Date(selectedPost.datePublished).toLocaleString()}
@@ -123,14 +187,15 @@ const getImageUrl = (fileName) => {
 
                 {selectedPost.comments.map((comment) => (
                   <div key={comment.postCommentId} className="flex items-start gap-2">
-                 <Avatar size={36} src={getImageUrl(comment.userImage)} />
-
+                    <Avatar size={36} src={getImageUrl(comment.userImage)} />
                     <div className="flex w-[90%] flex-col">
                       <div className="flex items-center justify-between gap-1">
                         <span className="font-bold">{comment.userName}</span>
-                        <FaRegHeart className="text-red-500 cursor-pointer" size={14} />
+                           <FaRegHeart className="text-red-500 cursor-pointer mr-[5px]" size={14} />
+                                                      
                       </div>
-                      <div className='break-words'>{comment.comment}</div>
+                      <div className="break-words">{comment.comment}</div>
+                         <MdOutlineDeleteForever onClick={()=>handleDeleteComment(comment.postCommentId)} className='text-xl ml-auto hover:text-red-600' />
                       <div className="text-xs text-gray-400">
                         {new Date(comment.dateCommented).toLocaleString()}
                       </div>
@@ -139,7 +204,6 @@ const getImageUrl = (fileName) => {
                 ))}
               </div>
 
-              {/* Лайки и кнопки поста */}
               <div className="p-4 border-t border-gray-200 flex flex-col items-start gap-3">
                 <div className='flex items-center gap-4'>
                   <FaRegHeart size={24} className="cursor-pointer" />
@@ -152,14 +216,20 @@ const getImageUrl = (fileName) => {
                 </span>
               </div>
 
-              {/* Поле для ввода комментария */}
               <div className="p-4 border-t border-gray-200 flex gap-2">
-                <Input placeholder="Добавьте комментарий..." />
-                <Button type="primary">Опубликовать</Button>
+                <Input 
+                  value={postComment} 
+                  onChange={(e)=>setPostComment(e.target.value)} 
+                  placeholder="Добавьте комментарий..." 
+                  onPressEnter={handleAddComment}
+                  disabled={isCommenting}
+                />
+                <Button type="primary" loading={isCommenting} onClick={handleAddComment}>
+                  Опубликовать
+                </Button>
               </div>
             </div>
 
-            {/* Кнопка закрытия */}
             <button
               onClick={() => setSelectedPost(null)}
               className="absolute top-2 right-2 bg-black/50 text-white rounded-full w-10 h-10 flex items-center justify-center"

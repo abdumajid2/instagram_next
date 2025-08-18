@@ -60,13 +60,13 @@ const Search = () => {
 
 	if (!search) {
 		return (
-			<div>
+			<div className='p-[25px]'>
 				<input
 					type='search'
 					placeholder='Search...'
 					value={search}
 					onChange={e => setSearch(e.target.value)}
-					className='w-full p-2 rounded-md mb-6 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400'
+					className='w-[100%] p-2 rounded-md mb-6 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400'
 				/>
 				<ExploreComponent />
 			</div>

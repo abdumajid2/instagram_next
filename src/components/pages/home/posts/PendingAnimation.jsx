@@ -3,7 +3,7 @@ import React from "react";
 const PendingAnimation = () => {
   return (
 
-    <main className="md:w-[40%] min-h-screen flex justify-center items-start bg-white p-10">
+    <main className="md:w-[36%] mx-auto min-h-screen flex justify-center items-start bg-white p-10">
 
       <section className="flex flex-col gap-8 w-full max-w-[600px]">
         <article className="flex flex-col gap-4">

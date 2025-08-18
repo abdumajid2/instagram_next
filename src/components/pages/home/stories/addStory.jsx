@@ -50,7 +50,7 @@ const AddStory = () => {
     <div>
       <button
         onClick={showModal}
-        className="bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 w-16 h-16 sm:w-20 sm:h-20 rounded-full border border-gray-300 flex items-center justify-center cursor-pointer hover:to-purple-500 hover:via-pink-400 hover:from-yellow-300 transition-colors delay-75"
+        className="bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 w-16 h-16 sm:w-18 sm:h-18 rounded-full border border-gray-300 flex items-center justify-center cursor-pointer hover:to-purple-500 hover:via-pink-400 hover:from-yellow-300 transition-colors delay-75"
       >
         <LuPlus className="text-white text-xl" />
       </button>
@@ -65,7 +65,10 @@ const AddStory = () => {
         width={400}
         className="!rounded-2xl !overflow-hidden"
       >
-        <form onSubmit={addNewStory} className="flex flex-col items-center gap-4 p-4">
+        <form
+          onSubmit={addNewStory}
+          className="flex flex-col items-center gap-4 p-4"
+        >
           <h2 className="text-lg font-semibold text-gray-800">Create Story</h2>
 
           <label
