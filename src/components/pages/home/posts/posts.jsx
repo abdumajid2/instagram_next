@@ -14,7 +14,7 @@ import Image from "next/image";
 import userImage from "../../../../components/pages/home/images/user.jpg";
 import React, { useEffect, useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Flex, Input, Modal } from "antd";
+import { Modal } from "antd";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import ErrorAnimation from "@/components/pages/home/posts/ErrorAnimation ";
 import {
@@ -30,6 +30,10 @@ import Story from "../stories/story";
 import { Navigation, Pagination } from "swiper/modules";
 import PendingAnimation from "./PendingAnimation";
 import { GoTrash } from "react-icons/go";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import Link from "next/link";
 
 const Posts = () => {
   const { data, isLoading, isError } = useGetPostsQuery();
@@ -37,7 +41,6 @@ const Posts = () => {
   const { data: postInfo, refetch: infoRefetch } = useGetPostByIdQuery(infoId);
   const [addComment] = useAddCommentMutation();
   const [addLikedPost] = useAddLikePostMutation();
-  const posts = data?.data || [];
   const [addFollow] = useAddFollowMutation();
   const [deleteFollow] = useDeleteFollowMutation();
   const [followerId, setFollowerId] = useState(null);
@@ -173,35 +176,42 @@ const Posts = () => {
     }
   };
 
+  // contentModal
+  let [contentModal, setContentModal] = useState(false);
+
   if (isLoading) return <PendingAnimation />;
   if (isError) return <ErrorAnimation />;
 
   return (
-    <div className="md:w-[50%] mx-auto flex flex-col gap-7">
-      
-        <Story />
-
+    <div className="md:w-[45%] w-full mx-auto"> 
+      <Story />
+      <div className="md:w-[80%] mx-auto flex flex-col gap-7 max-w-full mt-7">
         {/* Modal Comments */}
         <Modal
-          className="!w-[80%] !h-[90vh] !m-0 !p-0 !absolute !top-1/2 !left-1/2 !-translate-x-1/2 !-translate-y-1/2 overflow-hidden"
-          title=""
-          closable={{ "aria-label": "Custom Close Button" }}
+          className="!w-full !h-full !m-0 !p-0 !absolute !top-1/2 !left-1/2 !-translate-x-1/2 !-translate-y-1/2 overflow-hidden sm:!w-[80%] md:!h-[90vh]"
+          title={null}
+          closable={false}
           open={isModalOpen}
           onOk={handleCancel}
           onCancel={handleCancel}
           footer={null}
           centered
         >
-          <section className="flex w-full h-[85vh]">
-            <aside className="w-[60%] bg-black flex items-center justify-center">
+          <section className="flex flex-col md:flex-row w-full h-full md:h-[85vh]">
+            <Swiper
+              modules={[Navigation, Pagination]}
+              navigation
+              pagination={{ clickable: true }}
+              className="w-full md:w-[60%] h-1/2 md:h-full md:flex  hidden bg-black items-center justify-center"
+            >
               {postInfo?.data?.images.map((file, i) => {
                 const isVideo =
                   file.toLowerCase().endsWith(".mp4") ||
                   file.toLowerCase().endsWith(".mov");
                 return (
-                  <div
+                  <SwiperSlide
                     key={i}
-                    className="w-full md:h-[80vh] flex items-center justify-center"
+                    className="w-full flex items-center justify-center"
                   >
                     {isVideo ? (
                       <video
@@ -210,27 +220,26 @@ const Posts = () => {
                         autoPlay
                         controls
                         loop
-                        className="w-full md:h-[80vh] object-contain"
+                        className="w-full hidden md:block h-full object-contain"
                       />
                     ) : (
                       <img
                         src={`${imgUrl}${file}`}
                         alt="image"
-                        className="w-full md:h-[80vh] object-contain"
+                        className="w-full hidden md:block h-full object-contain"
                       />
                     )}
-                  </div>
+                  </SwiperSlide>
                 );
               })}
-            </aside>
-
-            <aside className="md:w-[40%] p-4 flex flex-col justify-between">
+            </Swiper>
+            <aside className="w-full md:w-[50%] p-2 md:p-4 flex flex-col justify-between md:h-full  h-[94vh]">
               <section>
                 <article className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3">
                     {postInfo?.data?.userImage ? (
                       <img
-                        className="w-10 h-10 rounded-full"
+                        className="w-8 h-8 sm:w-10 sm:h-10 rounded-full"
                         src={`${imgUrl}${postInfo?.data?.userImage}`}
                         alt={postInfo?.data?.userName}
                       />
@@ -238,48 +247,52 @@ const Posts = () => {
                       <Image
                         src={userImage}
                         alt="user"
-                        width={40}
-                        height={40}
-                        className="rounded-full"
+                        width={32}
+                        height={32}
+                        className="w-8 h-8 sm:w-10 sm:h-10 rounded-full"
                       />
                     )}
-                    <h3 className="font-semibold">{postInfo?.data?.userName}</h3>
+                    <h3 className="font-semibold text-sm sm:text-base">
+                      {postInfo?.data?.userName}
+                    </h3>
                   </div>
-                  <HiOutlineDotsHorizontal className="text-lg" />
+                  <HiOutlineDotsHorizontal className="text-base sm:text-lg" />
                 </article>
 
-                <hr className="border-1 border-gray-200 my-3" />
+                <hr className="border-1 border-gray-200 my-2 sm:my-3" />
 
-                <section className="flex flex-col gap-4 max-h-[60vh] overflow-y-auto">
+                <section className="flex flex-col gap-2 sm:gap-4 h-[30vh] sm:h-[60vh] overflow-y-auto no-scrollbar">
                   {postInfo?.data?.comments.map((comment) => (
                     <article
                       key={comment.postCommentId}
-                      className="flex items-start gap-3"
+                      className="flex items-start gap-2 sm:gap-3"
                     >
                       <Image
                         src={userImage}
-                        width={36}
-                        height={36}
+                        width={32}
+                        height={32}
                         alt="user"
-                        className="rounded-full flex-shrink-0"
+                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex-shrink-0"
                       />
 
                       <div className="flex-1 flex flex-col">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-semibold text-sm">
+                        <div className="flex items-center gap-1 sm:gap-2">
+                          <h3 className="font-semibold text-xs sm:text-sm">
                             {comment.userName || "user"}
                           </h3>
-                          <p className="text-sm">{comment.comment}</p>
+                          <p className="text-xs sm:text-sm">
+                            {comment.comment}
+                          </p>
                         </div>
                         <div className="flex items-center justify-between mt-1">
-                          <p className="text-xs text-gray-400">
+                          <p className="text-[10px] sm:text-xs text-gray-400">
                             {formatTimeAgo(comment.dateCommented)}
                           </p>
                           <GoTrash
                             onClick={() =>
                               deleteOldComment(comment.postCommentId)
                             }
-                            className="text-sm text-gray-400 hover:text-red-500 cursor-pointer"
+                            className="text-xs sm:text-sm text-gray-400 hover:text-red-500 cursor-pointer"
                           />
                         </div>
                       </div>
@@ -290,20 +303,20 @@ const Posts = () => {
 
               <form
                 onSubmit={addNewComment}
-                className="flex justify-between border-1 border-gray-300 w-full p-3 rounded"
+                className="flex justify-between border-1 border-gray-300 w-full p-2 sm:p-3 rounded"
               >
-                <div className="flex items-center gap-3 ">
-                  <FaRegFaceSmileWink className="text-2xl" />
+                <div className="flex items-center gap-2 sm:gap-3 ">
+                  <FaRegFaceSmileWink className="text-xl sm:text-2xl" />
                   <input
                     type="text"
                     value={inpAddComment}
                     onChange={(e) => setInpAddComment(e.target.value)}
                     placeholder="Add comment..."
-                    className="w-full outline-none"
+                    className="w-full outline-none text-sm sm:text-base"
                   />
                 </div>
                 <button
-                  className={`text-blue-900 text-[16px] font-semibold ${
+                  className={`text-blue-900 text-sm sm:text-base font-semibold ${
                     inpAddComment ? "" : "opacity-65"
                   }`}
                 >
@@ -322,56 +335,56 @@ const Posts = () => {
           onOk={handleCancelFollower}
           onCancel={handleCancelFollower}
           footer={null}
-          className="md:!max-w-[400px]"
+          className="!w-[90%] sm:!w-[60%] md:!w-[40%] !max-w-md"
           centered
         >
           <section className="flex flex-col text-center">
             {isFollower?.data?.isSubscriber ? (
               <button
                 onClick={() => deleteOldFollower(followerId)}
-                className="text-red-500 text-[16px] font-semibold pb-3 hover:bg-gray-100"
+                className="text-red-500 text-sm sm:text-base font-semibold py-3 hover:bg-gray-100"
               >
                 Unfollow
               </button>
             ) : (
               <button
                 onClick={() => addNewFollower(followerId)}
-                className="text-blue-500 text-[16px] font-semibold py-3 hover:bg-gray-100"
+                className="text-blue-500 text-sm sm:text-base font-semibold py-3 hover:bg-gray-100"
               >
                 Subscribe
               </button>
             )}
 
-            <div className="border-t-1 border-gray-300" />
+            <div className="border-t border-gray-300" />
 
-            <button className="py-[10px] text-[16px] hover:bg-gray-100">
+            <button className="py-[10px] text-sm sm:text-base hover:bg-gray-100">
               Report
             </button>
-            <div className="border-t-1 border-gray-300" />
+            <div className="border-t border-gray-300" />
 
-            <button className="py-[10px] text-[16px] hover:bg-gray-100">
+            <button className="py-[10px] text-sm sm:text-base hover:bg-gray-100">
               Block
             </button>
-            <div className="border-t-1 border-gray-300" />
+            <div className="border-t border-gray-300" />
 
-            <button className="py-[10px] text-[16px] hover:bg-gray-100">
+            <button className="py-[10px] text-sm sm:text-base hover:bg-gray-100">
               Restrict
             </button>
-            <div className="border-t-1 border-gray-300" />
+            <div className="border-t border-gray-300" />
 
-            <button className="py-[10px] text-[16px] hover:bg-gray-100">
+            <button className="py-[10px] text-sm sm:text-base hover:bg-gray-100">
               Copy profile link
             </button>
-            <div className="border-t-1 border-gray-300" />
+            <div className="border-t border-gray-300" />
 
-            <button className="py-[10px] text-[16px] hover:bg-gray-100">
+            <button className="py-[10px] text-sm sm:text-base hover:bg-gray-100">
               Share this profile
             </button>
 
-            <div className="mt-2 border-t-1 border-gray-300">
+            <div className="mt-2 border-t border-gray-300">
               <button
                 onClick={handleCancelFollower}
-                className="w-full pt-3 text-[16px] font-semibold hover:bg-gray-100"
+                className="w-full pt-3 text-sm sm:text-base font-semibold hover:bg-gray-100"
               >
                 Cancel
               </button>
@@ -379,14 +392,13 @@ const Posts = () => {
           </section>
         </Modal>
 
-        {/* Posts List */}
         {localPosts.map((e) => (
-          <article key={e.postId} className="w-[80%] mx-auto">
+          <article key={e.postId} className="w-full pb-4 border-b-1 border-gray-300">
             <div className="flex items-center justify-between">
-              <section className="flex items-center gap-3">
+              <Link href={`/profile/${e.userId}`} className="flex items-center gap-3">
                 {e.userImage ? (
                   <img
-                    className="w-10 h-10 rounded-full"
+                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-full"
                     src={`${imgUrl}${e.userImage}`}
                     alt={e.userName}
                   />
@@ -394,35 +406,26 @@ const Posts = () => {
                   <Image
                     src={userImage}
                     alt="user"
-                    width={40}
-                    height={40}
-                    className="rounded-full"
+                    width={36}
+                    height={36}
+                    className="rounded-full w-9 h-9 sm:w-10 sm:h-10"
                   />
                 )}
                 <div className="flex items-center gap-2">
                   <h3 className="font-semibold text-sm">{e.userName}</h3>
-                  <span className="p-[2px] rounded-full bg-gray-500"></span>
-                  <p className="text-sm text-gray-500">
+                  <span className="hidden sm:block p-[2px] rounded-full bg-gray-500"></span>
+                  <p className="text-xs sm:text-sm text-gray-500">
                     {formatTimeAgo(e.datePublished)}
                   </p>
                 </div>
-              </section>
-
-              <div className="flex items-center gap-3 ">
-                <HiOutlineDotsHorizontal
-                  onClick={() => followerModal(e)}
-                  className="cursor-pointer hover:text-gray-600 text-xl"
-                />
-                <button
-                  onClick={() => addNewFollower(e.userId)}
-                  className="text-blue-900 text-[16px] font-semibold hover:opacity-65 transition-colors delay-75 rounded bg-white py-2 px-10 border-1 border-blue-600"
-                >
-                  Subscribe
-                </button>
-              </div>
+              </Link>
+              <HiOutlineDotsHorizontal
+                onClick={() => followerModal(e)}
+                className="cursor-pointer hover:text-gray-600 text-lg sm:text-xl"
+              />
             </div>
 
-            <div className="mt-4">
+            <div className="mt-3 sm:mt-4">
               <Swiper
                 modules={[Navigation, Pagination]}
                 navigation
@@ -435,18 +438,18 @@ const Posts = () => {
                     file.toLowerCase().endsWith(".mov");
                   return (
                     <SwiperSlide key={i}>
-                      <div className="w-full md:max-h-[600px] min-h-[400px] flex items-center justify-center bg-black rounded-xl">
+                      <div className="w-full max-h-[400px] sm:max-h-[500px] flex items-center justify-center bg-black rounded">
                         {isVideo ? (
                           <video
                             src={`${imgUrl}${file}`}
                             controls
-                            className="min-h-[200px] rounded"
+                            className="w-full max-h-[400px] sm:max-h-[450px] md:min-h-[500px] min-h-[350px] object-contain"
                           />
                         ) : (
                           <img
                             src={`${imgUrl}${file}`}
                             alt="image"
-                            className="w-full md:max-h-[500px] object-contain rounded-xl"
+                            className="w-full max-h-[400px] sm:max-h-[450px] md:min-h-[500px] min-h-[350px] object-contain"
                           />
                         )}
                       </div>
@@ -455,42 +458,76 @@ const Posts = () => {
                 })}
               </Swiper>
             </div>
-
-            <div className="flex items-center justify-between mt-4 text-2xl">
-              <div className="flex items-center gap-3">
-                {e.postLike ? (
-                  <FaHeart
-                    onClick={() => addNewLikedPost(e.postId)}
-                    className="text-red-600 cursor-pointer hover:text-red-500"
+            <div className="flex flex-col gap-2 mt-3">
+              <div className="flex items-center justify-between text-2xl">
+                <div className="flex items-center gap-4">
+                  {e.postLike ? (
+                    <FaHeart
+                      onClick={() => addNewLikedPost(e.postId)}
+                      className="text-red-600 cursor-pointer hover:opacity-80 transition"
+                    />
+                  ) : (
+                    <FaRegHeart
+                      onClick={() => addNewLikedPost(e.postId)}
+                      className="text-gray-800 cursor-pointer hover:opacity-60 transition"
+                    />
+                  )}
+                  <FaRegComment
+                    onClick={() => openComment(e)}
+                    className="cursor-pointer hover:opacity-60 transition"
+                  />
+                  <IoSendOutline className="cursor-pointer hover:opacity-60 transition" />
+                </div>
+                {e.postFavorite ? (
+                  <FaBookmark
+                    onClick={() => addNewPostFavourite(e.postId)}
+                    className="cursor-pointer"
                   />
                 ) : (
-                  <FaRegHeart
-                    onClick={() => addNewLikedPost(e.postId)}
-                    className="text-gray-600 cursor-pointer hover:text-gray-500"
+                  <FaRegBookmark
+                    onClick={() => addNewPostFavourite(e.postId)}
+                    className="cursor-pointer hover:opacity-60 transition"
                   />
                 )}
-                <h1>{e.postLikeCount}</h1>
-                <h1>{e.comments.length}</h1>
-                <FaRegComment
-                  onClick={() => openComment(e)}
-                  className="hover:text-gray-500 cursor-pointer"
-                />
-                <IoSendOutline className="hover:text-gray-500 cursor-pointer" />
               </div>
-              {e.postFavorite ? (
-                <FaBookmark
-                  onClick={() => addNewPostFavourite(e.postId)}
-                  className="cursor-pointer"
-                />
-              ) : (
-                <FaRegBookmark
-                  onClick={() => addNewPostFavourite(e.postId)}
-                  className="hover:text-gray-500 cursor-pointer"
-                />
+              <h3 className="text-sm font-semibold text-gray-900 mt-2">
+                {e.postLikeCount} likes
+              </h3>
+              <div
+                className={`text-sm text-gray-800 leading-snug ${
+                  e.content ? "" : "hidden"
+                }`}
+              >
+                {e.content && e.content.length > 40 ? (
+                  contentModal ? (
+                    <p onClick={() => setContentModal(false)}>{e.content}</p>
+                  ) : (
+                    <p>
+                      {e.content.slice(0, 40)}
+                      <span
+                        className="text-gray-500 cursor-pointer text-sm font-medium"
+                        onClick={() => setContentModal(true)}
+                      >
+                        ... more
+                      </span>
+                    </p>
+                  )
+                ) : (
+                  <p>{e.content}</p>
+                )}
+              </div>
+              {e.comments?.length > 0 && (
+                <p
+                  onClick={() => openComment(e)}
+                  className="text-sm text-gray-500 cursor-pointer hover:underline"
+                >
+                  View all {e.comments.length} comments
+                </p>
               )}
             </div>
           </article>
         ))}
+      </div>
     </div>
   );
 };
