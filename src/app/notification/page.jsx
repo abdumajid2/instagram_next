@@ -66,7 +66,7 @@ export default function Notification() {
   if (subsLoading || subscrLoading) return <p className="p-4">Загрузка…</p>;
 
   return (
-    <div className="w-full max-w-xl bg-white rounded-2xl border border-gray-200 ml-[10px] top-[10px] px-[10px]">
+    <div className="lg:w-[90%] lg:m-auto bg-white rounded-2xl border border-gray-200 lg:ml-[10px] top-[10px] px-[10px]">
       <div className="flex items-center justify-between px-4 py-3 border-b">
         <h1 className="font-bold text-[30px]">Notifications</h1>
         <Link href="/"><p className="text-[20px]">❌</p></Link>
@@ -79,7 +79,7 @@ export default function Notification() {
           const u = row?.userShortInfo || {};
           const photo = u.userPhoto ? `${API}/images/${u.userPhoto}` : placeholder.src;
 
-          // правильно: проверяем, ПОДПИСАН ЛИ Я на этого пользователя
+
           const iFollow = myFollowingSet.has(u.userId);
 
           return (
@@ -95,7 +95,7 @@ export default function Notification() {
                   <p className="text-gray-500 text-sm">Followed you</p>
                 </div>
               </div>
-                            {!iFollow ? (
+              {!iFollow ? (
                 <button
                   className="px-3 py-1.5 rounded bg-[#EFF6FF] text-[#3B82F6]"
                   onClick={() => onFollow(u.userId)}
