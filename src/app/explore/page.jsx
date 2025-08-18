@@ -1,22 +1,24 @@
 "use client"
+
 import { useState, useEffect } from "react"
 import {
-  useGetPostsQuery,
   useLikePostMutation,
   useAddCommentMutation,
   useDeleteCommentMutation,
   useAddFollowingMutation,
   useDeleteFollowingMutation,
   useGetSubscriptionsQuery,
-  useAddPostFavoriteMutation
+  useAddPostFavoriteMutation,
+  useGetPostsQuery
 } from "@/store/pages/explore/exploreApi"
-import { FaHeart, FaComment, FaTrash, FaTimes } from "react-icons/fa"
-import { MdSlowMotionVideo } from "react-icons/md"
+import { FaComment, FaHeart, FaTimes, FaTrash } from 'react-icons/fa'
 import EmojiPicker from 'emoji-picker-react'
+import defaultAvatar from '../../assets/icon/pages/explore/Без названия.jpg'
 
-export default function ExplorePage() {
-  const { data, isLoading, refetch } = useGetPostsQuery()
+const ExplorePage = () => {
   const [selectedPost, setSelectedPost] = useState(null)
+  const { data, refetch } = useGetPostsQuery({ pageNumber: 1, pageSize: 999 })
+
   const [comment, setComment] = useState("")
   const [likedPosts, setLikedPosts] = useState({})
   const [postLikes, setPostLikes] = useState({})
@@ -25,16 +27,12 @@ export default function ExplorePage() {
   const [deleteComment] = useDeleteCommentMutation()
   const [addFollowing] = useAddFollowingMutation()
   const [deleteFollowing] = useDeleteFollowingMutation()
+  const [isFollowing, setIsFollowing] = useState(false)
+  const [showPicker, setShowPicker] = useState(false)
+
   const currentUserId = 1
   const { data: subscriptions } = useGetSubscriptionsQuery(currentUserId)
-  const [isFollowing, setIsFollowing] = useState(false)
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false)
-
-  const subscriptionList = Array.isArray(subscriptions?.data)
-    ? subscriptions.data
-    : Array.isArray(subscriptions)
-      ? subscriptions
-      : []
+  const [addPostFavorite] = useAddPostFavoriteMutation()
 
   useEffect(() => {
     if (data?.data) {
@@ -51,14 +49,16 @@ export default function ExplorePage() {
 
   useEffect(() => {
     if (selectedPost) {
-      const following = subscriptionList.some(
-        (u) => u.userId === selectedPost.userId
-      )
+      const subscriptionList = Array.isArray(subscriptions?.data)
+        ? subscriptions.data
+        : Array.isArray(subscriptions)
+          ? subscriptions
+          : []
+      const following = subscriptionList.some(u => u.userId === selectedPost.userId)
       setIsFollowing(following)
     }
-  }, [selectedPost, subscriptionList])
+  }, [selectedPost, subscriptions])
 
-  let [addPostFavorite] = useAddPostFavoriteMutation()
   const handleLike = async (postId) => {
     try {
       await likePost(postId).unwrap()
@@ -78,8 +78,7 @@ export default function ExplorePage() {
     try {
       await addComment({ postId: selectedPost.postId, comment }).unwrap()
       setComment("")
-      setShowEmojiPicker(false)
-      await refetch()
+      refetch()
     } catch (err) {
       console.error(err)
     }
@@ -88,7 +87,7 @@ export default function ExplorePage() {
   const handleDeleteComment = async (commentId) => {
     try {
       await deleteComment(commentId).unwrap()
-      await refetch()
+      refetch()
     } catch (err) {
       console.error(err)
     }
@@ -109,99 +108,89 @@ export default function ExplorePage() {
     }
   }
 
-  const onEmojiClick = (emojiData, event) => {
-    setComment(emojiData.emoji)
-  }
-
   return (
     <>
-      <div className="grid grid-cols-3 p-[5vh] gap-[2px] auto-rows-[150px]">
-        {data?.data?.map((post, index) => {
-          const firstImage = post.images?.[0]
-          const isVideo = /\.(mp4)$/i.test(firstImage)
-          const src = `http://37.27.29.18:8003/images/${firstImage}`
-          const isTall = (index + 1) % 3 === 0
+      {/* Posts Grid */}
+      <div className="container mx-auto px-0 py-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 md:gap-2">
+          {data?.data?.map((post) => {
+            const firstMedia = post.images?.[0]
+            const isVideo = firstMedia ? /\.(mp4)$/i.test(firstMedia) : false
+            const src = firstMedia
+              ? `http://37.27.29.18:8003/images/${firstMedia}`
+              : 'https://via.placeholder.com/500x500'
 
-
-          return (
-            <div
-              key={post.postId}
-              onClick={() => setSelectedPost(post)}
-              className={`relative overflow-hidden bg-gray-200 group cursor-pointer ${isTall ? "row-span-3" : "row-span-2"}`}
-            >
-              {isVideo ? (
-                <div className="relative w-full h-full">
+            return (
+              <div
+                key={post.postId}
+                onClick={() => setSelectedPost(post)}
+                className="relative aspect-square w-full cursor-pointer group overflow-hidden"
+              >
+                {isVideo ? (
                   <video
                     src={src}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     muted
                     loop
                     autoPlay
                     playsInline
                   />
-                  <div className="absolute bottom-2 left-2 flex items-center gap-3 bg-black/40 p-1.5 rounded">
-                    <div className="flex items-center gap-1 cursor-pointer" onClick={(e) => { e.stopPropagation(); handleLike(post.postId) }}>
-                      <FaHeart
-                        className={likedPosts[post.postId] ? "text-red-500" : "text-white"}
-                      />
-                      <span className="text-white text-sm">{postLikes[post.postId]}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <FaComment className="text-white" />
-                      <span className="text-white text-sm">{post.commentCount || 0}</span>
-                    </div>
+                ) : (
+                  <img
+                    src={src}
+                    alt="Post"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                )}
+                <div className="absolute inset-0 bg-black/30 flex items-center justify-center gap-5 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-1 text-white font-bold">
+                    <FaHeart />
+                    <span>{postLikes[post.postId] || 0}</span>
                   </div>
-                  <div className="absolute top-2 right-2 bg-black/50 p-1.5 rounded-full text-white">
-                    <MdSlowMotionVideo size={18} />
+                  <div className="flex items-center gap-1 text-white font-bold">
+                    <FaComment />
+                    <span>{post.commentCount || 0}</span>
                   </div>
                 </div>
-              ) : (
-                <img src={src} alt="Post" className="w-full h-full object-cover" />
-              )}
-            </div>
-          )
-        })}
+              </div>
+            )
+          })}
+        </div>
       </div>
 
+      {/* Post Modal */}
       {selectedPost && (
-        <div className="fixed inset-0 bg-black/70 m-auto flex items-center justify-center z-50">
-          <div className="bg-white w-[90%] h-[90%] flex">
-            <div className="flex-1 bg-black flex items-center justify-center">
-              {/\.(mp4)$/i.test(selectedPost.images?.[0]) ? (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+          <div className="bg-white w-[90%] h-[90%] flex relative">
+            {/* Media */}
+            <div className="flex-1 bg-black flex items-center justify-center relative">
+              {selectedPost.images?.[0] && /\.(mp4)$/i.test(selectedPost.images[0]) ? (
                 <video
                   src={`http://37.27.29.18:8003/images/${selectedPost.images[0]}`}
-                  className="max-w-full w-[90%] h-[90%] max-h-full rounded-[5px]"
+                  className="max-w-full w-[70%] h-[90%] max-h-full rounded-[5px]"
                   controls
-                  autoPlay
                 />
               ) : (
                 <img
-                  src={`http://37.27.29.18:8003/images/${selectedPost.images[0]}`}
+                  src={`http://37.27.29.18:8003/images/${selectedPost.images?.[0]}`}
                   alt="Post"
-                  className="max-w-full w-[90%] h-[90%] max-h-full rounded-[5px]"
+                  className="max-w-full w-[70%] h-[90%] max-h-full rounded-[5px] object-contain"
                 />
               )}
             </div>
 
-
-
+            {/* Sidebar */}
             <div className="w-[350px] flex flex-col border border-[gainsboro]">
+              {/* Header */}
               <div className="p-4 flex items-center justify-between border-b border-[gainsboro]">
                 <div className="flex items-center gap-3">
-                  {selectedPost.userImage ? (
-                    <img
-                      src={`http://37.27.29.18:8003/${selectedPost.userImage}`}
-                      alt={selectedPost.userName}
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 flex items-center justify-center">
-                      <span className="text-white font-bold">{selectedPost.userName?.[0] || "U"}</span>
-                    </div>
-                  )}
-                  <span className="font-semibold">{selectedPost.userName || "User"}</span>
+                  <img
+                    src={defaultAvatar}
+                    alt={defaultAvatar}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                  <span className="font-semibold">{selectedPost.userName}</span>
                 </div>
-
                 <button
                   onClick={handleFollowToggle}
                   className={`px-3 py-1 rounded text-sm ${isFollowing ? "bg-gray-300" : "bg-blue-500 text-white"}`}
@@ -210,7 +199,7 @@ export default function ExplorePage() {
                 </button>
               </div>
 
-
+              {/* Like & Comment Info */}
               <div className="p-4 flex items-center gap-4 border-b border-[gainsboro]">
                 <div className="flex items-center gap-2 cursor-pointer" onClick={() => handleLike(selectedPost.postId)}>
                   <FaHeart className={likedPosts[selectedPost.postId] ? "text-red-500" : ""} />
@@ -221,20 +210,15 @@ export default function ExplorePage() {
                 </div>
               </div>
 
+              {/* Comments */}
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {selectedPost.comments?.map((c) => (
                   <div key={c.commentId} className="flex items-start gap-2">
-                    {c.userImage ? (
-                      <img
-                        src={`http://37.27.29.18:8003/${c.userImage}`}
-                        alt={c.userName}
-                        className="w-8 h-8 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 flex items-center justify-center">
-                        <span className="text-white font-bold">{c.userName?.[0] || "U"}</span>
-                      </div>
-                    )}
+                    <img
+                      src={defaultAvatar}
+                      alt={defaultAvatar}
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
                     <div className="flex-1">
                       <p className="text-sm font-semibold">{c.userName || "User"}</p>
                       <p className="text-sm text-gray-700">{c.comment}</p>
@@ -247,6 +231,7 @@ export default function ExplorePage() {
                 ))}
               </div>
 
+              {/* Add Comment */}
               <div className="p-4 border-t border-[gainsboro] flex gap-2 relative">
                 <input
                   type="text"
@@ -257,38 +242,41 @@ export default function ExplorePage() {
                 />
                 <button
                   type="button"
-                  onClick={() => setShowEmojiPicker(prev => !prev)}
-                  className="px-2 bg-gray-200 rounded"
+                  onClick={() => setShowPicker(prev => !prev)}
+                  className="px-2 py-1 bg-gray-200 rounded"
                 >
                   😊
                 </button>
-                <button onClick={handleAddComment} className="bg-blue-500 text-white px-3 rounded">
+                <button
+                  onClick={handleAddComment}
+                  className="bg-blue-500 text-white px-3 rounded"
+                >
                   Post
                 </button>
 
-                {showEmojiPicker && (
-                  <div className="absolute bottom-12 right-0 z-50">
-                    <div className="flex justify-end mb-1">
-                      <button onClick={() => setShowEmojiPicker(false)} className="text-red-500"><FaTimes /></button>
-                    </div>
-                    <EmojiPicker onEmojiClick={onEmojiClick} />
+                {showPicker && (
+                  <div className="absolute bottom-12 left-0 z-50">
+                    <EmojiPicker
+                      onEmojiClick={(emojiData) =>
+                        setComment(prev => prev + emojiData.emoji)
+                      }
+                    />
                   </div>
                 )}
               </div>
             </div>
+
+            <button
+              onClick={() => setSelectedPost(null)}
+              className="absolute top-4 right-4 text-white text-3xl"
+            >
+              <FaTimes />
+            </button>
           </div>
-
-          import {FaTimes} from "react-icons/fa"
-
-          <button
-            onClick={() => setSelectedPost(null)}
-            className="absolute top-4 right-4 text-white text-3xl"
-          >
-            <FaTimes />
-          </button>
-
         </div>
       )}
     </>
   )
 }
+
+export default ExplorePage
