@@ -45,6 +45,20 @@ const Reals = () => {
   let [postid, setpostid] = useState(null);
   let [isSubscribet, setIsSubscribet] = useState(false);
 
+
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const showShareModal = () => {
+    setIsShareModalOpen(true);
+  };
+  const handleShareOk = () => {
+    setIsShareModalOpen(false);
+  };
+  const handleShareCancel = () => {
+    setIsShareModalOpen(false);
+  };
+
+
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showMoreModal = () => {
     setIsModalOpen(true);
@@ -258,7 +272,7 @@ const Reals = () => {
                     <p>{e.commentCount}</p>
                   </div>
                   <div className="flex flex-col gap-5 items-center">
-                    <PiPaperPlaneTiltBold className="w-7 h-7 hover:text-[#cacaca]" />
+                    <PiPaperPlaneTiltBold onClick={showShareModal} className="w-7 h-7 hover:text-[#cacaca]" />
                     <button>
                       {savedStates[e.postId] ?? e.postFavorite ? (
                         <FaBookmark className="w-8 h-8" />
@@ -290,6 +304,17 @@ const Reals = () => {
                     />
                   </div>
                 </div>
+                <Modal
+                  title="Share"
+                  closable={{ 'aria-label': 'Custom Close Button' }}
+                  open={isShareModalOpen}
+                  onOk={handleShareOk}
+                  onCancel={handleShareCancel}
+                  styles={{
+                    mask: { backgroundColor: "transparent" },
+                  }}
+                >
+                </Modal>
                 <Modal
                   title={null}
                   open={isModalOpen}
