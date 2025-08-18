@@ -1,6 +1,6 @@
 'use client'
 import { useGetFavoritePostQuery } from '@/store/pages/setting/settingApi'
-import { Switch } from 'antd'
+import { Modal, Switch } from 'antd'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -12,6 +12,7 @@ export default function Setting() {
 	let [comentModal, setComentModal] = useState(false)
 	let [repostModal, setRepostModal] = useState(false)
 	let [likeModal, setLikeModal] = useState(false)
+	let [languageModal, setLanguageModal] = useState(false)
 
 	function showNotificationsModal() {
 		setNotificationsModal(true)
@@ -21,6 +22,7 @@ export default function Setting() {
 		setComentModal(false)
 		setRepostModal(false)
 		setLikeModal(false)
+		setLanguageModal(false)
 	}
 
 	function showConfidentialityModal() {
@@ -31,6 +33,7 @@ export default function Setting() {
 		setComentModal(false)
 		setRepostModal(false)
 		setLikeModal(false)
+		setLanguageModal(false)
 	}
 
 	function showFriendModal() {
@@ -41,6 +44,7 @@ export default function Setting() {
 		setComentModal(false)
 		setRepostModal(false)
 		setLikeModal(false)
+		setLanguageModal(false)
 	}
 
 	function showEnemyModal() {
@@ -51,6 +55,7 @@ export default function Setting() {
 		setComentModal(false)
 		setRepostModal(false)
 		setLikeModal(false)
+		setLanguageModal(false)
 	}
 
 	function showComentModal() {
@@ -61,6 +66,7 @@ export default function Setting() {
 		setComentModal(true)
 		setRepostModal(false)
 		setLikeModal(false)
+		setLanguageModal(false)
 	}
 
 	function showRepostModal() {
@@ -71,6 +77,7 @@ export default function Setting() {
 		setComentModal(false)
 		setRepostModal(true)
 		setLikeModal(false)
+		setLanguageModal(false)
 	}
 
 	function showLikeModal() {
@@ -81,9 +88,30 @@ export default function Setting() {
 		setComentModal(false)
 		setRepostModal(false)
 		setLikeModal(true)
+		setLanguageModal(false)
+	}
+
+	function showLanguageModal() {
+		setNotificationsModal(false)
+		setConfidentialityModal(false)
+		setFriendModal(false)
+		setEnemyModal(false)
+		setComentModal(false)
+		setRepostModal(false)
+		setLikeModal(false)
+		setLanguageModal(true)
 	}
 
 	let { data: favoritePostData } = useGetFavoritePostQuery()
+
+	const [search, setSearch] = useState('')
+	console.log(favoritePostData)
+
+	const filteredPost = favoritePostData?.data?.filter(
+		user =>
+			user.content?.toLowerCase().includes(search.toLowerCase()) ||
+			user.title?.toLowerCase().includes(search.toLowerCase())
+	)
 
 	return (
 		<>
@@ -129,6 +157,7 @@ export default function Setting() {
 						</svg>
 						<p onClick={showNotificationsModal}>Уведомления</p>
 					</div>
+
 					<p className='text-gray-600 mb-4'>Кто может видеть ваш контент</p>
 
 					<div className='flex items-center gap-3 text-gray-800 hover:text-blue-600 cursor-pointer'>
@@ -269,8 +298,6 @@ export default function Setting() {
 						<p onClick={showLikeModal}>Избранные</p>
 					</div>
 
-					{/* ------- */}
-
 					<div className='flex items-center gap-3 text-gray-800 hover:text-blue-600 cursor-pointer'>
 						<svg
 							xmlns='http://www.w3.org/2000/svg'
@@ -286,7 +313,7 @@ export default function Setting() {
 								d='m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802'
 							/>
 						</svg>
-						<p>Язык</p>
+						<p onClick={showLanguageModal}>Язык</p>
 					</div>
 
 					<p className='text-gray-600 mb-4'>Для профисиональных аккаунтов</p>
@@ -866,73 +893,124 @@ export default function Setting() {
 					)}
 
 					{likeModal && (
-						<div className='max-w-4xl mx-auto p-6'>
-							<h2 className='text-3xl font-bold text-center mb-8'>Избранные</h2>
+						<div className='max-w-6xl mx-auto p-4 sm:p-6'>
+							<h2 className='text-3xl font-extrabold text-center mb-10 text-gray-800'>
+								Избранные
+							</h2>
 
-							<div className='grid sm:grid-cols-2 lg:grid-cols-3 gap-6'>
-								{favoritePostData?.data?.map(el => {
+							<input
+								type='search'
+								className='w-full p-2 rounded-md mb-6 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400'
+								value={search}
+								onChange={e => setSearch(e.target.value)}
+								placeholder='Search...'
+							/>
+
+							<div className='grid sm:grid-cols-2 lg:grid-cols-3 gap-8'>
+								{filteredPost?.map(el => {
 									const file = el.images[0]
 									const url = `http://37.27.29.18:8003/images/${file}`
-									const isVideo = /\.(mp4)$/i.test(file)
+
+									const extension = file.split('.').pop().toLowerCase()
+									const isVideo = extension === 'mp4'
 
 									return (
 										<div
 											key={el.postId}
-											className='bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300'
+											className='bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300'
 										>
 											<div className='relative group'>
 												{isVideo ? (
 													<video
 														src={url}
-														className='w-full h-48 object-cover'
+														className='w-full h-56 object-cover'
 														controls
-														/>
+													/>
 												) : (
 													<img
 														src={url}
 														alt={el.title || 'Изображение'}
-														className='w-full h-48 object-cover'
+														className='w-full h-56 object-cover'
 													/>
-												)}
-
-												{isVideo && (
-													<div className='absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 group-hover:bg-opacity-50 transition'>
-														<svg
-															xmlns='http://www.w3.org/2000/svg'
-															className='w-12 h-12 text-white opacity-80 group-hover:opacity-100'
-															fill='currentColor'
-															viewBox='0 0 24 24'
-														>
-															<path d='M8 5v14l11-7z' />
-														</svg>
-													</div>
 												)}
 											</div>
 
-											<div className='p-4'>
-												<h3 className='text-lg font-semibold truncate'>
+											<div className='p-5 flex flex-col gap-3'>
+												<h3 className='text-lg font-semibold text-gray-900 truncate'>
 													{el.title && el.title !== 'null'
 														? el.title
 														: 'Без названия'}
 												</h3>
-												<p className='text-sm text-gray-500 mt-1 line-clamp-2'>
+
+												<p className='text-sm text-gray-500 line-clamp-2'>
 													{el.content || 'Без описания'}
 												</p>
-												<div className='flex justify-between items-center mt-3 text-gray-600 text-sm'>
-													<span>
+
+												<div className='flex justify-between items-center mt-3'>
+													<span className='text-xs text-gray-400'>
 														{new Date(el.datePublished).toLocaleDateString(
 															'ru-RU'
 														)}
 													</span>
-													<span className='flex items-center gap-1'>
-														❤️ {el.postLikeCount}
-													</span>
+
+													<div className='flex items-center gap-3'>
+														<span className='flex items-center gap-1 text-gray-600'>
+															❤️ {el.postLikeCount}
+														</span>
+													</div>
 												</div>
 											</div>
 										</div>
 									)
 								})}
 							</div>
+						</div>
+					)}
+
+					{languageModal && (
+						<div className='max-w-2xl mx-auto p-6'>
+							<h2 className='text-3xl font-bold text-center mb-8'>
+								Выберите язык
+							</h2>
+							<details className='group rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors duration-200 overflow-hidden'>
+								<summary className='flex justify-between items-center p-4 cursor-pointer list-none'>
+									<span className='font-medium text-gray-800'>
+										Языки
+									</span>
+									<svg
+										className='w-5 h-5 text-gray-500 transition-transform duration-200 group-open:rotate-180'
+										xmlns='http://www.w3.org/2000/svg'
+										fill='none'
+										viewBox='0 0 24 24'
+										stroke='currentColor'
+									>
+										<path
+											strokeLinecap='round'
+											strokeLinejoin='round'
+											strokeWidth={2}
+											d='M19 9l-7 7-7-7'
+										/>
+									</svg>
+								</summary>
+								<div className='px-4 pb-4 pt-2 text-gray-600'>
+									Настройте язык на ваше устройстве. Вы
+									можете выбрать любой из предоставленных ниже языков.
+									<div className='mt-4 space-y-3'>
+										<label className='flex items-center justify-between space-x-3'>
+											<span>Русский</span>
+											<button>Применить</button>
+										</label>
+										<label className='flex items-center justify-between space-x-3'>
+											<span>English</span>
+											<button>Apply</button>
+										</label>
+										<label className='flex items-center justify-between space-x-3'>
+											<span>Точики</span>
+											<button>Муроҷиат кунед</button>
+										</label>
+									</div>
+								</div>
+							</details>
 						</div>
 					)}
 				</div>

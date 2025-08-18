@@ -12,7 +12,6 @@ import { Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import { LuPlus } from "react-icons/lu";
 import AddStory from "./addStory";
 
 const Story = () => {
@@ -48,34 +47,36 @@ const Story = () => {
 
   return (
     <div className="w-full overflow-x-auto border-b-1 border-gray-300 pb-3">
+      {/* // storyModal  */}
       {isModalOpen && storyById?.data && (
         <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center">
-          <div className="relative w-full max-w-3xl h-[90vh] flex flex-col items-center justify-center">
+          <div className="relative w-full max-w-full sm:max-w-xl md:max-w-3xl h-[90vh] flex flex-col items-center justify-center">
             <button
               onClick={handleCancel}
-              className="absolute top-5 cursor-pointer right-5 z-50 bg-black/50 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-gray-700 transition"
+              className="absolute top-3 right-3 sm:top-5 sm:right-5 cursor-pointer z-50 bg-black/50 text-white rounded-full w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center hover:bg-gray-700 transition text-2xl"
             >
               ✕
             </button>
 
-            <div className="absolute top-5 left-5 flex flex-col gap-1 z-50">
-              <div className="flex items-center gap-3">
+            <div className="absolute top-3 left-3 sm:top-5 sm:left-5 flex flex-col gap-1 z-50">
+              <div className="flex items-center gap-2 sm:gap-3">
                 {storyById?.data.userImage ? (
                   <img
                     src={`${imgUrl}${storyById?.data.userImage}`}
                     alt="image"
-                    className="w-16 h-16 rounded-full border border-gray-300"
+                    className="w-10 h-10 sm:w-16 sm:h-16 rounded-full border border-gray-300"
                   />
                 ) : (
                   <Image
                     src={userImage}
-                    width={64}
-                    height={64}
+                    width={40}
+                    height={40}
+                    sm={{ width: 64, height: 64 }}
                     alt="image"
-                    className="rounded-full border border-gray-300"
+                    className="w-10 h-10 sm:w-16 sm:h-16 rounded-full border border-gray-300"
                   />
                 )}
-                <span className="text-gray-500 font-semibold">
+                <span className="text-gray-500 font-semibold text-sm sm:text-base">
                   {storyById.data.userName}
                 </span>
               </div>
@@ -87,58 +88,46 @@ const Story = () => {
             </div>
 
             {storyById.data.stories.length > 0 && (
-              <Swiper 
+              <Swiper
                 modules={[Navigation, Pagination]}
                 navigation
                 pagination={{ clickable: true }}
                 className="w-full h-full flex items-center justify-center"
               >
-                {storyById.data.stories
-                  //   .filter((file) => {
-                  //     const storyTime = new Date(file.createAt);
-                  //     const now = new Date();
-                  //     return now - storyTime <= 86400 * 1000;
-                  //   })
-                  .map((file) => {
-                    const fileName = file.fileName || "";
-                    const isVideo =
-                      fileName.toLowerCase().endsWith(".mp4") ||
-                      fileName.toLowerCase().endsWith(".mov");
-                    return (
-                      <SwiperSlide
-                        key={file.id}
-                        className="flex items-center justify-center"
-                      >
-                        {isVideo ? (
-                          <video
-                            src={`${imgUrl}${fileName}`}
-                            controls
-                            autoPlay
-
-                            className="max-h-[85vh] min-h-[40vh] max-w-[90%] rounded-xl object-contain shadow-lg"
-
-
-                          />
-                        ) : (
-                          <img
-                            src={`${imgUrl}${fileName}`}
-                            alt="story"
-
-                            className="max-h-[85vh] min-h-[40vh] max-w-[90%] rounded-xl object-contain shadow-lg"
-
-
-                          />
-                        )}
-                      </SwiperSlide>
-                    );
-                  })}
+                {storyById.data.stories.map((file) => {
+                  const fileName = file.fileName || "";
+                  const isVideo =
+                    fileName.toLowerCase().endsWith(".mp4") ||
+                    fileName.toLowerCase().endsWith(".mov");
+                  return (
+                    <SwiperSlide
+                      key={file.id}
+                      className="flex items-center justify-center"
+                    >
+                      {isVideo ? (
+                        <video
+                          src={`${imgUrl}${fileName}`}
+                          controls
+                          autoPlay
+                          className="max-h-[85vh] min-h-[40vh] max-w-[90%] rounded-xl object-contain shadow-lg"
+                        />
+                      ) : (
+                        <img
+                          src={`${imgUrl}${fileName}`}
+                          alt="story"
+                          className="max-h-[85vh] min-h-[40vh] max-w-[90%] rounded-xl object-contain shadow-lg"
+                        />
+                      )}
+                    </SwiperSlide>
+                  );
+                })}
               </Swiper>
             )}
           </div>
         </div>
       )}
 
-      <section className="flex flex-nowrap items-start gap-5">
+      <section className="flex flex-nowrap items-start gap-4 sm:gap-5 px-2">
         <AddStory />
 
         {data?.map((story) => {
@@ -152,7 +141,7 @@ const Story = () => {
             >
               <div className="flex flex-col items-center">
                 <div
-                  className={`relative w-18 h-18 rounded-full p-1 ${
+                  className={`relative w-18 h-18 sm:w-20 sm:h-20 rounded-full p-0.5 sm:p-1 ${
                     hasStory
                       ? "bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600"
                       : ""
@@ -174,7 +163,7 @@ const Story = () => {
                     />
                   )}
                 </div>
-                <h3 className="text-sm mt-1">{story.userName}</h3>
+                <h3 className="text-xs sm:text-sm mt-1">{story.userName}</h3>
               </div>
             </article>
           );

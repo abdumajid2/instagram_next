@@ -10,18 +10,20 @@ const AsideOfHome = () => {
   const users = data?.data || [];
 
   return (
-    <div className="w-[40%] p-5 bg-white border border-gray-200 rounded-lg">
-      <h2 className="text-gray-500 font-semibold mb-4">Suggestions For You</h2>
+    <div className="w-[40%] hidden md:block p-5 bg-white border border-gray-200 rounded-lg">
+      <div className="flex items-center justify-between mb-4 text-sm">
+        <h2 className="text-gray-500 font-semibold">
+          Suggestions For You
+        </h2>
+        <h3 className="hover:text-gray-500 cursor-pointer">View all</h3>
+      </div>
 
       {isLoading ? (
-        <PendingAnimationOfAsideOfHome/>
+        <PendingAnimationOfAsideOfHome />
       ) : (
         <section className="flex flex-col gap-4">
-          {users.slice((0,5)).map((user) => (
-            <article
-              key={user.userId}
-              className="flex items-center justify-between"
-            >
+          {users.slice(0, 5).map((user, i) => (
+            <article key={i} className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 {user.avatar ? (
                   <img
