@@ -15,19 +15,18 @@ export default function MessengerApp() {
 
   const messagesEndRef = useRef(null);
 
-  // Автоскролл вниз при смене активного чата или при обновлении данных
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [activeChatId, data]);
 
-  // Автоматический выбор первого чата после загрузки
+
   useEffect(() => {
     if (!activeChatId && chatList.length > 0) {
       setActiveChatId(chatList[0].chatId);
     }
   }, [chatList, activeChatId]);
 
-  // Получаем активный чат из списка
+
   const activeChat = chatList.find((c) => c.chatId === activeChatId);
 
   const handleSend = async () => {
@@ -47,7 +46,7 @@ export default function MessengerApp() {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* Sidebar с чатами */}
+
       <aside className="w-80 bg-white border-r p-4 overflow-y-auto">
         <h2 className="text-xl font-semibold mb-4">Chats</h2>
         <ul className="space-y-4">
@@ -77,7 +76,7 @@ export default function MessengerApp() {
         </ul>
       </aside>
 
-      {/* Окно сообщений */}
+  
       <main className="flex-1 flex flex-col p-6 bg-white">
         {!activeChat ? (
           <div className="flex-1 flex items-center justify-center text-gray-500">
