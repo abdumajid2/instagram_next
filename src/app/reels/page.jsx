@@ -18,8 +18,10 @@ import {
 } from "@/store/pages/reels/ReelsApi";
 import { Modal } from "antd";
 import ReelsLoader from "./ReelsLoader";
+import Link from "next/link";
 
-let userImage = "https://www.transparentpng.com/download/user/gray-user-profile-icon-png-fP8Q1P.png";
+let userImage =
+  "https://www.transparentpng.com/download/user/gray-user-profile-icon-png-fP8Q1P.png";
 
 const Reals = () => {
   let { data, isLoading, refetch } = useGetReelsQuery();
@@ -36,11 +38,26 @@ const Reals = () => {
   const [likeCounts, setLikeCounts] = useState({});
   const [savedStates, setSavedStates] = useState({});
   const [expanded, setExpanded] = useState({});
+  const [subscribet, setSubscribet] = useState({});
 
-  let [ comments, setcomments ] = useState([]);
-  let [ addcomment, setaddcomment ] = useState("");
-  let [ postid, setpostid ] = useState(null);
-  let [ isSubscribet, setIsSubscribet ] = useState(false)
+  let [comments, setcomments] = useState([]);
+  let [addcomment, setaddcomment] = useState("");
+  let [postid, setpostid] = useState(null);
+  let [isSubscribet, setIsSubscribet] = useState(false);
+
+
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const showShareModal = () => {
+    setIsShareModalOpen(true);
+  };
+  const handleShareOk = () => {
+    setIsShareModalOpen(false);
+  };
+  const handleShareCancel = () => {
+    setIsShareModalOpen(false);
+  };
+
+
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showMoreModal = () => {
@@ -115,6 +132,21 @@ const Reals = () => {
     }
   };
 
+  const handleSubscribe = async (userId, isSubscribed) => {
+    setSubscribet((prev) => ({ ...prev, [userId]: !isSubscribed }));
+
+    try {
+      if (isSubscribed) {
+        await UnFolow(userId).unwrap();
+      } else {
+        await Folow(userId).unwrap();
+      }
+    } catch (err) {
+      console.error(err);
+      setSubscribet((prev) => ({ ...prev, [userId]: isSubscribed }));
+    }
+  };
+
   const handleSave = async (postId, currentState) => {
     const isSaved = savedStates[postId] ?? currentState;
     setSavedStates((prev) => ({ ...prev, [postId]: !isSaved }));
@@ -131,7 +163,7 @@ const Reals = () => {
       <div className="h-screen w-full overflow-y-scroll snap-y snap-mandatory">
         {data?.data.map((e, i) => {
           const isLiked = likedStates[e.postId] ?? e.postLike;
-          if(isLoading) return <ReelsLoader />
+          if (isLoading) return <ReelsLoader />;
           return (
             <div
               className="relative flex justify-center items-end w-full lg:h-screen h-[98vh]"
@@ -149,7 +181,7 @@ const Reals = () => {
                     src={`http://37.27.29.18:8003/images/${e.images}`}
                   ></video>
                 </div>
-                <div className="absolute left-2 flex flex-col lg:bottom-[0px] w-full items-start gap-3 text-[#e4e4e4]">
+                <div className="absolute left-2 flex flex-col lg:bottom-[0px] bottom-[60px] w-full items-start gap-3 text-[#e4e4e4]">
                   <div className="flex items-center gap-4">
                     <img
                       className="w-12 h-12 rounded-[50%] bg-white"
@@ -160,40 +192,47 @@ const Reals = () => {
                       }
                       alt=""
                     />
-                    <p>{e.userName}</p>
-                    {e.isSubscriber ? (
+                    <Link href={`/profile/${e.userId}`}>{e.userName}</Link>
+                    {subscribet[e.userId] ?? e.isSubscriber ? (
                       <button
-                        onClick={() => {
-                          UnFolow(e.userId);
-                        }}
+                        onClick={() => handleSubscribe(e.userId, true)}
                         className="border py-1 px-3 rounded-xl"
                       >
                         You are subscribet
                       </button>
                     ) : (
                       <button
-                        onClick={() => {
-                          Folow(e.userId);
-                        }}
+                        onClick={() => handleSubscribe(e.userId, false)}
                         className="border py-1 px-3 rounded-xl"
                       >
                         Subscribe
                       </button>
                     )}
                   </div>
-                  <p className={expanded[e.postId] ? "whitespace-pre-line w-[90%]" : "line-clamp-1 w-[90%]"}>
-                    {e.content}
-                  </p>
+                  <div className="flex w-[80%] items-end">
+                    <p
+                      className={
+                        expanded[e.postId]
+                        ? "whitespace-pre-line w-[90%]"
+                        : "line-clamp-1 w-[90%]"
+                      }
+                      >
+                      {e.content}
+                    </p>
                     {e.content?.length > 10 && (
                       <button
-                        onClick={() =>
-                          setExpanded((prev) => ({ ...prev, [e.postId]: !prev[e.postId] }))
-                        }
-                        className="text-sm text-gray-300 mt-1"
+                      onClick={() =>
+                        setExpanded((prev) => ({
+                          ...prev,
+                          [e.postId]: !prev[e.postId],
+                        }))
+                      }
+                      className="text-sm text-gray-300 mt-1"
                       >
                         {expanded[e.postId] ? "скрыть" : "ещё"}
                       </button>
                     )}
+                  </div>
                   <p className="lg:w-95">🎵 {e.userName} original audio</p>
                 </div>
                 <button
@@ -233,7 +272,7 @@ const Reals = () => {
                     <p>{e.commentCount}</p>
                   </div>
                   <div className="flex flex-col gap-5 items-center">
-                    <PiPaperPlaneTiltBold className="w-7 h-7 hover:text-[#cacaca]" />
+                    <PiPaperPlaneTiltBold onClick={showShareModal} className="w-7 h-7 hover:text-[#cacaca]" />
                     <button>
                       {savedStates[e.postId] ?? e.postFavorite ? (
                         <FaBookmark className="w-8 h-8" />
@@ -248,7 +287,9 @@ const Reals = () => {
                   <div className="flex flex-col items-center lg:gap-15 gap-2">
                     <p
                       className="text-4xl cursor-pointer"
-                      onClick={()=> {showMoreModal(), setIsSubscribet(e.isSubscriber)}}
+                      onClick={() => {
+                        showMoreModal(), setIsSubscribet(e.isSubscriber);
+                      }}
                     >
                       ...
                     </p>
@@ -263,6 +304,17 @@ const Reals = () => {
                     />
                   </div>
                 </div>
+                <Modal
+                  title="Share"
+                  closable={{ 'aria-label': 'Custom Close Button' }}
+                  open={isShareModalOpen}
+                  onOk={handleShareOk}
+                  onCancel={handleShareCancel}
+                  styles={{
+                    mask: { backgroundColor: "transparent" },
+                  }}
+                >
+                </Modal>
                 <Modal
                   title={null}
                   open={isModalOpen}
