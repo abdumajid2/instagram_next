@@ -18,6 +18,7 @@ import {
 } from "@/store/pages/reels/ReelsApi";
 import { Modal } from "antd";
 import ReelsLoader from "./ReelsLoader";
+import Link from "next/link";
 
 let userImage =
   "https://www.transparentpng.com/download/user/gray-user-profile-icon-png-fP8Q1P.png";
@@ -177,7 +178,7 @@ const Reals = () => {
                       }
                       alt=""
                     />
-                    <p>{e.userName}</p>
+                    <Link href={`/profile/${e.userId}`}>{e.userName}</Link>
                     {subscribet[e.userId] ?? e.isSubscriber ? (
                       <button
                         onClick={() => handleSubscribe(e.userId, true)}
