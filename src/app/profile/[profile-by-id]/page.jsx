@@ -34,7 +34,7 @@ export default function ProfileById() {
   const userId = String(params['profile-by-id'] || '');
   const router = useRouter();
 
-  /** === Я (мой id из JWT) === */
+
   const [myId, setMyId] = useState(null);
   useEffect(() => {
     try {
@@ -50,7 +50,7 @@ export default function ProfileById() {
     }
   }, []);
 
-  /** === Профиль и истории пользователя === */
+ 
   const {
     data: userData,
     error: userError,
@@ -106,7 +106,7 @@ export default function ProfileById() {
     }
   };
 
-  /** === Просмотр сторис === */
+
   const [showProfileImage, setShowProfileImage] = useState(false);
   const [storyOpen, setStoryOpen] = useState(false);
   const [storyIndex, setStoryIndex] = useState(0);
@@ -137,12 +137,11 @@ export default function ProfileById() {
 
 
 
-  /** === Чаты === */
-  // после того как знаем myId, только тогда тянем список чатов
+ 
   const { data: chatsData } = useGetChatsQuery(undefined, { skip: !myId });
   const myChats = chatsData?.data || [];
 
-  // Определяем «собеседника» относительно меня в конкретном чате
+
   function getPeer(chat, meId) {
     if (String(chat.sendUserId) === String(meId)) {
       return {
@@ -156,10 +155,9 @@ export default function ProfileById() {
       name: chat.sendUserName,
       image: chat.sendUserImage,
     };
-    // В ответе /Chat/get-chats нет поля c.userId — поэтому вычисляем вручную
+ 
   }
 
-  // Ищем существующий чат именно с этим userId
   const existingChat = useMemo(() => {
     if (!myId) return null;
     return myChats.find((c) => String(getPeer(c, myId).id) === String(userId)) || null;
@@ -179,7 +177,7 @@ export default function ProfileById() {
         name = peer.name || user?.userName || 'user';
         avatar = (peer.image || user?.image || '').trim();
       } else {
-        // /Chat/create-chat возвращает { data: <chatId>, ... }
+     
         const res = await createChat(userId).unwrap();
         chatId = res?.data ?? res;
         name = user?.userName || 'user';
@@ -189,16 +187,14 @@ export default function ProfileById() {
       router.push(
         `/chats/${chatId}?name=${encodeURIComponent(name)}&avatar=${encodeURIComponent(avatar)}`
       );
-      // На странице чата собирайте полный src так:
-      // const full = avatar ? `${API}/images/${avatar}` : '/placeholder.png'
     } catch (e) {
       console.error('Ошибка при открытии/создании чата:', e);
       alert('Не удалось открыть чат');
     }
   }
 
-  /** === Вкладки === */
-  const [activeTab, setActiveTab] = useState('posts'); // posts | tagged
+
+  const [activeTab, setActiveTab] = useState('posts'); 
   const [followersOpen, setFollowersOpen] = useState(false);
   const [followingOpen, setFollowingOpen] = useState(false);
 

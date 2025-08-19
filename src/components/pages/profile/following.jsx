@@ -9,6 +9,7 @@ import {
   useGetSubscribersQuery,
   useGetSubscriptionsQuery,
 } from "@/store/pages/profile/ProfileApi";
+import { useTranslation } from "react-i18next";
 
 export default function FollowingMenu({ open, onClose, userId: propsUserId }) {
   const [decode, setDecode] = useState(null);
@@ -45,7 +46,7 @@ export default function FollowingMenu({ open, onClose, userId: propsUserId }) {
   } = useGetSubscribersQuery(userId, { skip: !open || !userId });
 
   const followings = follResp?.data || [];
-  // локально считаем, что всех из “following” мы уже фоллоуим
+
   useEffect(() => {
     if (!open) return;
     setLocalFollowing(followings.map((u) => ({ ...u, isFollowing: true })));
@@ -82,7 +83,7 @@ export default function FollowingMenu({ open, onClose, userId: propsUserId }) {
       await Promise.all([refetchFoll(), refetchSubs()]);
     } catch (error) {
       console.error(error);
-      // откат
+    
       setLocalFollowing((prev) =>
         prev.map((u) =>
           u?.userShortInfo?.userId === targetUserId
@@ -92,6 +93,13 @@ export default function FollowingMenu({ open, onClose, userId: propsUserId }) {
       );
     }
   };
+
+      const {t, i18n} = useTranslation();
+      function TranslateClick(lang) {
+          i18n.changeLanguage(lang);
+      }
+  
+
 
 if (!userId) return null; 
 
