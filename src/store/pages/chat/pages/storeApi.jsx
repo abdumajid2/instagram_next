@@ -74,6 +74,11 @@ export const chatApi = createApi({
       invalidatesTags: [{ type: "Chats", id: "LIST" }],
     }),
 
+   getPostById: builder.query({
+      query: (id) => `Post/get-post-by-id?id=${id}`,
+    }),
+  
+
     
     deleteChat: builder.mutation({
       query: (chatId) => ({
@@ -93,4 +98,5 @@ export const {
   useDeleteMessageMutation,
   useDeleteChatMutation,
   useCreateChatMutation,
+  useGetPostByIdQuery,
 } = chatApi;

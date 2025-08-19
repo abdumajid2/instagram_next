@@ -222,11 +222,12 @@ export default function Notification() {
             <h2 className="font-semibold mb-3">Подписчики</h2>
             <div className="space-y-3">
               {followerEvents.length === 0 && (
-                <div className="text-gray-500">Пока никто не подписался</div>
+                <div className="text-gray-500"></div>
               )}
               {followerEvents.map((e) => {
                 const iFollow = myFollowingSet.has(e.byId);
                 return (
+
                   <div key={`f-${e.byId}`} className="flex items-center justify-between gap-3">
                     <div
                       className="flex items-center gap-3 cursor-pointer"

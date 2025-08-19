@@ -27,6 +27,7 @@ import Peer from "peerjs";
 const FILE_BASE = "http://37.27.29.18:8003/StaticFiles";
 const API_BASE = "http://37.27.29.18:8003";
 
+/* ===================== JWT helpers ===================== */
 function getAuthPayload() {
   if (typeof window === "undefined") return null;
   const token = localStorage.getItem("authToken");
@@ -45,7 +46,12 @@ function getMyName() {
   const p = getAuthPayload();
   return p?.name || p?.fullName || "User";
 }
+function useAuthToken() {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem("authToken");
+}
 
+/* ===================== Utils ===================== */
 const getSenderId = (m) => m?.userId ?? m?.senderUserId ?? m?.fromUserId ?? null;
 const getStamp = (m) => {
   const t = new Date(m?.sendMassageDate || m?.sendMessageDate || m?.createdAt || 0).getTime();
@@ -85,6 +91,27 @@ function readAsDataURL(file) {
   });
 }
 
+/** Парсер: post:ID | reel:ID | /posts/ID | /reels/ID | ?id=ID */
+function extractSharedEntity(text) {
+  if (!text) return null;
+  const s = String(text);
+
+  let m = s.match(/(?:^|\s)(post|reel):(\d+)(?:\s|$)/i);
+  if (m) return { kind: m[1].toLowerCase(), id: Number(m[2]) };
+
+  m = s.match(/\/(posts|reels)\/(\d+)(?:\b|\/|$)/i);
+  if (m) return { kind: m[1].toLowerCase() === "posts" ? "post" : "reel", id: Number(m[2]) };
+
+  m = s.match(/[?&]id=(\d+)\b/i);
+  if (m) {
+    const kind = /reel/i.test(s) ? "reel" : "post";
+    return { kind, id: Number(m[1]) };
+  }
+
+  return null;
+}
+
+/* ===================== Overlays ===================== */
 function ReelOverlay({ src, onClose }) {
   const videoRef = useRef(null);
   const [paused, setPaused] = useState(false);
@@ -158,6 +185,7 @@ function VideoCallOverlay({
       remoteRef.current.play().catch(() => {});
     }
   }, [remoteStream]);
+
   return (
     <div className="fixed inset-0 z-[100] bg-black flex items-center justify-center">
       <video ref={remoteRef} className="absolute inset-0 w-full h-full object-cover opacity-90" playsInline />
@@ -207,69 +235,85 @@ function VideoCallOverlay({
   );
 }
 
-function useAuthToken() {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem("authToken");
-}
-
-function PostPreview({ postId }) {
+/* ===================== Превью пост/рилс ===================== */
+function PostPreview({ id, kind = "post", onOpenReel }) {
   const token = useAuthToken();
-  const [post, setPost] = useState(null);
+  const [data, setData] = useState(null);
   const [err, setErr] = useState("");
+
   useEffect(() => {
     let abort = false;
     async function load() {
       try {
-        const res = await fetch(`${API_BASE}/Post/get-post-by-id?id=${postId}`, {
+        const res = await fetch(`${API_BASE}/Post/get-post-by-id?id=${id}`, {
           headers: {
             accept: "*/*",
             authorization: token ? `Bearer ${token}` : "",
           },
         });
-        if (!res.ok) throw new Error();
+        if (!res.ok) throw new Error("bad status");
         const json = await res.json();
-        if (!abort) setPost(json?.data || null);
+        if (!abort) setData(json?.data || null);
       } catch {
-        if (!abort) setErr("Не удалось загрузить пост");
+        if (!abort) setErr("Не удалось загрузить " + (kind === "reel" ? "рилс" : "пост"));
       }
     }
-    if (postId) load();
+    load();
     return () => {
       abort = true;
     };
-  }, [postId, token]);
+  }, [id, kind, token]);
+
   if (err) return <div className="text-xs text-red-500">{err}</div>;
-  if (!post) return <div className="text-xs text-gray-500">Загрузка поста…</div>;
-  const firstImg = post.images?.[0] || "";
-  const vid = isVideo(firstImg);
+  if (!data) return <div className="text-xs text-gray-500">Загрузка…</div>;
+
+  const firstMedia = data.images?.[0] || "";
+  const isVid = isVideo(firstMedia);
+
   return (
-    <a href="#" onClick={(e) => e.preventDefault()} className="block w-56 sm:w-64 bg-white border rounded-xl overflow-hidden shadow hover:shadow-md transition">
-      <div className="relative w-full aspect-[9/16] bg-gray-100 flex items-center justify-center">
-        {firstImg ? (
-          vid ? (
-            <video src={`${FILE_BASE}/${firstImg}`} className="w-full h-full object-cover" muted playsInline preload="metadata" />
+    <div className="block w-56 sm:w-64 bg-white border rounded-xl overflow-hidden shadow hover:shadow-md transition">
+      <div
+        className="relative w-full aspect-[9/16] bg-gray-100 flex items-center justify-center cursor-pointer"
+        onClick={() => {
+          if (kind === "reel" || isVid) onOpenReel?.(`${firstMedia}`);
+        }}
+        title={kind === "reel" || isVid ? "Открыть рилс" : "Открыть пост"}
+      >
+        {firstMedia ? (
+          isVid ? (
+            <video
+              src={`${FILE_BASE}/${firstMedia}#t=0.1`}
+              className="w-full h-full object-cover"
+              muted
+              playsInline
+              loop
+              autoPlay
+              preload="metadata"
+            />
           ) : (
-            <img src={`${FILE_BASE}/${firstImg}`} alt={post.title || "post"} className="w-full h-full object-cover" />
+            <img src={`${FILE_BASE}/${firstMedia}`} alt={data.title || "post"} className="w-full h-full object-cover" />
           )
         ) : (
           <div className="text-gray-400 text-sm">Без медиа</div>
         )}
+
+        {(kind === "reel" || isVid) && (
+          <div className="absolute bottom-2 right-2 text-white text-xs bg-black/40 px-2 py-1 rounded">▶ Открыть</div>
+        )}
       </div>
+
       <div className="p-3">
-        <div className="text-sm font-semibold line-clamp-1">{post.title || "Без названия"}</div>
-        {post.content && <div className="text-xs text-gray-600 line-clamp-2 mt-1">{post.content}</div>}
-        <div className="text-[11px] text-gray-500 mt-2">❤️ {post.postLikeCount ?? 0} · 💬 {post.commentCount ?? 0}</div>
+        <div className="text-[11px] text-gray-500 mb-1">
+          {kind === "reel" || isVid ? "Reel" : "Post"} · ❤️ {data.postLikeCount ?? 0} · 💬 {data.commentCount ?? 0}
+        </div>
+        <div className="text-sm font-semibold line-clamp-1">{data.title || "Без названия"}</div>
+        {data.content && <div className="text-xs text-gray-600 line-clamp-2 mt-1">{data.content}</div>}
       </div>
-    </a>
+    </div>
   );
 }
 
-function extractPostId(text) {
-  if (!text) return null;
-  const m = String(text).match(/(?:^|\s)post:(\d+)(?:\s|$)/i);
-  return m ? Number(m[1]) : null;
-}
-
+/* ===================== Главная страница чата ===================== */
 export default function ChatByIdPage() {
   const params = useParams();
   const searchParams = useSearchParams();
@@ -288,9 +332,14 @@ export default function ChatByIdPage() {
     ? `http://37.27.29.18:8003/images/${searchParams.get("avatar")}`
     : `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}`;
 
-  const { data: chatsData } = useGetChatsQuery(undefined, { skip: !isNew });
-  const [createChat, { isLoading: isCreating }] = useCreateChatMutation();
+  // postId, переданный из SharePost
+  const sharedPostId = searchParams.get("postId");
+  const [sharedPostSent, setSharedPostSent] = useState(false);
 
+  const { data: chatsData } = useGetChatsQuery(undefined, { skip: !isNew });
+  const [createChat] = useCreateChatMutation();
+
+  // Создать/найти чат, при редиректе сохраняем postId
   useEffect(() => {
     const go = async () => {
       if (!isNew || !targetUserId) return;
@@ -300,28 +349,24 @@ export default function ChatByIdPage() {
         const pid = iAmSender ? c.receiveUserId : c.sendUserId;
         return String(pid) === String(targetUserId);
       });
+      const qs = `?name=${encodeURIComponent(userName)}&avatar=${encodeURIComponent(
+        searchParams.get("avatar") || ""
+      )}&partnerId=${encodeURIComponent(targetUserId)}${sharedPostId ? `&postId=${encodeURIComponent(sharedPostId)}` : ""}`;
+
       if (existing?.chatId) {
-        router.replace(
-          `/chats/${existing.chatId}?name=${encodeURIComponent(userName)}&avatar=${encodeURIComponent(
-            searchParams.get("avatar") || ""
-          )}&partnerId=${encodeURIComponent(targetUserId)}`
-        );
+        router.replace(`/chats/${existing.chatId}${qs}`);
         return;
       }
       try {
         const res = await createChat(String(targetUserId)).unwrap();
         const newChatId = res?.data ?? res?.chatId ?? res?.id;
         if (newChatId) {
-          router.replace(
-            `/chats/${newChatId}?name=${encodeURIComponent(userName)}&avatar=${encodeURIComponent(
-              searchParams.get("avatar") || ""
-            )}&partnerId=${encodeURIComponent(targetUserId)}`
-          );
+          router.replace(`/chats/${newChatId}${qs}`);
         }
       } catch {}
     };
     go();
-  }, [isNew, targetUserId, chatsData, createChat, router, userName, searchParams, myId]);
+  }, [isNew, targetUserId, chatsData, createChat, router, userName, searchParams, myId, sharedPostId]);
 
   const {
     data: messagesData,
@@ -334,6 +379,24 @@ export default function ChatByIdPage() {
 
   const [sendMessage, { isLoading: isSending }] = useSendMessageMutation();
   const [deleteMessage] = useDeleteMessageMutation();
+
+  // При первом открытии готового чата — если есть postId, сразу отправим "post:ID" и потом уберём postId из URL
+  useEffect(() => {
+    const autoShare = async () => {
+      if (!chatId || !sharedPostId || sharedPostSent) return;
+      try {
+        await sendMessage({ chatId, message: `post:${sharedPostId}` }).unwrap();
+        setSharedPostSent(true);
+        // очистим postId из URL, чтобы не дублировать при перезагрузке
+        const url = new URL(window.location.href);
+        url.searchParams.delete("postId");
+        router.replace(url.pathname + "?" + url.searchParams.toString());
+      } catch (e) {
+        // оставим как есть; пользователь сможет вручную отправить
+      }
+    };
+    autoShare();
+  }, [chatId, sharedPostId, sharedPostSent, sendMessage, router]);
 
   const [messageText, setMessageText] = useState("");
   const [file, setFile] = useState(null);
@@ -429,6 +492,7 @@ export default function ChatByIdPage() {
     } catch {}
   };
 
+  /* ====== WebRTC ====== */
   const [showCall, setShowCall] = useState(false);
   const [peer, setPeer] = useState(null);
   const [callConnection, setCallConnection] = useState(null);
@@ -463,7 +527,7 @@ export default function ChatByIdPage() {
   }, [myPeerId]);
 
   const startCall = async () => {
-    if (!partnerPeerId) return;
+    if (!partnerPeerId || !peer) return;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       setLocalStream(stream);
@@ -508,6 +572,7 @@ export default function ChatByIdPage() {
     setCamOff(!camOff);
   };
 
+  /* ====== UI states ====== */
   if (isNew) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-50">
@@ -546,7 +611,12 @@ export default function ChatByIdPage() {
             <button className="hover:text-black" title="Call">
               <BsTelephone size={18} />
             </button>
-            <button className="hover:text-black" title="Video" onClick={startCall} disabled={!partnerPeerId || !myPeerId || !peer}>
+            <button
+              className="hover:text-black"
+              title="Video"
+              onClick={startCall}
+              disabled={!partnerPeerId || !myPeerId || !peer}
+            >
               <BsCameraVideo size={18} />
             </button>
             <button className="hover:text-black" title="Info">
@@ -572,11 +642,11 @@ export default function ChatByIdPage() {
 
               const filePath = isPending ? "" : m?.file || "";
               const hasFile = isPending ? m.kind !== "other" || !!m.fileName : !!filePath;
-              const postId = isPending ? null : extractPostId(m?.messageText);
+
+              const shared = isPending ? null : extractSharedEntity(m?.messageText);
 
               return (
-                <div key={m.messageId ?? `${getStamp(m)}-${i}`} className="space-y-2 hidscroll
-				 ">
+                <div key={m.messageId ?? `${getStamp(m)}-${i}`} className="space-y-2">
                   {showDay && (
                     <div className="flex justify-center">
                       <span className="text-[11px] text-gray-500 bg-gray-100 px-2 py-1 rounded-full">{curDay}</span>
@@ -717,9 +787,14 @@ export default function ChatByIdPage() {
                         </div>
                       )}
 
-                      {postId && (
+                      {/* Карточка Post/Reel */}
+                      {shared && (
                         <div className={`${m?.messageText || hasFile ? "mt-3" : ""}`}>
-                          <PostPreview postId={postId} />
+                          <PostPreview
+                            id={shared.id}
+                            kind={shared.kind}
+                            onOpenReel={(src) => setReelSrc(src)}
+                          />
                         </div>
                       )}
 
@@ -746,6 +821,7 @@ export default function ChatByIdPage() {
             <button className="p-2 rounded-full text-gray-600 hover:bg-gray-100" title="Emoji">
               <FiSmile size={20} />
             </button>
+
             <div className="flex-1 flex items-center bg-white rounded-full border border-gray-300 focus-within:ring-2 focus-within:ring-blue-500">
               <input
                 value={messageText}
@@ -754,6 +830,16 @@ export default function ChatByIdPage() {
                 placeholder="Message…"
                 className="flex-1 bg-transparent px-4 py-2.5 outline-none text-[15px]"
               />
+
+              {/* Демо-кнопка «Поделиться постом»: подставляет 'post:47' */}
+              <button
+                className="p-2 rounded-full text-gray-600 hover:bg-gray-100"
+                title="Поделиться постом"
+                onClick={() => setMessageText((prev) => (prev ? `${prev} post:47` : "post:47"))}
+              >
+                🔗
+              </button>
+
               <button
                 onClick={() => fileInputRef.current?.click()}
                 className="p-2 rounded-full text-gray-600 hover:bg-gray-100"
@@ -772,6 +858,7 @@ export default function ChatByIdPage() {
                 <FiMic size={20} />
               </button>
             </div>
+
             <input
               type="file"
               ref={fileInputRef}
@@ -787,11 +874,14 @@ export default function ChatByIdPage() {
               className="hidden"
               accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip,.rar,.7z"
             />
+
             <button
               onClick={handleSend}
               disabled={isSending || (!messageText.trim() && !file) || !chatId}
               className={`ml-2 px-4 py-2 rounded-full font-semibold text-white ${
-                isSending || (!messageText.trim() && !file) || !chatId ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+                isSending || (!messageText.trim() && !file) || !chatId
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700"
               }`}
               title="Send"
             >
