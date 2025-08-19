@@ -1,0 +1,2 @@
+// apiBase.js
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://37.27.29.18:8003";
