@@ -19,6 +19,7 @@ import {
 import { Modal } from "antd";
 import ReelsLoader from "./ReelsLoader";
 import Link from "next/link";
+import SharePost from "@/components/pages/home/posts/sharePost";
 
 let userImage =
   "https://www.transparentpng.com/download/user/gray-user-profile-icon-png-fP8Q1P.png";
@@ -39,25 +40,12 @@ const Reals = () => {
   const [savedStates, setSavedStates] = useState({});
   const [expanded, setExpanded] = useState({});
   const [subscribet, setSubscribet] = useState({});
+  const [showPlayIcon, setShowPlayIcon] = useState({});
 
   let [comments, setcomments] = useState([]);
   let [addcomment, setaddcomment] = useState("");
   let [postid, setpostid] = useState(null);
   let [isSubscribet, setIsSubscribet] = useState(false);
-
-
-  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-  const showShareModal = () => {
-    setIsShareModalOpen(true);
-  };
-  const handleShareOk = () => {
-    setIsShareModalOpen(false);
-  };
-  const handleShareCancel = () => {
-    setIsShareModalOpen(false);
-  };
-
-
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showMoreModal = () => {
@@ -95,14 +83,18 @@ const Reals = () => {
     setOpen(false);
   };
 
-  const togglePlay = (e) => {
-    const video = e.currentTarget;
-    if (video.paused) {
-      video.play();
-    } else {
-      video.pause();
-    }
-  };
+  const togglePlay = (index) => {
+  const video = videoRefs.current[index];
+  if (!video) return;
+
+  if (video.paused) {
+    video.play();
+    setShowPlayIcon((prev) => ({ ...prev, [index]: false }));
+  } else {
+    video.pause();
+    setShowPlayIcon((prev) => ({ ...prev, [index]: true }));
+  }
+};
 
   const toggleMute = (index) => {
     const video = videoRefs.current[index];
@@ -158,6 +150,7 @@ const Reals = () => {
     }
   };
 
+  if(isLoading) return <ReelsLoader />
   return (
     <>
       <div className="h-screen w-full overflow-y-scroll snap-y snap-mandatory">
@@ -272,7 +265,9 @@ const Reals = () => {
                     <p>{e.commentCount}</p>
                   </div>
                   <div className="flex flex-col gap-5 items-center">
-                    <PiPaperPlaneTiltBold onClick={showShareModal} className="w-7 h-7 hover:text-[#cacaca]" />
+                    <div className="text-3xl">
+                      <SharePost el={e} />
+                    </div>
                     <button>
                       {savedStates[e.postId] ?? e.postFavorite ? (
                         <FaBookmark className="w-8 h-8" />
@@ -304,17 +299,6 @@ const Reals = () => {
                     />
                   </div>
                 </div>
-                <Modal
-                  title="Share"
-                  closable={{ 'aria-label': 'Custom Close Button' }}
-                  open={isShareModalOpen}
-                  onOk={handleShareOk}
-                  onCancel={handleShareCancel}
-                  styles={{
-                    mask: { backgroundColor: "transparent" },
-                  }}
-                >
-                </Modal>
                 <Modal
                   title={null}
                   open={isModalOpen}
@@ -446,5 +430,4 @@ const Reals = () => {
     </>
   );
 };
-
 export default Reals;
