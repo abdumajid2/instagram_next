@@ -149,7 +149,7 @@ const MiniSideBar = ({ children }) => {
 				</div>
 			</section>
 
-			<div className='ml-[0px]'>{children}</div>
+			<div className='ml-[0px] w-full'>{ children}</div>
 		</div>
 	)
 }
