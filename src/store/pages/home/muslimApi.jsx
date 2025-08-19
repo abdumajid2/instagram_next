@@ -77,6 +77,13 @@ export const muslimApi = createApi({
         method: "DELETE",
       }),
     }),
+    getSubscriptions: builder.query({
+      query: (UserId) =>
+        `FollowingRelationShip/get-subscriptions?UserId=${UserId}`,
+    }),
+    getChatByid: builder.query({
+      query: (chatId) => `Chat/get-chat-by-id?chatId=${chatId}`,
+    }),
   }),
 });
 
@@ -94,4 +101,6 @@ export const {
   useAddPostFavoriteMutation,
   useGetUsersQuery,
   useDeleteCommentMutation,
+  useGetSubscriptionsQuery,
+  useGetChatByidQuery,
 } = muslimApi;

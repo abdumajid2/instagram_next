@@ -8,6 +8,7 @@ import {
   useDeleteFollowMutation,
   useGetPostByIdQuery,
   useGetPostsQuery,
+  useGetUsersQuery,
   useIsFollowerQuery,
 } from "@/store/pages/home/muslimApi";
 import Image from "next/image";
@@ -24,7 +25,6 @@ import {
   FaRegComment,
   FaRegHeart,
 } from "react-icons/fa";
-import { IoSendOutline } from "react-icons/io5";
 import { FaRegFaceSmileWink } from "react-icons/fa6";
 import Story from "../stories/story";
 import { Navigation, Pagination } from "swiper/modules";
@@ -34,6 +34,11 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import Link from "next/link";
+import EmojiPicker from "emoji-picker-react";
+import { LuSend } from "react-icons/lu";
+import { jwtDecode } from "jwt-decode";
+import SharePost from "./sharePost";
+import { LiaTelegramPlane } from "react-icons/lia";
 
 const Posts = () => {
   const { data, isLoading, isError } = useGetPostsQuery();
@@ -55,6 +60,7 @@ const Posts = () => {
   const [isModalOpenFollower, setIsModalOpenFollower] = useState(false);
   const [localPosts, setLocalPosts] = useState([]);
   const [inpAddComment, setInpAddComment] = useState("");
+  const { data: users } = useGetUsersQuery();
 
   useEffect(() => {
     if (data?.data) {
@@ -179,18 +185,21 @@ const Posts = () => {
   // contentModal
   let [contentModal, setContentModal] = useState(false);
 
+  // Emoji
+  let [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
   if (isLoading) return <PendingAnimation />;
   if (isError) return <ErrorAnimation />;
 
   return (
-    <div className="md:w-[45%] w-full mx-auto"> 
+    <div className="md:w-[45%] w-full mx-auto">
       <Story />
       <div className="md:w-[80%] mx-auto flex flex-col gap-7 max-w-full mt-7">
         {/* Modal Comments */}
         <Modal
           className="!w-full !h-full !m-0 !p-0 !absolute !top-1/2 !left-1/2 !-translate-x-1/2 !-translate-y-1/2 overflow-hidden sm:!w-[80%] md:!h-[90vh]"
           title={null}
-          closable={false}
+          closable={{ "aria-label": "Custom Close Button" }}
           open={isModalOpen}
           onOk={handleCancel}
           onCancel={handleCancel}
@@ -233,7 +242,7 @@ const Posts = () => {
                 );
               })}
             </Swiper>
-            <aside className="w-full md:w-[50%] p-2 md:p-4 flex flex-col justify-between md:h-full  h-[94vh]">
+            <aside className="w-full md:w-[50%] p-2 md:p-4 flex flex-col justify-between md:h-full  h-[94vh] relative">
               <section>
                 <article className="flex items-center justify-between">
                   <div className="flex items-center gap-2 sm:gap-3">
@@ -261,7 +270,7 @@ const Posts = () => {
 
                 <hr className="border-1 border-gray-200 my-2 sm:my-3" />
 
-                <section className="flex flex-col gap-2 sm:gap-4 h-[30vh] sm:h-[60vh] overflow-y-auto no-scrollbar">
+                <section className="flex flex-col gap-5 mt-5 md:mt-0 h-[60vh] overflow-y-auto no-scrollbar">
                   {postInfo?.data?.comments.map((comment) => (
                     <article
                       key={comment.postCommentId}
@@ -272,7 +281,7 @@ const Posts = () => {
                         width={32}
                         height={32}
                         alt="user"
-                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex-shrink-0"
+                        className="w-9 h-9 rounded-full flex-shrink-0"
                       />
 
                       <div className="flex-1 flex flex-col">
@@ -301,28 +310,59 @@ const Posts = () => {
                 </section>
               </section>
 
-              <form
-                onSubmit={addNewComment}
-                className="flex justify-between border-1 border-gray-300 w-full p-2 sm:p-3 rounded"
-              >
-                <div className="flex items-center gap-2 sm:gap-3 ">
-                  <FaRegFaceSmileWink className="text-xl sm:text-2xl" />
-                  <input
-                    type="text"
-                    value={inpAddComment}
-                    onChange={(e) => setInpAddComment(e.target.value)}
-                    placeholder="Add comment..."
-                    className="w-full outline-none text-sm sm:text-base"
-                  />
+              <section className="md:relative bottom-4">
+                <div className="p-4 h-[40px] sm:h-fit hidden  md:flex sm:flex-col justify-center  items-center sm:items-start gap-3">
+                  <div className="flex items-center gap-4">
+                    <FaRegHeart size={24} className="cursor-pointer" />
+                    <FaRegComment size={24} className="cursor-pointer" />
+                    <LiaTelegramPlane size={24} className="cursor-pointer" />
+                  </div>
+                  <span className="font-semibold">
+                    {postInfo?.data?.postLikeCount} отметок "Нравится"
+                  </span>
+                  <span className="text-xs text-gray-500 sm:block hidden">
+                    Posted on:{" "}
+                    {new Date(postInfo?.data?.datePublished).toLocaleString()}
+                  </span>
                 </div>
-                <button
-                  className={`text-blue-900 text-sm sm:text-base font-semibold ${
-                    inpAddComment ? "" : "opacity-65"
-                  }`}
+                <form
+                  onSubmit={addNewComment}
+                  className="flex justify-between border-1 border-gray-300 w-full p-2 sm:p-3 rounded"
                 >
-                  Publish
-                </button>
-              </form>
+                  <div className="flex items-center gap-2 sm:gap-3 ">
+                    <FaRegFaceSmileWink
+                      onClick={() => setShowEmojiPicker((val) => !val)}
+                      className="text-xl sm:text-2xl cursor-pointer"
+                    />
+
+                    {showEmojiPicker && (
+                      <div className="absolute bottom-10 left-0 z-50">
+                        <EmojiPicker
+                          onEmojiClick={(emojiData) => {
+                            setInpAddComment((prev) => prev + emojiData.emoji);
+                            setShowEmojiPicker(false);
+                          }}
+                        />
+                      </div>
+                    )}
+
+                    <input
+                      type="text"
+                      value={inpAddComment}
+                      onChange={(e) => setInpAddComment(e.target.value)}
+                      placeholder="Add comment..."
+                      className="w-full outline-none text-sm sm:text-base"
+                    />
+                  </div>
+                  <button
+                    className={`text-blue-900 text-sm sm:text-base font-semibold ${
+                      inpAddComment ? "" : "opacity-65"
+                    }`}
+                  >
+                    Publish
+                  </button>
+                </form>
+              </section>
             </aside>
           </section>
         </Modal>
@@ -393,9 +433,15 @@ const Posts = () => {
         </Modal>
 
         {localPosts.map((e) => (
-          <article key={e.postId} className="w-full pb-4 border-b-1 border-gray-300">
+          <article
+            key={e.postId}
+            className="w-full pb-4 border-b-1 border-gray-300"
+          >
             <div className="flex items-center justify-between">
-              <Link href={`/profile/${e.userId}`} className="flex items-center gap-3">
+              <Link
+                href={`/profile/${e.userId}`}
+                className="flex items-center gap-3"
+              >
                 {e.userImage ? (
                   <img
                     className="w-9 h-9 sm:w-10 sm:h-10 rounded-full"
@@ -476,12 +522,12 @@ const Posts = () => {
                     onClick={() => openComment(e)}
                     className="cursor-pointer hover:opacity-60 transition"
                   />
-                  <IoSendOutline className="cursor-pointer hover:opacity-60 transition" />
+                  <SharePost el={e} />
                 </div>
                 {e.postFavorite ? (
                   <FaBookmark
                     onClick={() => addNewPostFavourite(e.postId)}
-                    className="cursor-pointer"
+                    className="cursor-pointer transition"
                   />
                 ) : (
                   <FaRegBookmark
@@ -490,7 +536,7 @@ const Posts = () => {
                   />
                 )}
               </div>
-              <h3 className="text-sm font-semibold text-gray-900 mt-2">
+              <h3 className="text-sm font-semibold text-gray-900 mt-1">
                 {e.postLikeCount} likes
               </h3>
               <div
@@ -521,7 +567,7 @@ const Posts = () => {
                   onClick={() => openComment(e)}
                   className="text-sm text-gray-500 cursor-pointer hover:underline"
                 >
-                  View all {e.comments.length} comments
+                  View all ({e.comments.length}) comments
                 </p>
               )}
             </div>
