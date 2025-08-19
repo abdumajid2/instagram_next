@@ -1,9 +1,9 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
+import { API_BASE_URL } from "@/lib/apiBase";
 export const chatApi = createApi({
   reducerPath: "chatApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://37.27.29.18:8003/",
+    baseUrl: API_BASE_URL,
     prepareHeaders: (headers) => {
       const authToken =
         typeof window !== "undefined"
