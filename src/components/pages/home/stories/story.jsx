@@ -17,7 +17,9 @@ import AddStory from "./addStory";
 const Story = () => {
   const { data } = useGetStoriesQuery();
   let [storyId, setStoryId] = useState(null);
-  const { data: storyById } = useGetStoryByIdQuery(storyId);
+  const { data: storyById } = useGetStoryByIdQuery(storyId, {
+    skip: !storyId,
+  });
   const imgUrl = "http://37.27.29.18:8003/images/";
 
   const [isModalOpen, setIsModalOpen] = useState(false);

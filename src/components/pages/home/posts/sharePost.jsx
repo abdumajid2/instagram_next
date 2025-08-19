@@ -137,7 +137,7 @@ const SharePost = ({ el }) => {
 
       <LuSend
         onClick={showModal}
-        className="cursor-pointer hover:opacity-60 transition rotate-12 relative right-1"
+        className="cursor-pointer hover:opacity-60 transition rotate-12 relative right-1 text-2xl"
       />
     </div>
   );
