@@ -323,8 +323,10 @@ return (
       )}
 
       {isMenuLoading && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">\
+        
           <div className="w-[92vw] max-w-[500px] flex flex-col gap-5 p-5 sm:p-[50px] rounded-2xl sm:rounded-4xl bg-white">
+            
             <ImCancelCircle className="ml-auto text-2xl" onClick={() => setIsMenuLoading(false)} />
             <p
               className="text-xl sm:text-2xl font-bold cursor-pointer"
@@ -335,6 +337,11 @@ return (
             >
               Qr code
             </p>
+               <Link href="/profile/editProfile" className="flex-1 sm:flex-none">
+              <button  className="text-xl sm:text-2xl font-bold cursor-pointer">
+                Edit profile
+              </button>
+            </Link>
             <Link href={"/notification"}>
               <p className="text-xl sm:text-2xl font-bold">Notification</p>
             </Link>
@@ -377,12 +384,8 @@ return (
 
 
           {/* actions — на мобилке в одну строку, компактнее */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Link href="/profile/editProfile" className="flex-1 sm:flex-none">
-              <button className="bg-[#F3F4F6] w-full sm:w-[105px] h-[36px] sm:h-[40px] px-3 rounded-xl flex items-center justify-center text-sm sm:text-base">
-                Edit profile
-              </button>
-            </Link>
+          <div className="flex items-center gap-2 sm:gap-[50px]">
+         
             <button
               className="bg-[#F3F4F6] w-[110px] sm:w-[105px] h-[36px] sm:h-[40px] rounded-xl flex items-center justify-center text-sm sm:text-base"
               onClick={() => setIsMenuLoading(true)}

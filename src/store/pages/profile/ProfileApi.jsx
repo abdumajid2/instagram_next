@@ -173,6 +173,12 @@ export const profileApi = createApi({
         url:`/Chat/create-chat?receiverUserId=${userId}`,
         method:"POST"
       })
+    }),
+    deletePost:builder.mutation({
+      query:(postId)=>({
+        url:`Post/delete-post?id=${postId}`,
+        method:"DELETE"
+      })
     })
   }),
 });
@@ -210,5 +216,6 @@ useGetPostsQuery,
   useGetUsersPostByIdQuery,
   useChatByIdQuery,
   useGetChatsQuery,
-  useCreateChatMutation
+  useCreateChatMutation,
+  useDeletePostMutation
 } = profileApi;
