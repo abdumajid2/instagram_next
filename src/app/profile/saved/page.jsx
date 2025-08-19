@@ -73,7 +73,7 @@ const handleDeleteComment = async (commentId) => {
 
   return (
     <>
-      <div className="w-full flex flex-wrap gap-3">
+   <div className="w-full sm:flex flex-wrap grid grid-cols-2  gap-3">
         {posts.map((post) => (
           <div
             key={post.postId}
@@ -87,12 +87,12 @@ const handleDeleteComment = async (commentId) => {
                   alt="saved post preview"
                   width={200}
                   height={200}
-                  className="rounded-lg object-cover w-[200px] h-[250px]"
+                  className="rounded-lg object-cover  sm:w-[200px] w-[170px] h-[250px]"
                 />
               ) : (
                 <video
                   src={getImageUrl(post.images[0])}
-                  className="rounded-lg object-cover w-[200px] h-[250px]"
+                  className="rounded-lg object-cover  sm:w-[200px] w-[170px] h-[250px]"
                   muted
                 />
               )
@@ -111,9 +111,8 @@ const handleDeleteComment = async (commentId) => {
 
       {selectedPost && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center">
-          <div className="bg-white w-[90%] h-[90%] flex rounded-xl overflow-hidden relative">
-
-            <div className="w-[60%] bg-black flex items-center justify-center">
+                  <div className="bg-white w-[90%] sm:h-[90%] h-[98%] flex sm:flex-row flex-col rounded-xl overflow-hidden relative">
+            <div className="sm:w-[60%] h-[35%] sm:h-full w-full bg-black flex items-center justify-center">
               {selectedPost.images?.length > 1 ? (
                 <Swiper modules={[Navigation, Scrollbar]} navigation scrollbar={{ draggable: true }} className="w-full h-full">
                   {selectedPost.images.map((file, idx) => (
@@ -161,7 +160,7 @@ const handleDeleteComment = async (commentId) => {
               )}
             </div>
 
-            <div className="w-[40%] flex flex-col border-l border-gray-200">
+ <div className="sm:w-[40%] h-full flex flex-col border-l w-full overflow-auto border-gray-200">
               <div className="flex items-center gap-3 p-4 border-b border-gray-200">
                 <Avatar size={40} src={getImageUrl(selectedPost.userImage)} />
                 <div className="flex flex-col">

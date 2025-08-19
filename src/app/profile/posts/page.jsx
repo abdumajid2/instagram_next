@@ -77,7 +77,7 @@ const handleDeleteComment = async (commentId) => {
 
   return (
     <>
-      <div className="w-full flex flex-wrap gap-3">
+      <div className="w-full sm:flex flex-wrap grid grid-cols-2  gap-3">
         {posts.map((post) => (
           <div
             key={post.postId}
@@ -91,7 +91,7 @@ const handleDeleteComment = async (commentId) => {
                   alt="post preview"
                   width={200}
                   height={200}
-                  className="rounded-lg object-cover w-[200px] h-[250px]"
+                  className="rounded-lg object-cover  sm:w-[200px] w-[170px] h-[250px]"
                 />
               ) : (
                 <video
@@ -115,10 +115,10 @@ const handleDeleteComment = async (commentId) => {
 
       {selectedPost && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center">
-          <div className="bg-white w-[90%] h-[90%] flex rounded-xl overflow-hidden relative">
+          <div className="bg-white w-[90%] sm:h-[90%] h-[98%] flex sm:flex-row flex-col rounded-xl overflow-hidden relative">
 
             {/* Левый блок - медиа */}
-            <div className="w-[60%] bg-black flex items-center justify-center">
+            <div className="sm:w-[60%] h-[35%] sm:h-full w-full bg-black flex items-center justify-center">
               {selectedPost.images?.length > 1 ? (
                 <Swiper modules={[Navigation, Scrollbar]} navigation scrollbar={{ draggable: true }} className="w-full h-full">
                   {selectedPost.images.map((file, idx) => (
@@ -167,7 +167,7 @@ const handleDeleteComment = async (commentId) => {
             </div>
 
             {/* Правый блок - инфо и комментарии */}
-            <div className="w-[40%] flex flex-col border-l border-gray-200">
+            <div className="sm:w-[40%] h-full flex flex-col border-l w-full overflow-auto border-gray-200">
               <div className="flex items-center gap-3 p-4 border-b border-gray-200">
                 <Avatar size={40} src={getImageUrl(selectedPost.userImage)} />
                 <div className="flex flex-col ">
@@ -175,7 +175,7 @@ const handleDeleteComment = async (commentId) => {
                 </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-4 space-y-3 text-sm">
+              <div className="flex-1  overflow-y-auto p-4 space-y-3 text-sm">
                 <div className="flex    items-start gap-2">
                   <Avatar size={36}  src={getImageUrl(selectedPost.userImage)} />
                   <div className="flex w-[90%] flex-col">
@@ -188,7 +188,7 @@ const handleDeleteComment = async (commentId) => {
                 </div>
 
                 {selectedPost.comments.map((comment) => (
-                  <div key={comment.postCommentId} className="flex items-start gap-2">
+                  <div key={comment.postCommentId} className="flex w-full  items-start gap-2">
                     <Avatar size={36} src={getImageUrl(comment.userImage)} />
                     <div className="flex w-[90%] flex-col">
                       <div className="flex items-center justify-between gap-1">
@@ -207,19 +207,19 @@ const handleDeleteComment = async (commentId) => {
                 ))}
               </div>
 
-              <div className="p-4 border-t border-gray-200 flex flex-col items-start gap-3">
+              <div className="p-4 border-t border-gray-200   h-[40px] sm:h-fit  flex sm:flex-col justify-center  items-center sm:items-start  gap-3">
                 <div className='flex items-center gap-4'>
                   <FaRegHeart size={24} className="cursor-pointer" />
                   <FaRegComment size={24} className="cursor-pointer" />
                   <LiaTelegramPlane size={24} className="cursor-pointer" />
                 </div>
                 <span className="font-semibold">{selectedPost.postLikeCount} отметок "Нравится"</span>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-gray-500 sm:block hidden">
                   Posted on: {new Date(selectedPost.datePublished).toLocaleString()}
                 </span>
               </div>
 
-              <div className="p-4 border-t border-gray-200 flex gap-2">
+              <div className="p-4 border-t  border-gray-200  flex gap-2">
                 <Input 
                   value={postComment} 
                   onChange={(e)=>setPostComment(e.target.value)} 
@@ -235,7 +235,7 @@ const handleDeleteComment = async (commentId) => {
 
             <button
               onClick={() => setSelectedPost(null)}
-              className="absolute top-2 right-2 bg-black/50 text-white rounded-full w-10 h-10 flex items-center justify-center"
+              className="absolute sm:top-2 sm:right-2   top-0 z-50 right-0 sm:bg-black/50 text-white rounded-full w-10 h-10 flex items-center justify-center"
             >
               ✕
             </button>

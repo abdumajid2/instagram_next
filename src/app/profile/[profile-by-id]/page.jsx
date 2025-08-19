@@ -207,9 +207,9 @@ export default function ProfileById() {
   if (!user) return <div>Пользователь не найден</div>;
 
   return (
-    <div className="sm:max-w-[640px] ml-[100px] mt-5">
+    <div className="w-full sm:max-w-[640px] mx-auto sm:ml-[100px] mt-2 sm:mt-5 px-3 sm:px-0">
       {/* HEADER */}
-      <section className="w-full flex items-center justify-between gap-6">
+        <section className="w-full flex  sm:flex-row items-start sm:items-start justify-between gap-4 sm:gap-[30px] h-auto sm:h-[160px]">
         <div
           className={
             hasStory
@@ -223,30 +223,33 @@ export default function ProfileById() {
             width={160}
             height={160}
             src={IMG(user?.image)}
-            className="h-[160px] w-[160px] object-cover rounded-full bg-white"
+                 className="h-[96px] w-[96px] sm:h-[160px] sm:w-[160px] object-cover rounded-full bg-white"
           />
         </div>
 
-        <article className="flex flex-col w-[70%] justify-between h-[140px]">
-          <div className="w-full flex items-start gap-[20px]">
+      <article className="w-[70%] flex flex-col items-start justify-between h-auto sm:h-[142px]">
+          <div className="w-full flex sm:flex-row flex-col items-start gap-[20px]">
             <p className="text-[20px] font-[700]">{user.userName}</p>
 
             {/* Follow/Unfollow */}
             {myId && myId !== String(userId) && (
-              <div>
+              <div className='flex items-start gap-[20px] mb-[10px]'>
                 <button
                   onClick={onToggleFollow}
                   disabled={followLoading || unfollowLoading}
-                  className={`px-9 py-1 rounded-md text-white font-semibold transition ${
+                  className={`sm:px-9 px-5 py-1 rounded-md text-white font-semibold transition ${
                     isFollowing ? 'bg-gray-500 hover:bg-gray-600' : 'bg-blue-600 hover:bg-blue-500'
                   }`}
                 >
                   {isFollowing ? 'Unfollow' : 'Follow'}
                 </button>
+                    <button onClick={goToChat} disabled={creatingChat} className="sm:px-4 sm:hidden px-1 text-[10px]  py-2 sm:py-1 rounded-md border">
+              Send message
+            </button>
               </div>
             )}
 
-            <button onClick={goToChat} disabled={creatingChat} className="px-4 py-1 rounded-md border">
+            <button onClick={goToChat} disabled={creatingChat} className="sm:px-4 px-1 sm:block hidden text-[10px]  py-2 rounded-md border">
               Send message
             </button>
           </div>
