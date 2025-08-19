@@ -12,7 +12,6 @@ import {
   useGetPostsQuery
 } from "@/store/pages/explore/exploreApi"
 import { FaComment, FaHeart, FaTimes, FaTrash } from 'react-icons/fa'
-import EmojiPicker from 'emoji-picker-react'
 import defaultAvatar from '../../assets/icon/pages/explore/Без названия.jpg'
 
 const ExplorePage = () => {
@@ -28,7 +27,6 @@ const ExplorePage = () => {
   const [addFollowing] = useAddFollowingMutation()
   const [deleteFollowing] = useDeleteFollowingMutation()
   const [isFollowing, setIsFollowing] = useState(false)
-  const [showPicker, setShowPicker] = useState(false)
 
   const currentUserId = 1
   const { data: subscriptions } = useGetSubscriptionsQuery(currentUserId)
@@ -110,7 +108,6 @@ const ExplorePage = () => {
 
   return (
     <>
-      {/* Posts Grid */}
       <div className="container mx-auto px-0 py-4">
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 md:gap-2">
           {data?.data?.map((post) => {
@@ -158,11 +155,16 @@ const ExplorePage = () => {
         </div>
       </div>
 
-      {/* Post Modal */}
       {selectedPost && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
           <div className="bg-white w-[90%] h-[90%] flex relative">
-            {/* Media */}
+            <button
+              onClick={() => setSelectedPost(null)}
+              className="absolute top-3 right-3 text-gray-700 hover:text-black text-2xl z-50"
+            >
+              <FaTimes />
+            </button>
+
             <div className="flex-1 bg-black flex items-center justify-center relative">
               {selectedPost.images?.[0] && /\.(mp4)$/i.test(selectedPost.images[0]) ? (
                 <video
@@ -179,14 +181,12 @@ const ExplorePage = () => {
               )}
             </div>
 
-            {/* Sidebar */}
             <div className="w-[350px] flex flex-col border border-[gainsboro]">
-              {/* Header */}
               <div className="p-4 flex items-center justify-between border-b border-[gainsboro]">
                 <div className="flex items-center gap-3">
                   <img
                     src={defaultAvatar}
-                    alt={defaultAvatar}
+                    alt="User"
                     className="w-10 h-10 rounded-full object-cover"
                   />
                   <span className="font-semibold">{selectedPost.userName}</span>
@@ -199,9 +199,11 @@ const ExplorePage = () => {
                 </button>
               </div>
 
-              {/* Like & Comment Info */}
               <div className="p-4 flex items-center gap-4 border-b border-[gainsboro]">
-                <div className="flex items-center gap-2 cursor-pointer" onClick={() => handleLike(selectedPost.postId)}>
+                <div
+                  className="flex items-center gap-2 cursor-pointer"
+                  onClick={() => handleLike(selectedPost.postId)}
+                >
                   <FaHeart className={likedPosts[selectedPost.postId] ? "text-red-500" : ""} />
                   <span>{postLikes[selectedPost.postId]}</span>
                 </div>
@@ -210,13 +212,12 @@ const ExplorePage = () => {
                 </div>
               </div>
 
-              {/* Comments */}
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {selectedPost.comments?.map((c) => (
                   <div key={c.commentId} className="flex items-start gap-2">
                     <img
                       src={defaultAvatar}
-                      alt={defaultAvatar}
+                      alt="User"
                       className="w-8 h-8 rounded-full object-cover"
                     />
                     <div className="flex-1">
@@ -231,7 +232,6 @@ const ExplorePage = () => {
                 ))}
               </div>
 
-              {/* Add Comment */}
               <div className="p-4 border-t border-[gainsboro] flex gap-2 relative">
                 <input
                   type="text"
@@ -241,37 +241,13 @@ const ExplorePage = () => {
                   className="flex-1 border border-[gainsboro] p-2 rounded"
                 />
                 <button
-                  type="button"
-                  onClick={() => setShowPicker(prev => !prev)}
-                  className="px-2 py-1 bg-gray-200 rounded"
-                >
-                  😊
-                </button>
-                <button
                   onClick={handleAddComment}
                   className="bg-blue-500 text-white px-3 rounded"
                 >
                   Post
                 </button>
-
-                {showPicker && (
-                  <div className="absolute bottom-12 left-0 z-50">
-                    <EmojiPicker
-                      onEmojiClick={(emojiData) =>
-                        setComment(prev => prev + emojiData.emoji)
-                      }
-                    />
-                  </div>
-                )}
               </div>
             </div>
-
-            <button
-              onClick={() => setSelectedPost(null)}
-              className="absolute top-4 right-4 text-white text-3xl"
-            >
-              <FaTimes />
-            </button>
           </div>
         </div>
       )}
