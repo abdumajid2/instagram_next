@@ -24,11 +24,12 @@ import {
 import { Spin } from "antd";
 import Peer from "peerjs";
 
-/* ===================== CONSTANTS ===================== */
+
 const FILE_BASE = "http://37.27.29.18:8003/StaticFiles";
 const API_BASE = "http://37.27.29.18:8003";
 
-/* ===================== JWT helpers ===================== */
+
+//грифтани ауз
 function getAuthPayload() {
   if (typeof window === "undefined") return null;
   const token = localStorage.getItem("authToken");
@@ -39,20 +40,28 @@ function getAuthPayload() {
     return null;
   }
 }
+
+
+// грифтани айди аз токен
 function getMyUserId() {
   const p = getAuthPayload();
   return p?.sid || p?.sub || p?.userId || p?.nameid || null;
 }
+
+
+// грифтани носи юзер
 function getMyName() {
   const p = getAuthPayload();
   return p?.name || p?.fullName || "User";
 }
+
+// грифтани токен аз localStorage
 function useAuthToken() {
   if (typeof window === "undefined") return null;
   return localStorage.getItem("authToken");
 }
 
-/* ===================== Utils ===================== */
+// типа барои утил 
 const getSenderId = (m) =>
   m?.userId ?? m?.senderUserId ?? m?.fromUserId ?? null;
 const getStamp = (m) => {
@@ -61,6 +70,9 @@ const getStamp = (m) => {
   ).getTime();
   return Number.isNaN(t) ? 0 : t;
 };
+
+
+
 const toTime = (s) => {
   const d = new Date(s || "");
   return Number.isNaN(d.getTime())
@@ -78,6 +90,8 @@ const toDay = (s) => {
       });
 };
 
+
+//типа проверкаи ёки тест кардани файло
 const isImage = (f) => /\.(jpg|jpeg|png|gif|webp|avif|svg)$/i.test(f || "");
 const isVideo = (f) => /\.(mp4|webm|mov|m4v|ogg|ogv)$/i.test(f || "");
 const isAudio = (f) => /\.(mp3|wav|ogg|m4a|aac|flac)$/i.test(f || "");
@@ -91,6 +105,9 @@ function formatBytes(bytes = 0) {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
 }
+
+
+
 function readAsDataURL(file) {
   return new Promise((resolve, reject) => {
     const fr = new FileReader();
@@ -100,7 +117,9 @@ function readAsDataURL(file) {
   });
 }
 
-/** Парсер: post:ID | reel:ID | /posts/ID | /reels/ID | ?id=ID */
+
+
+
 function extractSharedEntity(text) {
   if (!text) return null;
   const s = String(text);
@@ -124,7 +143,7 @@ function extractSharedEntity(text) {
   return null;
 }
 
-/* ===================== Overlays ===================== */
+// оверлей барои хаму рильс ва видеохо
 function ReelOverlay({ src, onClose }) {
   const videoRef = useRef(null);
   const [paused, setPaused] = useState(false);
@@ -262,7 +281,8 @@ function VideoCallOverlay({
   );
 }
 
-/* ===================== IG Card (Post/Reel) ===================== */
+
+//
 function IgCard({ id, kind = "post", onOpenReel }) {
   const token = useAuthToken();
   const [data, setData] = useState(null);
@@ -353,7 +373,7 @@ function IgCard({ id, kind = "post", onOpenReel }) {
   );
 }
 
-/* ===================== MAIN ===================== */
+//барои чат гузаштан
 export default function ChatByIdPage() {
   const params = useParams();
   const searchParams = useSearchParams();
@@ -372,14 +392,14 @@ export default function ChatByIdPage() {
     ? `http://37.27.29.18:8003/images/${searchParams.get("avatar")}`
     : `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}`;
 
-  // postId из SharePost
+  // postId ай поделиться омадагиш
   const sharedPostId = searchParams.get("postId") || "";
   const autoSharedRef = useRef(false);
 
   const { data: chatsData } = useGetChatsQuery(undefined, { skip: !isNew });
   const [createChat] = useCreateChatMutation();
 
-  // создать/найти чат
+  // чати нав сохтан
   useEffect(() => {
     const go = async () => {
       if (!isNew || !targetUserId) return;
@@ -419,6 +439,8 @@ export default function ChatByIdPage() {
     sharedPostId,
   ]);
 
+
+  // грифтани чатхо
   const {
     data: messagesData,
     refetch,
@@ -431,7 +453,7 @@ export default function ChatByIdPage() {
   const [sendMessage, { isLoading: isSending }] = useSendMessageMutation();
   const [deleteMessage] = useDeleteMessageMutation();
 
-  // авто-отправка post:ID один раз (StrictMode safe)
+  // якбор рои кадани пост
   useEffect(() => {
     if (!chatId || !sharedPostId) return;
     const key = `autoShare:${chatId}:${sharedPostId}`;
@@ -455,7 +477,7 @@ export default function ChatByIdPage() {
     })();
   }, [chatId, sharedPostId, sendMessage, router]);
 
-  /* ===== composer state ===== */
+  
   const [messageText, setMessageText] = useState("");
   const [file, setFile] = useState(null);
   const [hoveredId, setHoveredId] = useState(null);
@@ -465,6 +487,8 @@ export default function ChatByIdPage() {
   const endRef = useRef(null);
   const fileInputRef = useRef(null);
 
+
+  //барои сорт кардани смсхои чат
   const items = messagesData?.data || [];
   const sorted = useMemo(
     () =>
@@ -474,11 +498,15 @@ export default function ChatByIdPage() {
       ),
     [items]
   );
-  const combined = useMemo(() => [...sorted, ...pending], [sorted, pending]);
 
+
+  //ишам хам барои сорт ва скрол кадани аму ареаи чат
+  const combined = useMemo(() => [...sorted, ...pending], [sorted, pending]);
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [combined.length]);
+
+
 
   const handleSend = async () => {
     if (!chatId || (!messageText.trim() && !file)) return;
@@ -549,6 +577,8 @@ export default function ChatByIdPage() {
     }
   };
 
+
+  //делет смс иш
   const handleDelete = async (messageId) => {
     try {
       await deleteMessage(messageId).unwrap();
@@ -557,7 +587,8 @@ export default function ChatByIdPage() {
     } catch {}
   };
 
-  /* ====== WebRTC ====== */
+
+  //peer js chatgpt
   const [showCall, setShowCall] = useState(false);
   const [peer, setPeer] = useState(null);
   const [callConnection, setCallConnection] = useState(null);
@@ -670,7 +701,7 @@ export default function ChatByIdPage() {
   return (
     <>
       <div className="flex flex-col h-[94vh] md:h-screen  md:w-[80vw]  md:overflow-y-auto">
-        {/* Header как в IG */}
+
         <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b">
           <div className="flex items-center gap-3">
             <img
@@ -698,7 +729,6 @@ export default function ChatByIdPage() {
           </div>
         </div>
 
-        {/* Messages */}
         <div className="flex-1 overflow-y-auto px-2 sm:px-6 py-6 bg-white">
           <div className="mx-auto max-w-7xl space-y-4">
             {combined.map((m, i) => {
@@ -776,7 +806,6 @@ export default function ChatByIdPage() {
                         </p>
                       )}
 
-                      {/* Вложения-файлы */}
                       {hasFile && (
                         <div
                           className={`${displayText ? "mt-2" : ""} space-y-2`}
@@ -889,7 +918,7 @@ export default function ChatByIdPage() {
                         </div>
                       )}
 
-                      {/* IG-карточка пост/рилс */}
+
                       {shared && (
                         <div
                           className={`${displayText || hasFile ? "mt-3" : ""}`}
