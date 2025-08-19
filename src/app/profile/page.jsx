@@ -25,6 +25,7 @@ import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import p from "../../assets/img/pages/profile/profile/p.png";
 import Posts from "@/app/profile/posts/page";
 import Saved from "@/app/profile/saved/page";
+import { useTranslation } from "react-i18next";
 
 import {
   useGetMyProfileQuery,
@@ -72,14 +73,14 @@ export default function Profile() {
     if (hasToken === false) router.replace("/login");
   }, [hasToken, router]);
 
-  // ===== данные =====
+  // ===== даниё =====
   const { data, isLoading, isError } = useGetMyProfileQuery();
   const profile = data?.data;
 
   const { data: storiesResp, refetch: refetchStories } = useGetMyStoriesQuery();
   const stories = storiesResp?.data?.stories || [];
 
-  // ===== RTK mutations для сторис =====
+  // Историё
   const [addStory] = useAddStoryMutation();
   const [deleteStory] = useDeleteStoryMutation();
   const [addStoryView] = useAddStoryViewMutation();
@@ -96,7 +97,7 @@ export default function Profile() {
 
   const freshStories = useMemo(() => stories.filter(isFresh), [stories]);
 
-  // автоудаление истёкших
+  // удалит кадани история
   const cleanupDoneRef = useRef(false);
   useEffect(() => {
     if (cleanupDoneRef.current) return;
@@ -140,7 +141,7 @@ export default function Profile() {
 
 
 
-  // ===== Загрузка новой сторис =====
+  // добавити истрия
   const fileInputRef = useRef(null);
   const onNewStoryClick = () => fileInputRef.current?.click();
 
@@ -148,7 +149,7 @@ export default function Profile() {
     const file = e.target.files?.[0];
     if (!file) return;
     try {
-      await addStory({ file }).unwrap(); // POST /Story/AddStories
+      await addStory({ file }).unwrap(); 
       await refetchStories();
     } catch (err) {
       console.error("AddStories error:", err);
@@ -157,7 +158,7 @@ export default function Profile() {
     }
   };
 
-  // ===== Вьюер историй =====
+  //
   const [storyOpen, setStoryOpen] = useState(false);
   const [storyIndex, setStoryIndex] = useState(0);
 
@@ -242,10 +243,10 @@ const localLikes = useMemo(() => {
     setLocalLikes((st) => ({ ...st, [s.id]: next }));
 
     try {
-      await likeStoryMut(s.id).unwrap(); // POST /Story/LikeStory
+      await likeStoryMut(s.id).unwrap(); 
     } catch (err) {
       console.error(err);
-      setLocalLikes((st) => ({ ...st, [s.id]: prev })); // откат
+      setLocalLikes((st) => ({ ...st, [s.id]: prev })); 
     }
   };
 
@@ -255,7 +256,7 @@ const localLikes = useMemo(() => {
     const cur = freshStories[storyIndex];
     if (!cur) return;
     try {
-      await deleteStory(cur.id).unwrap(); // DELETE /Story/DeleteStory
+      await deleteStory(cur.id).unwrap(); 
       setStoryOpen(false);
       await refetchStories();
     } catch (err) {
@@ -269,7 +270,7 @@ const localLikes = useMemo(() => {
 
 
 
-  // ===== прочее UI =====
+ // модалкахо
   const [activeTab, setActiveTab] = useState("posts");
   const [isMenuLoading, setIsMenuLoading] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
@@ -277,7 +278,18 @@ const localLikes = useMemo(() => {
   const [openFollowers, setOpenFollowers] = useState(false);
   const [openFollowing, setOpenFollowing] = useState(false);
 
-  if (!hasToken) return <div className="p-6">Переход на страницу входа…</div>;
+
+
+
+  	const {t, i18n} = useTranslation();
+    function TranslateClick(lang) {
+        i18n.changeLanguage(lang);
+    }
+
+
+
+
+  if (!hasToken) return <div className="p-6">{t("profile.redirectLogin")}</div>;
   if (isLoading) return <p>Загрузка...</p>;
   if (isError) return <p>Ошибка при загрузке данных</p>;
 
@@ -335,18 +347,18 @@ return (
                 setIsMenuLoading(false);
               }}
             >
-              Qr code
+           {t("profile.qrCode")}
             </p>
                <Link href="/profile/editProfile" className="flex-1 sm:flex-none">
               <button  className="text-xl sm:text-2xl font-bold cursor-pointer">
-                Edit profile
+             {t("profile.editProfile")}
               </button>
             </Link>
             <Link href={"/notification"}>
-              <p className="text-xl sm:text-2xl font-bold">Notification</p>
+              <p className="text-xl sm:text-2xl font-bold">   {t("profile.notification")}</p>
             </Link>
             <Link href={"/setting"}>
-              <p className="text-xl sm:text-2xl font-bold">Settings and privacy</p>
+              <p className="text-xl sm:text-2xl font-bold"> {t("profile.settingsPrivacy")}</p>
             </Link>
             <p
               className="text-red-600 text-xl sm:text-2xl font-bold cursor-pointer"
@@ -357,7 +369,7 @@ return (
                 window.location.href = "/login";
               }}
             >
-              Log out
+          {t("profile.logout")}
             </p>
           </div>
         </div>
@@ -383,14 +395,14 @@ return (
 
 
 
-          {/* actions — на мобилке в одну строку, компактнее */}
+    
           <div className="flex items-center gap-2 sm:gap-[50px]">
          
             <button
               className="bg-[#F3F4F6] w-[110px] sm:w-[105px] h-[36px] sm:h-[40px] rounded-xl flex items-center justify-center text-sm sm:text-base"
               onClick={() => setIsMenuLoading(true)}
             >
-              View archive
+             {t("profile.viewArchive")}
             </button>
             <CgMenu
               className="text-2xl  cursor-pointer"
@@ -402,21 +414,21 @@ return (
         {/* stats */}
         <div className="flex w-full items-start sm:items-center justify-between sm:justify-start gap-6 sm:gap-7 mt-2 sm:mt-0">
           <p className="text-[13px] sm:text-[14px] font-[600]">
-            {profile?.postCount} <span className="text-[#64748B] font-[400]">posts</span>
+            {profile?.postCount} <span className="text-[#64748B] font-[400]">    {t("profile.posts")} </span>
           </p>
 
           <p
             className="text-[13px] sm:text-[14px] font-[600] cursor-pointer"
             onClick={() => setOpenFollowers(true)}
           >
-            {profile?.subscribersCount} <span className="text-[#64748B] font-[400]">followers</span>
+            {profile?.subscribersCount} <span className="text-[#64748B] font-[400]"> {t("profile.followers")}</span>
           </p>
 
           <p
             className="text-[13px] sm:text-[14px] font-[600] cursor-pointer"
             onClick={() => setOpenFollowing(true)}
           >
-            {profile?.subscriptionsCount} <span className="text-[#64748B] font-[400]">following</span>
+            {profile?.subscriptionsCount} <span className="text-[#64748B] font-[400]"> {t("profile.following")} </span>
           </p>
         </div>
 
@@ -424,7 +436,7 @@ return (
       </article>
     </section>
 
-    {/* STORIES — Swiper и загрузка */}
+    {/* История — Swiper  */}
     <div className="p-3 sm:p-5 bg-white -mx-3 sm:mx-0">
       <Swiper
         slidesPerView={4}
@@ -460,7 +472,7 @@ return (
           </SwiperSlide>
         ))}
 
-        {/* New story */}
+        {/* add story */}
         <SwiperSlide className="flex flex-col items-center justify-center">
           <button
             className="flex flex-col items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-gray-300 text-gray-500 hover:border-gray-500 hover:text-gray-700"
@@ -468,7 +480,7 @@ return (
             title="Add story"
           >
             <span className="text-2xl sm:text-3xl font-bold leading-none">+</span>
-            <p className="hidden sm:block text-xs mt-1">New</p>
+            <p className="hidden sm:block text-xs mt-1">{t("profile.newStory")}</p>
           </button>
           <input
             ref={fileInputRef}
@@ -490,7 +502,7 @@ return (
         className="fixed inset-0 z-[60] bg-black/90 flex items-center justify-center select-none p-3"
         onClick={onViewerClick}
       >
-        {/* верх: прогресс и пользователь */}
+
         <div className="absolute top-3 sm:top-4 left-3 right-3 sm:left-4 sm:right-4">
           <div className="flex gap-1.5 sm:gap-2 mb-2 sm:mb-3">
             {freshStories.map((_, i) => (
@@ -524,7 +536,7 @@ return (
           </div>
         </div>
 
-        {/* картинка */}
+        {/* история хдш */}
         <Image
           src={getImageSrc(freshStories[storyIndex].fileName)}
           alt="story-large"
@@ -556,11 +568,11 @@ return (
             {localLikes[freshStories[storyIndex].id]?.likedCount ??
               freshStories[storyIndex].likedCount ??
               0}{" "}
-            likes
+          {t("profile.likes")}
           </span>
         </div>
 
-        {/* удалить/закрыть */}
+        {/* удалить история */}
         <div className="absolute top-3 sm:top-4 right-3 sm:right-4 flex gap-2 sm:gap-3">
           <button
             className="text-white/80 hover:text-white text-xl sm:text-2xl"
@@ -588,7 +600,7 @@ return (
 
 
 
-    {/* TABS */}
+    {/* TABS пост сейв */}
     <section className="w-full my-5 sm:my-[30px] px-2 py-[5px] border-t flex items-center justify-center gap-6 sm:space-x-10 border-gray-400">
       <article
         onClick={() => setActiveTab("posts")}
@@ -597,7 +609,7 @@ return (
         }`}
       >
         <TiThSmallOutline className="text-lg sm:text-xl" />
-        <p className="hidden sm:block">Posts</p>
+        <p className="hidden sm:block">{t("profile.posts")}</p>
       </article>
 
       <article
@@ -607,7 +619,7 @@ return (
         }`}
       >
         <FaRegBookmark className="text-lg sm:text-xl" />
-        <p className="hidden sm:block">Saved</p>
+        <p className="hidden sm:block">  {t("profile.saved")}</p>
       </article>
 
       <article
@@ -617,7 +629,7 @@ return (
         }`}
       >
         <BsPersonSquare className="text-lg sm:text-xl" />
-        <p className="hidden sm:block">Tagged</p>
+        <p className="hidden sm:block">{t("profile.tagged")}</p>
       </article>
     </section>
 
@@ -627,7 +639,7 @@ return (
       {activeTab === "tagged" && <p>Tagged content</p>}
     </div>
 
-    {/* модалки подписчики/подписки */}
+    {/* модалки follower follwing */}
     <FollowersMenu
       open={openFollowers}
       onClose={() => setOpenFollowers(false)}

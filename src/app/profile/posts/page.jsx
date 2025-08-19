@@ -16,7 +16,7 @@ import { useDeleteCommentMutation } from '@/store/pages/explore/exploreApi'
 import Link from 'next/link'
 import SharePost from '@/components/pages/home/posts/sharePost'
 const Posts = ({ userId }) => {
-  // Используем query по userId
+
 const { data: postsData, isLoading, isError, refetch } = userId
   ? useGetUsersPostByIdQuery(userId)
   : useGetMyPostsQuery();

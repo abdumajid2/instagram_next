@@ -126,5 +126,128 @@
 "69": "Your followers",
 "70": "Advanced settings",
 "71": "Allow comments with GIFs"
-  }
+  },
+     "profile": {
+      "viewArchive": "View archive",
+      "editProfile": "Edit profile",
+      "notification": "Notification",
+      "settingsPrivacy": "Settings and privacy",
+      "logout": "Log out",
+      "qrCode": "Qr code",
+      "posts": "Posts",
+      "saved": "Saved",
+      "tagged": "Tagged",
+      "followers": "followers",
+      "following": "following",
+      "likes": "likes",
+      "newStory": "New",
+      "addStory": "Add story",
+      "deleteStory": "Delete story",
+      "close": "Close",
+      "viewed": "Viewed"
+    },
+    "placeholders": {
+      "profilePhoto": "Profile photo",
+      "story": "story",
+      "profileLarge": "Profile large",
+      "storyLarge": "story-large",
+      "user": "user"
+    },
+    "messages": {
+      "loading": "Loading...",
+      "error": "Error loading data",
+      "redirectLogin": "Redirecting to login..."
+    },
+    "ariaLabels": {
+      "openStories": "Open stories",
+      "viewAvatar": "View avatar",
+      "likeStory": "Like story"
+    },
+    "titles": {
+      "like": "Like",
+      "addStory": "Add story",
+      "closeStory": "Close",
+      "deleteStory": "Delete story"
+    },
+ "posts": {
+      "loading": "Loading posts...",
+      "error": "Error loading posts",
+      "noPosts": "No posts",
+      "addComment": "Add a comment...",
+      "publish": "Publish",
+      "likes": "likes",
+      "postedOn": "Posted on"
+    },
+	 "save": {
+    "posts": {
+      "loading": "Loading saved posts...",
+      "error": "Error loading data",
+      "noPosts": "No saved posts",
+      "addComment": "Add a comment...",
+      "publish": "Publish",
+      "likes": "likes",
+      "postedOn": "Posted on"
+    },
+    "comments": {
+      "added": "Comment added ✅",
+      "deleted": "Comment deleted ✅",
+      "deleteError": "Error deleting comment",
+      "addError": "Error adding comment"
+    }
+},
+  "profileById": {
+      "follow": "Follow",
+      "unfollow": "Unfollow",
+      "sendMessage": "Send message",
+      "posts": "Posts",
+      "tagged": "Tagged",
+      "followers": "followers",
+      "following": "following",
+      "noUser": "User not found",
+      "loading": "Loading profile...",
+      "error": "Error loading profile",
+      "storyViewTitle": "View story",
+      "closeStory": "Close story"
+    },
+    "chats": {
+      "openError": "Unable to open chat"
+    },
+	"editProfile": {
+      "breadcrumbProfile": "Profile",
+      "breadcrumbEdit": "Edit profile",
+      "changePhoto": "Change photo",
+      "name": "Name",
+      "userName": "User name",
+      "bio": "Bio",
+      "gender": "Gender",
+      "genderMale": "Male",
+      "genderFemale": "Female",
+      "privateInfoNote": "This won’t be part of your public profile.",
+      "submit": "Submit",
+      "loading": "Loading...",
+      "errorLoading": "Error loading data",
+      "successUpdate": "Profile updated successfully!",
+      "errorUpdate": "Error updating profile",
+      "successImage": "Profile image updated!",
+      "errorImage": "Error uploading image"
+    },
+	 "followersMenu": {
+      "title": "Followers",
+      "loading": "Loading…",
+      "errorSubscribers": "Error loading followers",
+      "errorSubscriptions": "Error loading subscriptions",
+      "empty": "No followers",
+      "follow": "Follow",
+      "unfollow": "Unfollow"
+    },
+	 "followingMenu": {
+      "title": "Following",
+      "loading": "Loading…",
+      "errorSubscriptions": "Error loading subscriptions",
+      "errorSubscribers": "Error loading followers",
+      "empty": "No followings",
+      "follow": "Follow",
+      "unfollow": "Unfollow"
+    }
+ 
 }
