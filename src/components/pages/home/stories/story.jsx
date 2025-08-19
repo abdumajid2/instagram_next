@@ -46,7 +46,7 @@ const Story = () => {
   }
 
   return (
-    <div className="w-full overflow-x-auto border-b-1 border-gray-300 pb-3">
+    <div className="w-full overflow-x-auto no-scrollbar border-b-1 border-gray-300 pb-3">
       {/* // storyModal  */}
       {isModalOpen && storyById?.data && (
         <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center">
@@ -87,7 +87,7 @@ const Story = () => {
               </span>
             </div>
 
-            {storyById.data.stories.length > 0 && (
+            {storyById?.data?.stories?.length > 0 && (
               <Swiper
                 modules={[Navigation, Pagination]}
                 navigation
@@ -99,23 +99,24 @@ const Story = () => {
                   const isVideo =
                     fileName.toLowerCase().endsWith(".mp4") ||
                     fileName.toLowerCase().endsWith(".mov");
+
                   return (
                     <SwiperSlide
                       key={file.id}
-                      className="flex items-center justify-center"
+                      className="flex items-center justify-center bg-black w-full h-full"
                     >
                       {isVideo ? (
                         <video
                           src={`${imgUrl}${fileName}`}
                           controls
                           autoPlay
-                          className="max-h-[85vh] min-h-[40vh] max-w-[90%] rounded-xl object-contain shadow-lg"
+                          className="object-contain rounded-xl shadow-lgw-full min-h-[200px] max-h-[85vh]"
                         />
                       ) : (
                         <img
                           src={`${imgUrl}${fileName}`}
                           alt="story"
-                          className="max-h-[85vh] min-h-[40vh] max-w-[90%] rounded-xl object-contain shadow-lg"
+                          className="object-contain rounded-xl shadow-lg  w-full min-h-[200px] max-h-[85vh]"
                         />
                       )}
                     </SwiperSlide>
