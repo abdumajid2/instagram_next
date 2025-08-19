@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react'
 import Image from 'next/image'
-import { useGetMyPostsQuery, useAddCommentMutation, useGetUsersPostByIdQuery } from '@/store/pages/profile/ProfileApi'
+import { useGetMyPostsQuery, useAddCommentMutation, useGetUsersPostByIdQuery, useDeletePostMutation } from '@/store/pages/profile/ProfileApi'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Scrollbar } from 'swiper/modules'
 import 'swiper/css'
@@ -14,6 +14,7 @@ import p from '../../../assets/img/pages/profile/profile/p.png'
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { useDeleteCommentMutation } from '@/store/pages/explore/exploreApi'
 import Link from 'next/link'
+import SharePost from '@/components/pages/home/posts/sharePost'
 const Posts = ({ userId }) => {
   // Используем query по userId
 const { data: postsData, isLoading, isError, refetch } = userId
@@ -25,7 +26,7 @@ const posts = userId ? postsData?.data || [] : postsData || [];
   const [selectedPost, setSelectedPost] = useState(null);
   const [addComment, { isLoading: isCommenting }] = useAddCommentMutation();
   const [postComment, setPostComment] = useState('');
-
+let [deletePost]=useDeletePostMutation()
   const getImageUrl = (fileName) => {
     if (!fileName) return p.src
     if (fileName.startsWith('http')) return fileName
@@ -37,6 +38,11 @@ const posts = userId ? postsData?.data || [] : postsData || [];
     const ext = fileName.split('.').pop().toLowerCase()
     if (["mp4", "mov", "webm"].includes(ext)) return "video"
     return "image"
+  }
+
+  function removePost(postId) {
+    deletePost(postId)
+    refetch()
   }
 
   const handleAddComment = async () => {
@@ -84,6 +90,7 @@ const handleDeleteComment = async (commentId) => {
             className="relative group cursor-pointer"
             onClick={() => setSelectedPost(post)}
           >
+          
             {post.images?.[0] && (
               getMediaType(post.images[0]) === "image" ? (
                 <Image
@@ -108,6 +115,8 @@ const handleDeleteComment = async (commentId) => {
               <div className="flex items-center gap-2">
                 <FaRegComment size={20} /> {post.commentCount}
               </div>
+              <div className='text-xl'> 
+               <SharePost el={post}/> </div>
             </div>
           </div>
         ))}
@@ -165,6 +174,7 @@ const handleDeleteComment = async (commentId) => {
                 )
               )}
             </div>
+  
 
             {/* Правый блок - инфо и комментарии */}
             <div className="sm:w-[40%] h-full flex flex-col border-l w-full overflow-auto border-gray-200">
@@ -206,17 +216,29 @@ const handleDeleteComment = async (commentId) => {
                   </div>
                 ))}
               </div>
+              
 
               <div className="p-4 border-t border-gray-200   h-[40px] sm:h-fit  flex sm:flex-col justify-center  items-center sm:items-start  gap-3">
                 <div className='flex items-center gap-4'>
                   <FaRegHeart size={24} className="cursor-pointer" />
                   <FaRegComment size={24} className="cursor-pointer" />
-                  <LiaTelegramPlane size={24} className="cursor-pointer" />
+               
+                             {!userId && ( // значит это мой профиль
+    <MdOutlineDeleteForever
+      size={28}
+      className=" text-red-400 drop-shadow cursor-pointer hover:text-red-600"
+      onClick={(e) => {
+        e.stopPropagation(); // чтобы не открывался modal
+        removePost(selectedPost.postId);
+      }}
+    />
+  )}
                 </div>
                 <span className="font-semibold">{selectedPost.postLikeCount} отметок "Нравится"</span>
                 <span className="text-xs text-gray-500 sm:block hidden">
                   Posted on: {new Date(selectedPost.datePublished).toLocaleString()}
                 </span>
+                
               </div>
 
               <div className="p-4 border-t  border-gray-200  flex gap-2">
