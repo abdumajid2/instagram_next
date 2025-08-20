@@ -1,35 +1,37 @@
-"use client"
-import Profile from '@/assets/icon/layout/instagramDefaultProfile.jpg'
+"use client";
+import Profile from "@/assets/icon/layout/instagramDefaultProfile.jpg";
 import {
-	add,
-	compas,
-	compasActive,
-	homeIcon,
-	homeIconActive,
-	message,
-	messageActive,
-	video,
-	videoActive,
-} from '@/assets/icon/layout/svg'
-import Image from 'next/image'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+  add,
+  compas,
+  compasActive,
+  homeIcon,
+  homeIconActive,
+  message,
+  messageActive,
+  video,
+  videoActive,
+} from "@/assets/icon/layout/svg";
+import AddPostButtonSm from "@/components/shared/addPostButtonSm";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
-export default function BottomNavigation({children}) {
-  const pathname = usePathname()
+export default function BottomNavigation({ children }) {
+  const pathname = usePathname();
 
   // Define reusable classes
-  const iconClass = "flex items-center gap-4 rounded-[8px] h-[52px] px-0 m-[0] justify-center"
-  const profileClass = "w-[25px] h-[25px] rounded-[50%]"
+  const iconClass =
+    "flex items-center gap-4 rounded-[8px] h-[52px] px-0 m-[0] justify-center";
+  const profileClass = "w-[25px] h-[25px] rounded-[50%]";
 
   // Map of pathnames to icons
   const icons = {
-    '/': { active:homeIcon , inactive:  homeIconActive},
-    '/explore': { active: compas, inactive:  compasActive},
-    '/reels': { active: video, inactive:  videoActive},
-    '/chats': { active: message, inactive:  messageActive},
-    '/profile': { active: Profile, inactive: Profile }, // No icon state, just border logic
-  }
+    "/": { active: homeIcon, inactive: homeIconActive },
+    "/explore": { active: compas, inactive: compasActive },
+    "/reels": { active: video, inactive: videoActive },
+    "/chats": { active: message, inactive: messageActive },
+    "/profile": { active: Profile, inactive: Profile }, // No icon state, just border logic
+  };
 
   return (
     <div>
@@ -39,33 +41,37 @@ export default function BottomNavigation({children}) {
           {/* Home */}
           <Link className="block" href="/">
             <div className={iconClass}>
-              {pathname === '/' ? icons['/'].active : icons['/'].inactive}
+              {pathname === "/" ? icons["/"].active : icons["/"].inactive}
             </div>
           </Link>
 
           {/* Explore */}
           <Link href="/explore">
             <div className={iconClass}>
-              {pathname === '/explore' ? icons['/explore'].active : icons['/explore'].inactive}
+              {pathname === "/explore"
+                ? icons["/explore"].active
+                : icons["/explore"].inactive}
             </div>
           </Link>
 
           {/* Reels */}
           <Link href="/reels">
             <div className={iconClass}>
-              {pathname === '/reels' ? icons['/reels'].active : icons['/reels'].inactive}
+              {pathname === "/reels"
+                ? icons["/reels"].active
+                : icons["/reels"].inactive}
             </div>
           </Link>
 
           {/* Create Button */}
-          <div className={iconClass}>
-            {add}
-          </div>
+          <AddPostButtonSm/>
 
           {/* Chats */}
           <Link href="/chats">
             <div className={iconClass}>
-              {pathname === '/chats' ? icons['/chats'].active : icons['/chats'].inactive}
+              {pathname === "/chats"
+                ? icons["/chats"].active
+                : icons["/chats"].inactive}
             </div>
           </Link>
 
@@ -73,7 +79,11 @@ export default function BottomNavigation({children}) {
           <Link href="/profile">
             <div className={iconClass}>
               <Image
-                className={`${pathname === '/profile' ? 'border-[2px] border-[solid] border-[black]' : ''} ${profileClass}`}
+                className={`${
+                  pathname === "/profile"
+                    ? "border-[2px] border-[solid] border-[black]"
+                    : ""
+                } ${profileClass}`}
                 src={Profile}
                 alt="Profile"
               />
@@ -82,5 +92,5 @@ export default function BottomNavigation({children}) {
         </div>
       </section>
     </div>
-  )
+  );
 }
