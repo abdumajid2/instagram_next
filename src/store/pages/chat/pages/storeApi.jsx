@@ -1,9 +1,9 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
+import { API_BASE_URL } from "@/lib/apiBase";
 export const chatApi = createApi({
   reducerPath: "chatApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://37.27.29.18:8003/",
+    baseUrl: API_BASE_URL,
     prepareHeaders: (headers) => {
       const authToken =
         typeof window !== "undefined"
@@ -15,7 +15,6 @@ export const chatApi = createApi({
   }),
   tagTypes: ["Chats", "Messages"],
   endpoints: (builder) => ({
-    // Список чатов
     getChats: builder.query({
       query: () => "Chat/get-chats",
       providesTags: (res) =>
@@ -30,13 +29,12 @@ export const chatApi = createApi({
           : [{ type: "Chats", id: "LIST" }],
     }),
 
-    // Сообщения одного чата
+
     getChatById: builder.query({
       query: (id) => `Chat/get-chat-by-id?chatId=${id}`,
       providesTags: (_res, _err, id) => [{ type: "Messages", id }],
     }),
 
-    // Поиск пользователей (можно расширить параметрами при необходимости)
     getUsers: builder.query({
       query: (q = "") =>
         q

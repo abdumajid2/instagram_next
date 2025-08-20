@@ -15,8 +15,10 @@ import { MdOutlineDeleteForever } from "react-icons/md";
 import { useDeleteCommentMutation } from '@/store/pages/explore/exploreApi'
 import Link from 'next/link'
 import SharePost from '@/components/pages/home/posts/sharePost'
+import { useTranslation } from 'react-i18next'
+import camera from '../../../assets/img/pages/profile/profile/camera.svg'
 const Posts = ({ userId }) => {
-  // Используем query по userId
+
 const { data: postsData, isLoading, isError, refetch } = userId
   ? useGetUsersPostByIdQuery(userId)
   : useGetMyPostsQuery();
@@ -67,19 +69,20 @@ const [deleteComment] = useDeleteCommentMutation();
 const handleDeleteComment = async (commentId) => {
   try {
     await deleteComment(commentId).unwrap();
-    message.success('Комментарий удалён ✅');
-    alert('Комментарий удалён ✅');
+    message.success(`${t(".save.posts.deleted")}`)
+    alert(`${t(".save.posts.deleted")}`)
     refetch();
   } catch (err) {
     console.error(err);
-    message.error('Ошибка при удалении комментария');
+    message.error(`${t("posts.deleteError")}`);
   }
 };
 
-
-  if (isLoading) return <p>Загрузка постов...</p>
-  if (isError) return <p>Ошибка при загрузке постов</p>
-  if (posts.length === 0) return <p>Нет постов</p>
+  const {t, i18n} = useTranslation();
+  if (isLoading) return <p>{t("save.posts.loading")}</p>
+  if (isError) return <p>{t("save.posts.error")}</p>
+  if (posts.length === 0) return <div className='w-full flex items-center justify-between flex-col h-full'><p className='text-2xl '>{t("save.posts.noPosts")}...
+  <Image alt='' className='w-[400px] h-[300px]' src={camera}/></p></div> 
 
   return (
     <>
@@ -234,9 +237,9 @@ const handleDeleteComment = async (commentId) => {
     />
   )}
                 </div>
-                <span className="font-semibold">{selectedPost.postLikeCount} отметок "Нравится"</span>
+                <span className="font-semibold">{selectedPost.postLikeCount} {t("posts.likes")}</span>
                 <span className="text-xs text-gray-500 sm:block hidden">
-                  Posted on: {new Date(selectedPost.datePublished).toLocaleString()}
+                {t("posts.postedOn")} {new Date(selectedPost.datePublished).toLocaleString()}
                 </span>
                 
               </div>
@@ -245,12 +248,12 @@ const handleDeleteComment = async (commentId) => {
                 <Input 
                   value={postComment} 
                   onChange={(e)=>setPostComment(e.target.value)} 
-                  placeholder="Добавьте комментарий..." 
+                  placeholder={`${t("posts.addComment")}`} 
                   onPressEnter={handleAddComment}
                   disabled={isCommenting}
                 />
                 <Button type="primary" loading={isCommenting} onClick={handleAddComment}>
-                  Опубликовать
+                {t("posts.publish")}
                 </Button>
               </div>
             </div>

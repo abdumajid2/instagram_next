@@ -9,6 +9,7 @@ import {
   useGetSubscribersQuery,
   useGetSubscriptionsQuery,
 } from "@/store/pages/profile/ProfileApi";
+import { useTranslation } from "react-i18next";
 
 export default function FollowingMenu({ open, onClose, userId: propsUserId }) {
   const [decode, setDecode] = useState(null);
@@ -45,7 +46,7 @@ export default function FollowingMenu({ open, onClose, userId: propsUserId }) {
   } = useGetSubscribersQuery(userId, { skip: !open || !userId });
 
   const followings = follResp?.data || [];
-  // локально считаем, что всех из “following” мы уже фоллоуим
+
   useEffect(() => {
     if (!open) return;
     setLocalFollowing(followings.map((u) => ({ ...u, isFollowing: true })));
@@ -82,7 +83,7 @@ export default function FollowingMenu({ open, onClose, userId: propsUserId }) {
       await Promise.all([refetchFoll(), refetchSubs()]);
     } catch (error) {
       console.error(error);
-      // откат
+    
       setLocalFollowing((prev) =>
         prev.map((u) =>
           u?.userShortInfo?.userId === targetUserId
@@ -92,6 +93,11 @@ export default function FollowingMenu({ open, onClose, userId: propsUserId }) {
       );
     }
   };
+
+      const {t, i18n} = useTranslation();
+  
+  
+
 
 if (!userId) return null; 
 
@@ -103,17 +109,17 @@ if (!userId) return null;
       >
         <div className="bg-white rounded-xl w-[90%] max-w-sm max-h-[80vh] overflow-hidden flex flex-col">
           <div className="relative px-4 py-3 border-b">
-            <Typography className="text-center font-semibold text-base">Подписки</Typography>
+            <Typography className="text-center font-semibold text-base">{t("followingMenu.title")}</Typography>
             <IconButton onClick={onClose} className="absolute right-2 top-2">
               <X />
             </IconButton>
           </div>
 
           {(follLoading || subsLoading) && (
-            <div className="p-4 text-sm text-gray-500">Загрузка…</div>
+            <div className="p-4 text-sm text-gray-500">  {t("followingMenu.loading")}</div>
           )}
-          {follError && <div className="p-4 text-sm text-red-600">Ошибка загрузки подписок</div>}
-          {subsError && <div className="p-4 text-sm text-red-600">Ошибка загрузки подписчиков</div>}
+          {follError && <div className="p-4 text-sm text-red-600"> {t("followingMenu.errorSubscriptions")}</div>}
+          {subsError && <div className="p-4 text-sm text-red-600"> {t("followingMenu.errorSubscribers")}</div>}
 
           <div className="overflow-y-auto px-4 py-2 space-y-3">
             {localFollowing.map((el) => {
@@ -138,13 +144,13 @@ if (!userId) return null;
                     size="small"
                     className="capitalize text-sm"
                   >
-                    {el.isFollowing ? "Отписаться" : "Подписаться"}
+                    {el.isFollowing ? `${t("followingMenu.unfollow")}` :  `${t("followingMenu.follow")}`}
                   </Button>
                 </div>
               );
             })}
             {open && !follLoading && followings.length === 0 && (
-              <div className="p-4 text-sm text-gray-500">Пусто</div>
+              <div className="p-4 text-sm text-gray-500">{t("followingMenu.empty")}</div>
             )}
           </div>
         </div>

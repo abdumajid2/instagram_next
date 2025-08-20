@@ -43,14 +43,20 @@ import { LiaTelegramPlane } from "react-icons/lia";
 const Posts = () => {
   const { data, isLoading, isError } = useGetPostsQuery();
   const [infoId, setInfoId] = useState(null);
-  const { data: postInfo, refetch: infoRefetch } = useGetPostByIdQuery(infoId);
+  const { data: postInfo, refetch: infoRefetch } = useGetPostByIdQuery(infoId, {
+    skip: !infoId,
+  });
   const [addComment] = useAddCommentMutation();
   const [addLikedPost] = useAddLikePostMutation();
   const [addFollow] = useAddFollowMutation();
   const [deleteFollow] = useDeleteFollowMutation();
   const [followerId, setFollowerId] = useState(null);
-  const { data: isFollower, refetch: followeRefetch } =
-    useIsFollowerQuery(followerId);
+  const { data: isFollower, refetch: followeRefetch } = useIsFollowerQuery(
+    followerId,
+    {
+      skip: !followerId,
+    }
+  );
   const [addPostFavorite] = useAddPostFavoriteMutation();
   const [deleteComment] = useDeleteCommentMutation();
   const imgUrl = "http://37.27.29.18:8003/images/";
@@ -60,7 +66,6 @@ const Posts = () => {
   const [isModalOpenFollower, setIsModalOpenFollower] = useState(false);
   const [localPosts, setLocalPosts] = useState([]);
   const [inpAddComment, setInpAddComment] = useState("");
-  const { data: users } = useGetUsersQuery();
 
   useEffect(() => {
     if (data?.data) {

@@ -4,11 +4,11 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 
 const BASE_URL = 'http://37.27.29.18:8003';
-
+import { API_BASE_URL } from '@/lib/apiBase';
 export const profileApi = createApi({
   reducerPath: 'profileApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: `${BASE_URL}/`,
+    baseUrl: API_BASE_URL,
     prepareHeaders: (headers) => {
       if (typeof window !== 'undefined') {
         const token =
@@ -20,7 +20,7 @@ export const profileApi = createApi({
   }),
   tagTypes: ['Profile', 'Stories', 'StoriesList', 'Posts', 'Following'],
   endpoints: (builder) => ({
-    // ===== PROFILE =====
+ 
     getMyProfile: builder.query({
       query: () => 'UserProfile/get-my-profile',
       providesTags: ['Profile'],
@@ -44,18 +44,18 @@ export const profileApi = createApi({
       invalidatesTags: ['Profile'],
     }),
 
-    // ===== POSTS =====
+   
     getMyPosts: builder.query({
       query: () => 'Post/get-my-posts',
       providesTags: ['Posts'],
     }),
 
-    // ===== USERS =====
+  
     getUsers: builder.query({
       query: () => 'User/get-users',
     }),
 
-    // ===== FOLLOWING / FOLLOWERS =====
+
     getSubscribers: builder.query({
       query: (userId) => `FollowingRelationShip/get-subscribers?UserId=${userId}`,
       providesTags: (_res, _err, userId) => [{ type: 'Following', id: `subs-${userId}` }],
@@ -84,7 +84,7 @@ export const profileApi = createApi({
       invalidatesTags: ['Following', 'Profile'],
     }),
 
-    // ===== STORIES =====
+
     getMyStories: builder.query({
       query: () => 'Story/get-my-stories',
       providesTags: (result) => {
@@ -111,7 +111,7 @@ export const profileApi = createApi({
         method: 'POST',
         params: { StoryId: storyId },
       }),
-      // просмотры обычно не нужно рефрешить
+   
       invalidatesTags: [],
     }),
 
@@ -128,7 +128,7 @@ export const profileApi = createApi({
     }),
 
     addStory: builder.mutation({
-      // useAddStoryMutation({ file, postId })
+   
       query: ({ file, postId = null }) => {
         const fd = new FormData();
         fd.append('Image', file);
@@ -179,7 +179,9 @@ export const profileApi = createApi({
         url:`Post/delete-post?id=${postId}`,
         method:"DELETE"
       })
-    })
+    }),
+    
+  
   }),
 });
 
@@ -196,17 +198,16 @@ export const {
   useUpdateUserProfileImageMutation,
   useUpdateUserProfileMutation,
 useGetPostsQuery,
-  // stories
+ 
   useLikeStoryMutation,
   useAddStoryViewMutation,
   useDeleteStoryMutation,
   useAddStoryMutation,
 
-  // following mutations
+  
   useAddFollowingMutation,
   useDeleteFollowingMutation,
 
-  // lazy hooks (получишь автоматически для query-эндпоинтов)
   useLazyGetSubscribersQuery,
   useLazyGetSubscriptionsQuery,
   useAddCommentMutation,
@@ -218,4 +219,7 @@ useGetPostsQuery,
   useGetChatsQuery,
   useCreateChatMutation,
   useDeletePostMutation
+
+
+  
 } = profileApi;

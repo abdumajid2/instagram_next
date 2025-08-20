@@ -13,6 +13,8 @@ import { Avatar, Input, Button, message } from 'antd'
 import p from '../../../assets/img/pages/profile/profile/p.png'
 import { useDeleteCommentMutation } from '@/store/pages/explore/exploreApi'
 import { MdOutlineDeleteForever } from "react-icons/md";
+import { useTranslation } from 'react-i18next'
+import saved from '../../../assets/img/pages/profile/profile/saved.svg'
 const Saved = () => {
   const { data, isLoading, isError, refetch } = useGetPostsQuery()
   const posts = data?.data?.filter((post) => post.postFavorite) || []
@@ -65,11 +67,12 @@ const handleDeleteComment = async (commentId) => {
     message.error('Ошибка при удалении комментария');
   }
 };
+  const {t, i18n} = useTranslation();
 
-
-  if (isLoading) return <p>Загрузка сохранённых постов...</p>
-  if (isError) return <p>Ошибка при загрузке данных</p>
-  if (posts.length === 0) return <p>Нет сохранённых постов</p>
+  if (isLoading) return <p>{t("save.posts.loading")}</p>
+  if (isError) return <p>{t("save.posts.error")}х</p>
+  if (posts.length === 0) return <div className='w-full flex items-center justify-between flex-col h-full'><p className='text-2xl '>{t("save.posts.noPosts")}...
+    <Image alt='' className='w-[400px] h-[300px]' src={saved}/></p></div> 
 
   return (
     <>
@@ -97,7 +100,7 @@ const handleDeleteComment = async (commentId) => {
                 />
               )
             )}
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-6 transition-opacity duration-300 text-white font-semibold text-lg">
+            <div className="absolute inset-0 bg-black/40 opacity-0  group-hover:rounded-xl rounded-2xl group-hover:opacity-100 flex items-center justify-center gap-6 transition-opacity duration-300 text-white font-semibold text-lg">
               <div className="flex items-center gap-2">
                 <FaRegHeart size={20} /> {post.postLikeCount}
               </div>
@@ -208,12 +211,12 @@ const handleDeleteComment = async (commentId) => {
                 <Input 
                   value={postComment} 
                   onChange={(e)=>setPostComment(e.target.value)} 
-                  placeholder="Добавьте комментарий..." 
+                  placeholder={`${t("save.posts.addComment")}`}
                   onPressEnter={handleAddComment}
                   disabled={isCommenting}
                 />
                 <Button type="primary" loading={isCommenting} onClick={handleAddComment}>
-                  Опубликовать
+          {t("save.posts.publish")}
                 </Button>
               </div>
             </div>
