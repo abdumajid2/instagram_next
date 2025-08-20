@@ -1,9 +1,9 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
+import { API_BASE_URL } from "@/lib/apiBase";
 export const muslimApi = createApi({
   reducerPath: "muslimApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://37.27.29.18:8003/",
+    baseUrl: API_BASE_URL,
     prepareHeaders: (headers) => {
       const authToken = localStorage.getItem("authToken");
       if (authToken) {
@@ -84,6 +84,13 @@ export const muslimApi = createApi({
     getChatByid: builder.query({
       query: (chatId) => `Chat/get-chat-by-id?chatId=${chatId}`,
     }),
+    addPost: builder.mutation({
+      query: (formData) => ({
+        url: "Post/add-post",
+        method: "POST",
+        body: formData,
+      }),
+    }),
   }),
 });
 
@@ -103,4 +110,5 @@ export const {
   useDeleteCommentMutation,
   useGetSubscriptionsQuery,
   useGetChatByidQuery,
+  useAddPostMutation,
 } = muslimApi;

@@ -25,6 +25,7 @@ import {
   problemIcon,
   threads,
 } from '@/assets/icon/layout/svg';
+import AddPostButton from '@/components/shared/switcher/addPostButton';
 
 const NavLink = ({ href, icon, activeIcon, label, isActive }) => (
   <Link legacyBehavior href={href}>
@@ -67,10 +68,7 @@ export default function SideBar({ children }) {
               <NavLink href="/chats" icon={message} activeIcon={messageActive} label={t('layout.message')} isActive={isActive} />
               <NavLink href="/notification" icon={like} activeIcon={likeActive} label={t('layout.notification')} isActive={isActive} />
 
-              <div className="flex items-center gap-4 w-[90%] m-auto rounded-md h-[52px] px-4 hover:bg-gray-100">
-                {action}
-                <p className="text-lg">{t('layout.create')}</p>
-              </div>
+              <AddPostButton/>
 
               <NavLink href="/profile" icon={<Image className={`${pathname === '/profile' ? 'border-2 border-black rounded-full' : ''} h-10 w-10`} src={Profile} alt="Profile" />} label={t('layout.profile')} isActive={isActive} />
             </div>

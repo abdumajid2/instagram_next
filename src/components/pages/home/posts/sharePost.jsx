@@ -32,7 +32,7 @@ const SharePost = ({ el }) => {
         decoded?.nameid;
       if (uid) setUserId(uid);
     } catch (error) {
-      console.error("JWT decode error:", error);
+      console.error(error);
     }
   }, []);
 

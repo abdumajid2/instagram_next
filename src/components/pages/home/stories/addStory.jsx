@@ -50,9 +50,9 @@ const AddStory = () => {
     <div>
       <button
         onClick={showModal}
-        className="bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 w-16 h-16 sm:w-18 sm:h-18 rounded-full border border-gray-300 flex items-center justify-center cursor-pointer hover:to-purple-500 hover:via-pink-400 hover:from-yellow-300 transition-colors delay-75"
+        className="bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 w-5 h-5 sm:w-6 sm:h-6 rounded-full border border-gray-300 flex items-center justify-center cursor-pointer hover:to-purple-500 hover:via-pink-400 hover:from-yellow-300 transition-colors delay-75"
       >
-        <LuPlus className="text-white text-xl" />
+        <LuPlus className="text-white" />
       </button>
 
       <Modal

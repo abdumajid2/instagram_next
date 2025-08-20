@@ -131,19 +131,21 @@ const Story = () => {
       )}
 
       <section className="flex flex-nowrap items-start gap-4 sm:gap-5 px-2">
-        <AddStory />
 
-        {data?.map((story) => {
+        {data?.map((story,i) => {
           const hasStory = story.stories && story.stories.length > 0;
 
           return (
             <article
               key={story.userId}
-              onClick={() => openStory(story)}
               className="flex-shrink-0 cursor-pointer"
             >
-              <div className="flex flex-col items-center">
+              <div className="flex flex-col items-center relative">
+                {i==0 && (
+                  <div className="absolute z-50 bottom-[22px] right-0"><AddStory/></div>
+                )} 
                 <div
+                onClick={() => openStory(story)}
                   className={`relative w-18 h-18 sm:w-20 sm:h-20 rounded-full p-0.5 sm:p-1 ${
                     hasStory
                       ? "bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600"

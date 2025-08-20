@@ -35,8 +35,6 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import Link from "next/link";
 import EmojiPicker from "emoji-picker-react";
-import { LuSend } from "react-icons/lu";
-import { jwtDecode } from "jwt-decode";
 import SharePost from "./sharePost";
 import { LiaTelegramPlane } from "react-icons/lia";
 
@@ -122,8 +120,8 @@ const Posts = () => {
 
   const addNewLikedPost = async (id) => {
     try {
-      setLocalPosts((prevPosts) =>
-        prevPosts.map((p) =>
+      setLocalPosts((e) =>
+        e.map((p) =>
           p.postId === id
             ? {
                 ...p,
@@ -171,8 +169,8 @@ const Posts = () => {
 
   const addNewPostFavourite = async (id) => {
     try {
-      setLocalPosts((prevPosts) =>
-        prevPosts.map((p) =>
+      setLocalPosts((e) =>
+        e.map((p) =>
           p.postId === id
             ? {
                 ...p,
