@@ -4,11 +4,11 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 
 const BASE_URL = 'http://37.27.29.18:8003';
-
+import { API_BASE_URL } from '@/lib/apiBase';
 export const profileApi = createApi({
   reducerPath: 'profileApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: `${BASE_URL}/`,
+    baseUrl: API_BASE_URL,
     prepareHeaders: (headers) => {
       if (typeof window !== 'undefined') {
         const token =
@@ -179,7 +179,9 @@ export const profileApi = createApi({
         url:`Post/delete-post?id=${postId}`,
         method:"DELETE"
       })
-    })
+    }),
+    
+  
   }),
 });
 
