@@ -10,12 +10,14 @@ import {
   useUpdateUserProfileImageMutation 
 } from '@/store/pages/profile/ProfileApi'
 import { useRouter } from 'next/navigation'
+import { useTranslation } from 'react-i18next'
 
 const EditProfile = () => {
   const router = useRouter()
   const { data, isLoading, isError } = useGetMyProfileQuery()
   const profile = data?.data
 
+   const {t, i18n} = useTranslation();
   const [updateProfile] = useUpdateUserProfileMutation()
   const [updateProfileImage] = useUpdateUserProfileImageMutation()
 
@@ -41,8 +43,8 @@ const EditProfile = () => {
     }
   }, [profile])
 
-  if (isLoading) return <p>Загрузка...</p>
-  if (isError) return <p>Ошибка при загрузке данных</p>
+  if (isLoading) return <p>   {t("editProfile.loading")}</p>
+  if (isError) return <p>{t("editProfile.errorLoading")}</p>
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -59,10 +61,10 @@ const EditProfile = () => {
     try {
       // Оборачиваем данные в userProfile
       await updateProfile({ userProfile: form }).unwrap()
-      message.success("Profile updated successfully!")
+      message.success(`${t("editProfile.successUpdate")}`)
       router.push('/profile')
     } catch (err) {
-      message.error("Error updating profile")
+      message.error(`${t("editProfile.errorUpdate")}`)
     }
 
     if (selectedFile) {
@@ -70,9 +72,9 @@ const EditProfile = () => {
       formData.append('imageFile', selectedFile)
       try {
         await updateProfileImage(formData).unwrap()
-        message.success("Profile image updated!")
+        message.success(`${t("editProfile.successImage")}`)
       } catch (err) {
-        message.error("Error uploading image")
+        message.error(`${t("editProfile.errorImage")}`)
       }
     }
   }
@@ -82,9 +84,9 @@ return (
     {/* Breadcrumbs */}
     <div className="flex flex-wrap items-center gap-2 text-[18px] sm:text-[20px]">
       <Link href="/profile">
-        <p className="font-[700] text-[#2563EB]">Profile</p>
+        <p className="font-[700] text-[#2563EB]">{t("editProfile.breadcrumbProfile")}</p>
       </Link>
-      <p className="font-[700] text-[#1E293B]">/ Edit profile</p>
+      <p className="font-[700] text-[#1E293B]">/ {t("editProfile.breadcrumbEdit")}</p>
     </div>
 
     {/* Header section */}
@@ -112,14 +114,14 @@ return (
           className="hidden"
         />
         <label htmlFor="fileInput">
-          <Button size="sm">Change photo</Button>
+          <Button size="sm">{t("editProfile.changePhoto")}</Button>
         </label>
       </div>
     </section>
 
     {/* Inputs */}
     <fieldset className="bg-white border-2 w-full h-[60px] border-[#E2E8F0] rounded-xl">
-      <legend className="ml-2 text-[#64748B] text-sm">Name</legend>
+      <legend className="ml-2 text-[#64748B] text-sm">{t("editProfile.name")}</legend>
       <input
         type="text"
         name="firstName"
@@ -130,7 +132,7 @@ return (
     </fieldset>
 
     <fieldset className="bg-white border-2 w-full h-[60px] border-[#E2E8F0] rounded-xl">
-      <legend className="ml-2 text-[#64748B] text-sm">User name</legend>
+      <legend className="ml-2 text-[#64748B] text-sm">{t("editProfile.userName")}</legend>
       <input
         type="text"
         name="userName"
@@ -141,7 +143,7 @@ return (
     </fieldset>
 
     <fieldset className="bg-white border-2 w-full h-[120px] sm:h-[100px] border-[#E2E8F0] rounded-xl">
-      <legend className="ml-2 text-[#64748B] text-sm">Bio</legend>
+      <legend className="ml-2 text-[#64748B] text-sm">{t("editProfile.bio")}</legend>
       <textarea
         name="about"
         value={form.about}
@@ -156,17 +158,17 @@ return (
       onChange={handleChange}
       className="bg-white text-[#64748B] border-2 w-full h-[60px] px-3 border-[#E2E8F0] rounded-xl"
     >
-      <option value="">Gender</option>
-      <option value="0">Male</option>
-      <option value="1">Female</option>
+      <option value="">{t("editProfile.gender")}</option>
+      <option value="0">{t("editProfile.genderMale")}</option>
+      <option value="1">{t("editProfile.genderFemale")}</option>
     </select>
-    <p className="text-[#64748B] text-sm">This won’t be part of your public profile.</p>
+    <p className="text-[#64748B] text-sm">{t("editProfile.privateInfoNote")}</p>
 
     <Button
       onClick={handleSubmit}
       className="w-[180px] h-[48px] mb-[100px] sm:mb-0 rounded-xl bg-[#E2E8F0] text-[#41526b]"
     >
-      Submit
+     {t("editProfile.submit")}
     </Button>
   </div>
 )

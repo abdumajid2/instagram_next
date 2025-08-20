@@ -530,7 +530,7 @@ return (
             <span className="text-xs sm:text-sm font-semibold">{profile?.userName}</span>
             {viewedMap[freshStories[storyIndex].id] && (
               <span className="ml-2 sm:ml-3 text-[10px] sm:text-xs px-2 py-0.5 rounded bg-white/15">
-                Viewed
+             {t("profile.viewed")}
               </span>
             )}
           </div>

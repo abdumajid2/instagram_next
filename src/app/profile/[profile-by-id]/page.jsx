@@ -25,6 +25,7 @@ import {
 import FollowersMenu from '@/components/pages/profile/followers';
 import FollowingMenu from '@/components/pages/profile/following';
 import Posts from '@/app/profile/posts/page';
+import { useTranslation } from 'react-i18next';
 
 const API = 'http://37.27.29.18:8003';
 const IMG = (f) => (f ? `${API}/images/${f}` : '/placeholder.png');
@@ -197,10 +198,10 @@ export default function ProfileById() {
   const [activeTab, setActiveTab] = useState('posts'); 
   const [followersOpen, setFollowersOpen] = useState(false);
   const [followingOpen, setFollowingOpen] = useState(false);
-
+    const {t, i18n} = useTranslation();
   if (userLoading || storiesLoading) return <Skeleton active paragraph={{ rows: 5 }} />;
-  if (userError) return <div>Ошибка: {String(userError)}</div>;
-  if (!user) return <div>Пользователь не найден</div>;
+  if (userError) return <div>{t("profileById.error")}: {String(userError)}</div>;
+  if (!user) return <div>     {t("profileById.noUser")}</div>;
 
   return (
     <div className="w-full sm:max-w-[640px] mx-auto sm:ml-[100px] mt-2 sm:mt-5 px-3 sm:px-0">
@@ -237,16 +238,16 @@ export default function ProfileById() {
                     isFollowing ? 'bg-gray-500 hover:bg-gray-600' : 'bg-blue-600 hover:bg-blue-500'
                   }`}
                 >
-                  {isFollowing ? 'Unfollow' : 'Follow'}
+                  {isFollowing ? `${t("profileById.unfollow")}` :  `${t("profileById.follow")}`}
                 </button>
                     <button onClick={goToChat} disabled={creatingChat} className="sm:px-4 sm:hidden px-1 text-[10px]  py-2 sm:py-1 rounded-md border">
-              Send message
+             {t("profileById.sendMessage")}
             </button>
               </div>
             )}
 
             <button onClick={goToChat} disabled={creatingChat} className="sm:px-4 px-1 sm:block hidden text-[10px]  py-2 rounded-md border">
-              Send message
+             {t("profileById.sendMessage")}
             </button>
           </div>
 
@@ -255,7 +256,7 @@ export default function ProfileById() {
 
           <div className="flex gap-6">
             <p className="text-[14px] font-[600]">
-              {user.postCount || 0} <span className="text-[#64748B] font-[400]">posts</span>
+              {user.postCount || 0} <span className="text-[#64748B] font-[400]">     {t("profileById.posts")}</span>
             </p>
 
             <p
@@ -263,7 +264,7 @@ export default function ProfileById() {
               onClick={() => setFollowersOpen(true)}
             >
               {user.subscribersCount || 0}{' '}
-              <span className="text-[#64748B] font-[400]">followers</span>
+              <span className="text-[#64748B] font-[400]">     {t("profileById.followers")}</span>
             </p>
 
             <p
@@ -271,7 +272,7 @@ export default function ProfileById() {
               onClick={() => setFollowingOpen(true)}
             >
               {user.subscriptionsCount || 0}{' '}
-              <span className="text-[#64748B] font-[400]">following</span>
+              <span className="text-[#64748B] font-[400]">     {t("profileById.following")}</span>
             </p>
           </div>
 
@@ -306,7 +307,7 @@ export default function ProfileById() {
           <Swiper slidesPerView={6} spaceBetween={10} freeMode modules={[FreeMode]}>
             {freshStories.map((story, idx) => (
               <SwiperSlide key={story.id} className="flex flex-col items-center">
-                <button onClick={() => openStoryAt(idx)} title="View story">
+                <button onClick={() => openStoryAt(idx)} title={`${t("profileById.storyViewTitle")}`}>
                   <div className="w-16 h-16 rounded-full p-[2px] bg-gradient-to-tr from-pink-500 via-red-500 to-yellow-500">
                     <div className="w-full h-full rounded-full overflow-hidden bg-white">
                       <Image
@@ -386,7 +387,7 @@ export default function ProfileById() {
               e.stopPropagation();
               closeStory();
             }}
-            title="Close story"
+            title={`${t("profileById.closeStory")}`}
           >
             ×
           </button>
@@ -401,7 +402,7 @@ export default function ProfileById() {
           }`}
           onClick={() => setActiveTab('posts')}
         >
-          Posts
+            {t("profileById.posts")}
         </button>
         <button
           className={`px-4 py-2 ${
@@ -409,7 +410,7 @@ export default function ProfileById() {
           }`}
           onClick={() => setActiveTab('tagged')}
         >
-          Tagged
+             {t("profileById.tagged")}
         </button>
       </div>
 
