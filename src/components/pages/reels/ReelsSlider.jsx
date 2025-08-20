@@ -23,7 +23,7 @@ export default function ReelsSlider( { reels } ) {
         className="mySwiper"
       >
         {reels.map((e, i) => {
-            return <SwiperSlide>Slide 1</SwiperSlide>
+            return <SwiperSlide key={i}>Slide 1</SwiperSlide>
         })}
       </Swiper>
     </>
