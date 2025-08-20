@@ -55,7 +55,7 @@ function ChatActionModal({ chatId, onDeleted }) {
       setOpen(false);
       onDeleted?.(chatId);
     } catch (e) {
-      console.error("Ошибка удаления:", e);
+      console.error(e);
     }
   };
 
@@ -110,15 +110,15 @@ export default function MessengerApp() {
   const [showSidebar, setShowSidebar] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
-  const openChat = (item) => {
-    const q = `?name=${encodeURIComponent(item.partnerName)}&avatar=${encodeURIComponent(item.partnerImage || "")}&partnerId=${encodeURIComponent(item.partnerId)}`;
-  router.push(`/chats/${item.chatId}${q}`);
+  const openChat = (e) => {
+    const q = `?name=${encodeURIComponent(e.partnerName)}&avatar=${encodeURIComponent(e.partnerImage || "")}&partnerId=${encodeURIComponent(e.partnerId)}`;
+  router.push(`/chats/${e.chatId}${q}`);
   setShowSidebar(false);
   };
 
   const handleUserSelect = (u) => {
   
-    router.push(`/chats/new?userId=${u.id}&name=${encodeURIComponent(u.fullName)}&avatar=${encodeURIComponent(u.avatar || "")}`);
+    router.push(`/chats/new?userId=${u.id}&name&avatar`);
     setShowModal(false);
   };
 
