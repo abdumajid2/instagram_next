@@ -149,7 +149,7 @@ const Reels = () => {
           const isLiked = likedStates[e.postId] ?? e.postLike;
           if (isLoading) return <ReelsLoader />;
           return (
-            <div className="relative flex justify-center items-end w-full lg:h-screen h-[98vh]" key={i}>
+            <div  className="relative flex justify-center items-end w-full lg:h-screen h-[98vh]" key={i}>
               <div className="relative w-full lg:w-110 h-screen cursor-pointer">
                 <div className="flex lg:w-110 w-full m-auto h-screen snap-start items-center justify-center bg-black">
                   <video
