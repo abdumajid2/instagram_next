@@ -158,7 +158,7 @@ export default function Profile() {
     }
   };
 
-  //
+
   const [storyOpen, setStoryOpen] = useState(false);
   const [storyIndex, setStoryIndex] = useState(0);
 
@@ -205,7 +205,7 @@ const localLikes = useMemo(() => {
     return () => clearTimeout(timer);
   }, [storyOpen, storyIndex, freshStories.length]);
 
-  // клавиши
+
   useEffect(() => {
     if (!storyOpen) return;
     const onKey = (e) => {
@@ -218,7 +218,6 @@ const localLikes = useMemo(() => {
     return () => window.removeEventListener("keydown", onKey);
   }, [storyOpen, freshStories.length]);
 
-  // клики по краям экрана
   const onViewerClick = (e) => {
     const mid = window.innerWidth / 2;
     if (e.clientX > mid) {
@@ -300,7 +299,7 @@ return (
       <div
         className={
           (hasStory
-            ? "p-[3px] rounded-full bg-gradient-to-tr from-pink-500 via-red-500 to-yellow-500 "
+            ? "p-[3px] rounded-full bg-gradient-to-tr from-yellow-500 via-red-500 to-blue-500 "
             : "") + "shrink-0"
         }
         onClick={() => (hasStory ? openStoryAt(0) : setShowProfileImage(true))}
