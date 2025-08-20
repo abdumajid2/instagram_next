@@ -700,7 +700,7 @@ export default function ChatByIdPage() {
 
   return (
     <>
-      <div className="flex flex-col h-[94vh] md:h-screen  md:w-[80vw]  md:overflow-y-auto">
+      <div className="flex flex-col h-[94vh] md:h-screen  md:w-[85vw]  md:overflow-y-auto">
 
         <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b">
           <div className="flex items-center gap-3">
@@ -730,7 +730,7 @@ export default function ChatByIdPage() {
         </div>
 
         <div className="flex-1 overflow-y-auto px-2 sm:px-6 py-6 bg-white">
-          <div className="mx-auto max-w-7xl space-y-4">
+          <div className="mx-auto max-w-10xl space-y-4">
             {combined.map((m, i) => {
               const isPending = !!m.__pending;
               const mine =
@@ -796,8 +796,8 @@ export default function ChatByIdPage() {
                       className={[
                         "relative max-w-[78%] sm:max-w-[65%] px-3.5 py-2 rounded-2xl shadow-sm border",
                         mine
-                          ? "bg-[#efefef] text-black border-transparent"
-                          : "bg-white text-gray-900 border-gray-200",
+                          ? "bg-[#efefef] text-black rounded-br-xs border-transparent"
+                          : "bg-white rounded-tl-xs text-gray-900 border-gray-200",
                       ].join(" ")}
                     >
                       {!!displayText && (
@@ -973,7 +973,7 @@ export default function ChatByIdPage() {
                 value={messageText}
                 onChange={(e) => setMessageText(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                placeholder="Напишите сообщение…"
+                placeholder="Messages"
                 className="w-full bg-transparent px-3 py-2 md:px-4 md:py-2.5 outline-none text-[15px]"
               />
 
