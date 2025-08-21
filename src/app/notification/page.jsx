@@ -3,6 +3,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
+import Image from "next/image";
+
 import placeholder from "@/assets/img/pages/profile/profile/p.png";
 import {
   useGetSubscribersQuery,
@@ -12,7 +14,6 @@ import {
   useFollowUserMutation,
   useUnfollowUserMutation,
 } from "@/store/pages/notification/notification";
-import Image from "next/image";
 
 const API = "http://37.27.29.18:8003";
 
@@ -34,12 +35,13 @@ function humanTime(ts) {
 }
 
 export default function Notification() {
-  const router = useRouter(); // ✅ хук внутри компонента
+  const router = useRouter();
 
+  // ====== auth ======
   const [userId, setUserId] = useState(null);
   useEffect(() => {
     try {
-      const token = localStorage.getItem("authToken");
+      const token = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
       if (!token) return;
       const decoded = jwtDecode(token);
       const uid = decoded?.sid || decoded?.nameid || decoded?.userId || decoded?.id;
@@ -49,6 +51,7 @@ export default function Notification() {
     }
   }, []);
 
+  // ====== API ======
   // 1) подписчики (они подписались на меня)
   const { data: subscribers = [], isLoading: subsLoading } =
     useGetSubscribersQuery(userId, { skip: !userId });
@@ -61,26 +64,28 @@ export default function Notification() {
   const { data: myPosts = [], isLoading: myPostsLoading } =
     useGetMyPostsQuery(undefined, { skip: !userId });
 
-  // 4) рекомендации
+  // 4) рекомендации пользователей
   const { data: users = [], isLoading: usersLoading } =
     useGetUsersQuery({ pageNumber: 1, pageSize: 40 }, { skip: !userId });
 
   const [followUser, { isLoading: followingInFlight }] = useFollowUserMutation();
   const [unfollowUser, { isLoading: unfollowingInFlight }] = useUnfollowUserMutation();
 
+  // множество id, на кого я подписан
   const myFollowingSet = useMemo(() => {
-    const ids = subscriptions.map((row) => row?.userShortInfo?.userId).filter(Boolean);
+    const ids = subscriptions
+      .map((row) => row?.userShortInfo?.userId || row?.userShortInfo?.id)
+      .filter(Boolean);
     return new Set(ids);
   }, [subscriptions]);
 
-  // ------ EVENTS ------
+  // ====== EVENTS ======
   const commentEvents = useMemo(() => {
     const ev = [];
     for (const p of myPosts) {
       const pid = p?.postId;
-      const img = Array.isArray(p?.images) && p.images.length
-        ? `${API}/images/${p.images[0]}`
-        : null;
+      const img =
+        Array.isArray(p?.images) && p.images.length ? `${API}/images/${p.images[0]}` : null;
 
       for (const c of p?.comments ?? []) {
         ev.push({
@@ -103,9 +108,8 @@ export default function Notification() {
     const ev = [];
     for (const p of myPosts) {
       const pid = p?.postId;
-      const img = Array.isArray(p?.images) && p.images.length
-        ? `${API}/images/${p.images[0]}`
-        : null;
+      const img =
+        Array.isArray(p?.images) && p.images.length ? `${API}/images/${p.images[0]}` : null;
       for (const u of p?.userLikes ?? []) {
         ev.push({
           type: "like",
@@ -124,9 +128,10 @@ export default function Notification() {
   const followerEvents = useMemo(() => {
     return subscribers.map((row) => {
       const u = row?.userShortInfo || {};
+      const id = u.userId ?? u.id;
       return {
         type: "follow",
-        byId: u.userId,
+        byId: id,
         byName: u.userName || "user",
         byPhoto: u.userPhoto ? `${API}/images/${u.userPhoto}` : placeholder.src,
         at: null,
@@ -134,20 +139,29 @@ export default function Notification() {
     });
   }, [subscribers]);
 
-  const thisWeekComments = commentEvents.filter((e) => {
-    if (!e.at) return false;
-    const dt = new Date(e.at);
-    const diffDays = (Date.now() - dt.getTime()) / (1000 * 60 * 60 * 24);
-    return diffDays <= 7;
-  });
+  const thisWeekComments = useMemo(() => {
+    return commentEvents.filter((e) => {
+      if (!e.at) return false;
+      const dt = new Date(e.at);
+      const diffDays = (Date.now() - dt.getTime()) / (1000 * 60 * 60 * 24);
+      return diffDays <= 7;
+    });
+  }, [commentEvents]);
 
   const recommendations = useMemo(() => {
     const notMeNotFollowed = users
-      .filter((u) => u?.id && u.id !== userId && !myFollowingSet.has(u.id))
+      .map((u) => ({
+        id: u.id ?? u.userId, // нормализуем ключ
+        userName: u.userName ?? u.name ?? "user",
+        avatar: u.avatar ?? u.userPhoto ?? null,
+        subscribersCount: u.subscribersCount ?? 0,
+      }))
+      .filter((u) => u.id && u.id !== userId && !myFollowingSet.has(u.id))
       .slice(0, 15);
     return notMeNotFollowed;
   }, [users, userId, myFollowingSet]);
 
+  // ====== handlers ======
   const onFollow = async (targetId) => {
     try {
       await followUser(targetId).unwrap();
@@ -172,7 +186,7 @@ export default function Notification() {
     <div className="lg:w-[90%] lg:m-auto lg:ml-[10px] bg-white rounded-2xl border border-gray-200 px-3 py-3">
       <div className="flex items-center justify-between px-2 py-2 border-b">
         <h1 className="font-bold text-[24px]">Уведомления</h1>
-        <Link href="/"><p className="text-[18px]">❌</p></Link>
+        <Link href="/"><span className="text-[18px] cursor-pointer">❌</span></Link>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
@@ -195,6 +209,8 @@ export default function Notification() {
                     <Image
                       src={e.byPhoto}
                       alt={e.byName}
+                      width={46}
+                      height={46}
                       className="rounded-full w-[46px] h-[46px] object-cover"
                     />
                     <div className="leading-tight">
@@ -209,6 +225,8 @@ export default function Notification() {
                     <Image
                       src={e.postPreview}
                       alt="post"
+                      width={48}
+                      height={48}
                       className="w-[48px] h-[48px] object-cover rounded"
                       onClick={(ev) => ev.stopPropagation()}
                     />
@@ -223,12 +241,11 @@ export default function Notification() {
             <h2 className="font-semibold mb-3">Подписчики</h2>
             <div className="space-y-3">
               {followerEvents.length === 0 && (
-                <div className="text-gray-500"></div>
+                <div className="text-gray-500">Пока никто не подписался</div>
               )}
               {followerEvents.map((e) => {
                 const iFollow = myFollowingSet.has(e.byId);
                 return (
-
                   <div key={`f-${e.byId}`} className="flex items-center justify-between gap-3">
                     <div
                       className="flex items-center gap-3 cursor-pointer"
@@ -237,6 +254,8 @@ export default function Notification() {
                       <Image
                         src={e.byPhoto}
                         alt={e.byName}
+                        width={46}
+                        height={46}
                         className="rounded-full w-[46px] h-[46px] object-cover"
                       />
                       <div className="leading-tight">
@@ -272,14 +291,9 @@ export default function Notification() {
           <section className="mb-2">
             <h2 className="font-semibold mb-3">Лайки ваших постов</h2>
             <div className="space-y-3">
-              {likeEvents.length === 0 && (
-                <div className="text-gray-500">Пока лайков нет</div>
-              )}
+              {likeEvents.length === 0 && <div className="text-gray-500">Пока лайков нет</div>}
               {likeEvents.map((e, idx) => (
-                <div
-                  key={`l-${e.postId}-${e.byId}-${idx}`}
-                  className="flex items-center justify-between gap-3"
-                >
+                <div key={`l-${e.postId}-${e.byId}-${idx}`} className="flex items-center justify-between gap-3">
                   <div
                     className="flex items-center gap-3 cursor-pointer"
                     onClick={() => router.push(`/profile-by-id/${e.byId}`)}
@@ -287,6 +301,8 @@ export default function Notification() {
                     <Image
                       src={e.byPhoto}
                       alt={e.byName}
+                      width={46}
+                      height={46}
                       className="rounded-full w-[46px] h-[46px] object-cover"
                     />
                     <div className="leading-tight">
@@ -299,6 +315,8 @@ export default function Notification() {
                     <Image
                       src={e.postPreview}
                       alt="post"
+                      width={48}
+                      height={48}
                       className="w-[48px] h-[48px] object-cover rounded"
                       onClick={(ev) => ev.stopPropagation()}
                     />
@@ -321,23 +339,20 @@ export default function Notification() {
                 const avatar = u.avatar ? `${API}/images/${u.avatar}` : placeholder.src;
                 const iFollow = myFollowingSet.has(u.id);
                 return (
-                  <div
-                    key={u.id}
-                    className="flex items-center justify-between gap-3"
-                  >
+                  <div key={u.id} className="flex items-center justify-between gap-3">
                     <div
                       className="flex items-center gap-3 cursor-pointer"
-                      onClick={() => router.push(`/notification/${u.userId}`)}
+                      onClick={() => router.push(`/profile-by-id/${u.id}`)}
                     >
                       <Image
                         src={avatar}
                         alt={u.userName}
+                        width={40}
+                        height={40}
                         className="rounded-full w-[40px] h-[40px] object-cover"
                       />
                       <div className="leading-tight">
-                        <div onClick={() => router.push(`/profile/${e.byId}`)} className="font-medium text-sm hover:underline">
-                          {u.userName}
-                        </div>
+                        <div className="font-medium text-sm hover:underline">{u.userName}</div>
                         <div className="text-xs text-gray-500">
                           Подписчики: {u.subscribersCount ?? 0}
                         </div>
@@ -347,10 +362,7 @@ export default function Notification() {
                     {!iFollow ? (
                       <button
                         className="px-3 py-1 rounded bg-[#EFF6FF] text-[#3B82F6]"
-                        onClick={(ev) => {
-                          ev.stopPropagation();
-                          onFollow(u.id);
-                        }}
+                        onClick={(ev) => { ev.stopPropagation(); onFollow(u.id); }}
                         disabled={followingInFlight}
                       >
                         Подписаться
@@ -358,10 +370,7 @@ export default function Notification() {
                     ) : (
                       <button
                         className="px-3 py-1 rounded bg-gray-200"
-                        onClick={(ev) => {
-                          ev.stopPropagation();
-                          onUnfollow(u.id);
-                        }}
+                        onClick={(ev) => { ev.stopPropagation(); onUnfollow(u.id); }}
                         disabled={unfollowingInFlight}
                       >
                         Отписаться

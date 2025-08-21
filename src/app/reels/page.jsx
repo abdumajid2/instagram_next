@@ -135,7 +135,6 @@ const Reels = () => {
                 />
               )}
 
-
               {/* Мьют */}
               <button
                 onClick={() => {
@@ -164,76 +163,10 @@ const Reels = () => {
                     <CiHeart
                       className="w-10 h-10 hover:text-[#949494]"
                       onClick={() => addLike(e.postId)}
-
-  if(isLoading) return <ReelsLoader />
-  return (
-    <>
-      <div className="h-screen w-full overflow-y-scroll snap-y snap-mandatory">
-        {data?.data.map((e, i) => {
-          const isLiked = likedStates[e.postId] ?? e.postLike;
-          if (isLoading) return <ReelsLoader />;
-          return (
-            <div  className="relative flex justify-center items-end w-full lg:h-screen h-[98vh]" key={i}>
-              <div className="relative w-full lg:w-110 h-screen cursor-pointer">
-                <div className="flex lg:w-110 w-full m-auto h-screen snap-start items-center justify-center bg-black">
-                  <video
-                    onClick={()=>togglePlay(i)}
-                    ref={(el) => (videoRefs.current[i] = el)}
-                    muted={mutedStates[i] ?? true}
-                    className="w-full h-screen"
-                    autoPlay
-                    loop
-                    src={`http://37.27.29.18:8003/images/${e.images}`}
-                  ></video>
-                </div>
-                <div className="absolute left-2 flex flex-col lg:bottom-[0px] bottom-[60px] w-full items-start gap-3 text-[#e4e4e4]">
-                  <div className="flex items-center gap-4">
-                    <img className="w-12 h-12 rounded-[50%] bg-white" src={ e.userImage ? `http://37.27.29.18:8003/images/${e.userImage}` : userImage} alt="" />
-                    <Link href={`/profile/${e.userId}`}>{e.userName}</Link>
-                    {subscribet[e.userId] ?? e.isSubscriber ? (
-                      <button onClick={() => handleSubscribe(e.userId, true)} className="border py-1 px-3 rounded-xl">You are subscribet</button>) : (
-                      <button onClick={() => handleSubscribe(e.userId, false)} className="border py-1 px-3 rounded-xl"> Subscribe</button>
-                    )}
-                  </div>
-                  <div className="flex w-[80%] items-end">
-                    <p className={expanded[e.postId] ? "whitespace-pre-line w-[90%]" : "line-clamp-1 w-[90%]"}>{e.content}</p>
-                    {e.content?.length > 10 && (
-                      <button onClick={() => setExpanded((prev) => ({ ...prev, [e.postId]: !prev[e.postId],}))} className="text-sm text-gray-300 mt-1">{expanded[e.postId] ? "скрыть" : "ещё"}</button>
-                    )}
-                  </div>
-                  <p className="lg:w-95">🎵 {e.userName} original audio</p>
-                </div>
-                <button className="absolute left-45 top-110 rounded-2xl p-1 text-white">
-                  {showPlayIcon[i] && <BsPlayCircleFill size={80} />}
-                </button>
-                <button className="absolute right-2 top-3 rounded-2xl p-1 bg-[#616161c1]" onClick={() => toggleMute(i)}>
-                  {mutedStates[i] ?? true ? (
-                    <IoVolumeMuteSharp className="text-white w-6 h-6" />) : (
-                    <GoUnmute className="text-white w-6 h-6" />
-                  )}
-                </button>
-                <div className="flex flex-col items-center gap-2 lg:mb-5 mb-20 absolute bottom-0 right-1 text-white">
-                  <div className="flex flex-col items-center">
-                    {isLiked ? (
-                      <FaHeart className="text-red-500 w-8 h-8" onClick={() => handleLike(e.postId, e.postLikeCount)} />) : (
-                      <CiHeart className="w-10 h-10 hover:text-[#949494]" onClick={() => handleLike(e.postId, e.postLikeCount)}/>
-                    )}
-                    <p>{likeCounts[e.postId] ?? e.postLikeCount}</p>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <FaRegComment
-                      onClick={() => {
-                        showModal(),
-                        setcomments(e.comments),
-                        setpostid(e.postId);
-                      }}
-                      className="w-8 h-8 hover:text-[#cdcdcd]"
-
                     />
                   )}
                   <p>{likeCounts[e.postId] ?? e.postLikeCount}</p>
                 </div>
-
                 <div className="flex flex-col items-center">
                   <FaRegComment
                     onClick={() => {

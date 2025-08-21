@@ -155,8 +155,6 @@ export default function Profile() {
     }
   };
 
-
-
   const [storyOpen, setStoryOpen] = useState(false);
   const [storyIndex, setStoryIndex] = useState(0);
 
@@ -201,7 +199,6 @@ export default function Profile() {
     return () => clearTimeout(timer);
   }, [storyOpen, storyIndex, freshStories.length]);
 
-
   useEffect(() => {
     if (!storyOpen) return;
     const onKey = (e) => {
@@ -213,7 +210,6 @@ export default function Profile() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [storyOpen, freshStories.length]);
-
 
   const onViewerClick = (e) => {
     const mid = window.innerWidth / 2;
@@ -278,7 +274,6 @@ export default function Profile() {
   if (isLoading) return <p>Загрузка...</p>;
   if (isError) return <p>Ошибка при загрузке данных</p>;
 
-
   return (
     <div className="w-full sm:max-w-[640px] mx-auto sm:ml-[100px] mt-2 sm:mt-5 px-3 sm:px-0">
       {/* HEADER */}
@@ -301,30 +296,6 @@ export default function Profile() {
             className="h-[96px] w-[96px] sm:h-[160px] sm:w-[160px] object-cover rounded-full bg-white"
           />
         </div>
-
-return (
-  <div className="w-full sm:max-w-[640px] mx-auto sm:ml-[100px] mt-2 sm:mt-5 px-3 sm:px-0">
-    {/* HEADER */}
-    <section className="w-full flex  sm:flex-row items-center sm:items-start justify-between gap-4 sm:gap-[30px] h-auto sm:h-[160px]">
-      <div
-        className={
-          (hasStory
-            ? "p-[3px] rounded-full bg-gradient-to-tr from-yellow-500 via-red-500 to-blue-500 "
-            : "") + "shrink-0"
-        }
-        onClick={() => (hasStory ? openStoryAt(0) : setShowProfileImage(true))}
-        style={{ cursor: "pointer" }}
-        aria-label={hasStory ? "Open stories" : "View avatar"}
-      >
-        <Image
-          alt="Profile photo"
-          width={160}
-          height={160}
-          src={getImageSrc(profile?.image)}
-          className="h-[96px] w-[96px] sm:h-[160px] sm:w-[160px] object-cover rounded-full bg-white"
-        />
-      </div>
-
 
         {showProfileImage && !hasStory && (
           <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center px-4">
