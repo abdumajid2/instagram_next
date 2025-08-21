@@ -55,7 +55,7 @@ export default function Login() {
   return (
     <div className="flex min-h-screen items-center justify-center ">
 
-      <Image alt="" className="hidden  lg:block" src={loginImg} />
+      
 
       <Image className="hidden lg:block" alt="" src={loginImg} />
 
