@@ -41,7 +41,7 @@ export default function Registration() {
 	return (
 		<>
 			<div className="flex min-h-screen items-center justify-center ">
-				<Image className="hidden lg:block" src={loginImg} />
+				<Image className="hidden lg:block" src={loginImg} alt="" />
 				<div className="w-[500px] h-[700px] flex flex-col gap-[20px]    p-10 ">
 					<h1 className="mb-8 text-center text-3xl font-extrabold text-gray-900">
 						Instagram

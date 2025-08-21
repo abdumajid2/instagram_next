@@ -20,21 +20,22 @@ import { Modal } from "antd";
 import ReelsLoader from "./ReelsLoader";
 import Link from "next/link";
 import SharePost from "@/components/pages/home/posts/sharePost";
+import Image from "next/image";
 
-let userImage =
+const FALLBACK_USER_IMG =
   "https://www.transparentpng.com/download/user/gray-user-profile-icon-png-fP8Q1P.png";
 
 const Reels = () => {
-  let { data, isLoading, refetch } = useGetReelsQuery();
-  let [addLike] = useAddLikeMutation();
-  let [Folow] = useFollowMutation();
-  let [UnFolow] = useUnFollowMutation();
-  let [addToFavorite] = useAddToFavoriteMutation();
-  let [addCommentf] = useAddCommentMutation();
-  let [deleteComment] = useDeleteCommentMutation();
+  const { data, isLoading } = useGetReelsQuery();
+  const [addLike] = useAddLikeMutation();
+  const [follow] = useFollowMutation();
+  const [unfollow] = useUnFollowMutation();
+  const [addToFavorite] = useAddToFavoriteMutation();
+  const [addCommentf] = useAddCommentMutation();
+  const [deleteComment] = useDeleteCommentMutation();
 
-  const [mutedStates, setMutedStates] = useState({});
   const videoRefs = useRef([]);
+  const [mutedStates, setMutedStates] = useState({});
   const [likedStates, setLikedStates] = useState({});
   const [likeCounts, setLikeCounts] = useState({});
   const [savedStates, setSavedStates] = useState({});
@@ -42,104 +43,127 @@ const Reels = () => {
   const [subscribet, setSubscribet] = useState({});
   const [showPlayIcon, setShowPlayIcon] = useState({});
 
-  let [comments, setcomments] = useState([]);
-  let [addcomment, setaddcomment] = useState("");
-  let [postid, setpostid] = useState(null);
-  let [isSubscribet, setIsSubscribet] = useState(false);
+  const [comments, setcomments] = useState([]);
+  const [addcomment, setaddcomment] = useState("");
+  const [postid, setpostid] = useState(null);
+  const [isSubscribet, setIsSubscribet] = useState(false);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const showMoreModal = () => {
-    setIsModalOpen(true);
-  };
-  const handleMoreCancel = () => {
-    setIsModalOpen(false);
-  };
-  const [open, setOpen] = useState(false);
-  const showModal = () => {
-    setOpen(true);
-  };
-  const handleOk = async () => {
-    if (!addcomment.trim()) return;
-    try {
-      await addCommentf({ comment: addcomment, postId: postid }).unwrap();
-      setcomments((prev) => [
-        {
-          userImage: null,
-          userName: "You",
-          comment: addcomment,
-        },
-        ...prev,
-      ]);
-      setaddcomment("");
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  const handleCancel = () => {
-    setOpen(false);
-  };
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const [openComments, setOpenComments] = useState(false);
 
-  const togglePlay = (index) => {
-    const video = videoRefs.current[index];
-    if (!video) return;
-    if (video.paused) {
-      video.play();
-      setShowPlayIcon((prev) => ({ ...prev, [index]: false }));
-    } else {
-      video.pause();
-      setShowPlayIcon((prev) => ({ ...prev, [index]: true }));
-    }
-  };
+  if (isLoading) return <ReelsLoader />;
 
-  const toggleMute = (index) => {
-    const video = videoRefs.current[index];
-    if (!video) return;
-    video.muted = !video.muted;
-    setMutedStates((prev) => ({ ...prev, [index]: video.muted }));
-  };
+  return (
+    <div className="h-screen w-full overflow-y-scroll snap-y snap-mandatory">
+      {data?.data?.map((e, i) => {
+        const isLiked = likedStates[e.postId] ?? e.postLike;
+        return (
+          <div
+            key={e.postId ?? i}
+            className="relative flex justify-center items-end w-full lg:h-screen h-[98vh]"
+          >
+            <div className="relative w-full lg:w-110 h-screen cursor-pointer">
+              <div className="flex lg:w-110 w-full m-auto h-screen snap-start items-center justify-center bg-black">
+                <video
+                  onClick={() => {
+                    const video = videoRefs.current[i];
+                    if (video.paused) {
+                      video.play();
+                      setShowPlayIcon((p) => ({ ...p, [i]: false }));
+                    } else {
+                      video.pause();
+                      setShowPlayIcon((p) => ({ ...p, [i]: true }));
+                    }
+                  }}
+                  ref={(el) => (videoRefs.current[i] = el)}
+                  muted={mutedStates[i] ?? true}
+                  className="w-full h-screen"
+                  autoPlay
+                  loop
+                  src={`http://37.27.29.18:8003/images/${e.images}`}
+                />
+              </div>
 
-  const handleLike = async (postId, currentCount) => {
-    const isLiked = likedStates[postId] ?? false;
-    setLikedStates((prev) => ({ ...prev, [postId]: !isLiked }));
-    setLikeCounts((prev) => ({
-      ...prev,
-      [postId]: isLiked
-        ? (prev[postId] ?? currentCount) - 1
-        : (prev[postId] ?? currentCount) + 1,
-    }));
-    try {
-      await addLike(postId);
-    } catch (err) {
-      setLikedStates((prev) => ({ ...prev, [postId]: isLiked }));
-      setLikeCounts((prev) => ({...prev, [postId]: currentCount,}));
-      console.error(err);
-    }
-  };
+              {/* Автор */}
+              <div className="absolute left-2 flex flex-col lg:bottom-[0px] bottom-[60px] w-full items-start gap-3 text-[#e4e4e4]">
+                <div className="flex items-center gap-4">
+                  <Image
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 rounded-full bg-white"
+                    src={
+                      e.userImage
+                        ? `http://37.27.29.18:8003/images/${e.userImage}`
+                        : FALLBACK_USER_IMG
+                    }
+                    alt={`${e.userName ?? "user"} avatar`}
+                  />
+                  <Link href={`/profile/${e.userId}`}>{e.userName}</Link>
+                </div>
 
-  const handleSubscribe = async (userId, isSubscribed) => {
-    setSubscribet((prev) => ({ ...prev, [userId]: !isSubscribed }));
-    try {
-      if (isSubscribed) {
-        await UnFolow(userId).unwrap();
-      } else {
-        await Folow(userId).unwrap();
-      }
-    } catch (err) {
-      console.error(err);
-      setSubscribet((prev) => ({ ...prev, [userId]: isSubscribed }));
-    }
-  };
+                <div className="flex w-[80%] items-end">
+                  <p
+                    className={
+                      expanded[e.postId]
+                        ? "whitespace-pre-line w-[90%]"
+                        : "line-clamp-1 w-[90%]"
+                    }
+                  >
+                    {e.content}
+                  </p>
+                  {e.content?.length > 10 && (
+                    <button
+                      onClick={() =>
+                        setExpanded((prev) => ({
+                          ...prev,
+                          [e.postId]: !prev[e.postId],
+                        }))
+                      }
+                      className="text-sm text-gray-300 mt-1"
+                    >
+                      {expanded[e.postId] ? "скрыть" : "ещё"}
+                    </button>
+                  )}
+                </div>
+              </div>
 
-  const handleSave = async (postId, currentState) => {
-    const isSaved = savedStates[postId] ?? currentState;
-    setSavedStates((prev) => ({ ...prev, [postId]: !isSaved }));
-    try {
-      await addToFavorite({ postId });
-    } catch (err) {
-      setSavedStates((prev) => ({ ...prev, [postId]: isSaved }));
-      console.error(err);
-    }
-  };
+              {/* Play icon */}
+              {showPlayIcon[i] && (
+                <BsPlayCircleFill
+                  size={80}
+                  className="absolute left-1/2 top-1/2 text-white"
+                />
+              )}
+
+
+              {/* Мьют */}
+              <button
+                onClick={() => {
+                  const video = videoRefs.current[i];
+                  video.muted = !video.muted;
+                  setMutedStates((p) => ({ ...p, [i]: video.muted }));
+                }}
+                className="absolute right-2 top-3 rounded-2xl p-1 bg-[#616161c1]"
+              >
+                {mutedStates[i] ?? true ? (
+                  <IoVolumeMuteSharp className="text-white w-6 h-6" />
+                ) : (
+                  <GoUnmute className="text-white w-6 h-6" />
+                )}
+              </button>
+
+              {/* Лайки / комменты */}
+              <div className="flex flex-col items-center gap-2 absolute bottom-0 right-1 text-white">
+                <div className="flex flex-col items-center">
+                  {isLiked ? (
+                    <FaHeart
+                      className="text-red-500 w-8 h-8"
+                      onClick={() => addLike(e.postId)}
+                    />
+                  ) : (
+                    <CiHeart
+                      className="w-10 h-10 hover:text-[#949494]"
+                      onClick={() => addLike(e.postId)}
 
   if(isLoading) return <ReelsLoader />
   return (
@@ -204,100 +228,57 @@ const Reels = () => {
                         setpostid(e.postId);
                       }}
                       className="w-8 h-8 hover:text-[#cdcdcd]"
+
                     />
-                    <p>{e.commentCount}</p>
-                  </div>
-                  <div className="flex flex-col gap-5 items-center">
-                    <div className="text-3xl">
-                      <SharePost el={e} />
-                    </div>
-                    <button>
-                      {savedStates[e.postId] ?? e.postFavorite ? (
-                        <FaBookmark className="w-8 h-8" />) : (
-                        <LiaBookmark className="w-10 h-10 hover:text-[#949494]" onClick={() => handleSave(e.postId, e.postFavorite)}/>
-                      )}
-                    </button>
-                  </div>
-                  <div className="flex flex-col items-center lg:gap-15 gap-2">
-                    <p className="text-4xl cursor-pointer" onClick={() => { showMoreModal(), setIsSubscribet(e.isSubscriber);}}>...</p>
-                    <img className="w-10 h-10 rounded-[10px] bg-white" src={ e.userImage ? `http://37.27.29.18:8003/images/${e.userImage}` : userImage} alt=""/>
-                  </div>
-                </div>
-                <Modal
-                  title={null}
-                  open={isModalOpen}
-                  onCancel={handleMoreCancel}
-                  mask={false}
-                  styles={{
-                    mask: { backgroundColor: "transparent" },
-                  }}
-                  footer={null}
-                  closable={false}
-                  className="absolute top-0"
-                  modalRender={(modal) => (
-                    <div style={{ display: "flex", justifyContent: "center", alignItems: "center",}} onClick={handleMoreCancel}>
-                      {modal}
-                    </div>
                   )}
-                >
-                  <div className="text-xl text-center lg:text-start lg:top-100 top-50 lg:w-[300px] rounded-2xl">
-                    <p className="text-red-500 py-3 px-4 hover:bg-gray-200 rounded-xl">complain</p>
-                    {isSubscribet ? (
-                      <p className="py-3 px-4 hover:bg-gray-200 rounded-xl text-red-500" onClick={() => {UnFolow(e.userId);}}>unsubscribe</p>) : (
-                      <p className="py-3 px-4 hover:bg-gray-200 rounded-xl text-blue-500" onClick={() => { Folow(e.userId); }}>subscribe</p>
-                    )}
-                    <p className="py-3 px-4 hover:bg-gray-200 rounded-xl"> go to publication</p>
-                    <p className="py-3 px-4 hover:bg-gray-200 rounded-xl">share</p>
-                    <p className="py-3 px-4 hover:bg-gray-200 rounded-xl">copy link</p>
-                    <p className="py-3 px-4 hover:bg-gray-200 rounded-xl">embed on site</p>
-                    <p className="py-3 px-4 hover:bg-gray-200 rounded-xl">about the account</p>
-                  </div>
-                </Modal>
+                  <p>{likeCounts[e.postId] ?? e.postLikeCount}</p>
+                </div>
+
+                <div className="flex flex-col items-center">
+                  <FaRegComment
+                    onClick={() => {
+                      setOpenComments(true);
+                      setcomments(Array.isArray(e.comments) ? e.comments : []);
+                      setpostid(e.postId);
+                    }}
+                    className="w-8 h-8 hover:text-[#cdcdcd]"
+                  />
+                  <p>{e.commentCount}</p>
+                </div>
               </div>
             </div>
-          );
-        })}
-        <Modal
-          title="Comments"
-          open={open}
-          mask={false}
-          onCancel={handleCancel}
-          footer={[
-            <div key="custom-footer" className="flex gap-2 w-full">
-              <input
-                type="text"
-                placeholder="Add comment..."
-                name="addCommentInp"
-                value={addcomment}
-                onChange={(e) => {
-                  setaddcomment(e.target.value);
-                }}
-                className="flex-1 border rounded-lg px-3 py-2 outline-none"
-              />
-              <button onClick={() => {handleOk();}} className="bg-blue-500 text-white px-4 py-2 rounded-lg">Send</button>
-            </div>,
-          ]}
-        >
-          <div className="overflow-x-auto h-100 flex flex-col gap-10">
-            {comments.map((c, ind) => {
-              if (comments == []) return <p>not Comments yet</p>;
-              return (
-                <div key={ind} className="flex items-center gap-2 justify-between px-5">
-                  <div className="flex items-start gap-2">
-                    <img className="w-12 h-12 rounded-[50%]" src={ c.userImage ? `http://37.27.29.18:8003/images/${c.userImage}` : userImage} alt=""/>
-                    <div className="flex flex-col justify-between">
-                      <h3 className="text-[18px]">{c.userName}</h3>
-                      <p>{c.comment}</p>
-                    </div>
-                  </div>
-                  <button onClick={() => deleteComment(c.postCommentId)}>❌</button>
-                </div>
-              );
-            })}
           </div>
-        </Modal>
-      </div>
-    </>
+        );
+      })}
+
+      {/* Комментарии */}
+      <Modal open={openComments} onCancel={() => setOpenComments(false)} footer={null}>
+        {comments.length === 0 && <p>нет комментариев</p>}
+        {comments.map((c, ind) => (
+          <div
+            key={c.postCommentId ?? ind}
+            className="flex items-center gap-2 justify-between px-5"
+          >
+            <Image
+              width={40}
+              height={40}
+              className="w-10 h-10 rounded-full"
+              src={
+                c.userImage
+                  ? `http://37.27.29.18:8003/images/${c.userImage}`
+                  : FALLBACK_USER_IMG
+              }
+              alt={`${c.userName ?? "user"} avatar`}
+            />
+            <div>
+              <h3>{c.userName}</h3>
+              <p>{c.comment}</p>
+            </div>
+          </div>
+        ))}
+      </Modal>
+    </div>
   );
 };
+
 export default Reels;

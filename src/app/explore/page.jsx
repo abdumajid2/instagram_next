@@ -13,6 +13,7 @@ import {
 } from "@/store/pages/explore/exploreApi"
 import { FaComment, FaHeart, FaTimes, FaTrash } from 'react-icons/fa'
 import defaultAvatar from '../../assets/icon/pages/explore/Без названия.jpg'
+import Image from "next/image"
 
 const ExplorePage = () => {
   const [selectedPost, setSelectedPost] = useState(null)
@@ -133,7 +134,7 @@ const ExplorePage = () => {
                     playsInline
                   />
                 ) : (
-                  <img
+                  <Image
                     src={src}
                     alt="Post"
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
@@ -173,7 +174,7 @@ const ExplorePage = () => {
                   controls
                 />
               ) : (
-                <img
+                <Image
                   src={`http://37.27.29.18:8003/images/${selectedPost.images?.[0]}`}
                   alt="Post"
                   className="max-w-full w-[70%] h-[90%] max-h-full rounded-[5px] object-contain"
@@ -184,7 +185,7 @@ const ExplorePage = () => {
             <div className="w-[350px] flex flex-col border border-[gainsboro]">
               <div className="p-4 flex items-center justify-between border-b border-[gainsboro]">
                 <div className="flex items-center gap-3">
-                  <img
+                  <Image
                     src={defaultAvatar}
                     alt="User"
                     className="w-10 h-10 rounded-full object-cover"
@@ -215,7 +216,7 @@ const ExplorePage = () => {
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {selectedPost.comments?.map((c) => (
                   <div key={c.commentId} className="flex items-start gap-2">
-                    <img
+                    <Image
                       src={defaultAvatar}
                       alt="User"
                       className="w-8 h-8 rounded-full object-cover"

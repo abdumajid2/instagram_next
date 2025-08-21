@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
@@ -34,8 +33,9 @@ export default function ProfileById() {
   const params = useParams();
   const userId = String(params['profile-by-id'] || '');
   const router = useRouter();
+  const { t } = useTranslation();
 
-
+  // мой id только на клиенте
   const [myId, setMyId] = useState(null);
   useEffect(() => {
     try {
@@ -51,7 +51,7 @@ export default function ProfileById() {
     }
   }, []);
 
- 
+  // данные профиля и сторис
   const {
     data: userData,
     error: userError,
@@ -64,21 +64,23 @@ export default function ProfileById() {
   } = useGetUserStoryByIdQuery(userId, { skip: !userId });
 
   const user = userData?.data;
-  const userStories = storiesData?.data?.stories || [];
 
-  const freshStories = useMemo(
-    () =>
-      userStories.filter((s) => {
-        const t = Date.parse(s?.createAt || s?.createdAt || '');
-        if (Number.isNaN(t)) return false;
-        return Date.now() - t < 24 * 60 * 60 * 1000;
-      }),
-    [userStories]
-  );
+  // СТАБИЛЬНЫЙ список историй (исправление предупреждения №1)
+  const userStories = useMemo(() => storiesData?.data?.stories ?? [], [storiesData]);
+
+  const freshStories = useMemo(() => {
+    return userStories.filter((s) => {
+      const t = Date.parse(s?.createAt || s?.createdAt || '');
+      if (Number.isNaN(t)) return false;
+      return Date.now() - t < 24 * 60 * 60 * 1000; // < 24h
+    });
+  }, [userStories]);
+
   const hasStory = freshStories.length > 0;
 
   /** === Мои подписки (для статуса Follow) === */
   const { data: mySubsResp } = useGetSubscriptionsQuery(myId, { skip: !myId });
+
   const myFollowingIds = useMemo(() => {
     const arr = mySubsResp?.data || [];
     return new Set(
@@ -89,6 +91,7 @@ export default function ProfileById() {
         .filter(Boolean)
     );
   }, [mySubsResp]);
+
   const isFollowing = useMemo(() => myFollowingIds.has(String(userId)), [myFollowingIds, userId]);
 
   const [addFollowing, { isLoading: followLoading }] = useAddFollowingMutation();
@@ -107,7 +110,7 @@ export default function ProfileById() {
     }
   };
 
-
+  // модалки
   const [showProfileImage, setShowProfileImage] = useState(false);
   const [storyOpen, setStoryOpen] = useState(false);
   const [storyIndex, setStoryIndex] = useState(0);
@@ -135,13 +138,10 @@ export default function ProfileById() {
     return () => clearTimeout(timerRef.current);
   }, [storyOpen, storyIndex, freshStories.length]);
 
-
-
-
- 
+  // чаты
   const { data: chatsData } = useGetChatsQuery(undefined, { skip: !myId });
-  const myChats = chatsData?.data || [];
-
+  // СТАБИЛЬНЫЙ список чатов (исправление предупреждения №2)
+  const myChats = useMemo(() => chatsData?.data ?? [], [chatsData]);
 
   function getPeer(chat, meId) {
     if (String(chat.sendUserId) === String(meId)) {
@@ -156,7 +156,6 @@ export default function ProfileById() {
       name: chat.sendUserName,
       image: chat.sendUserImage,
     };
- 
   }
 
   const existingChat = useMemo(() => {
@@ -178,7 +177,6 @@ export default function ProfileById() {
         name = peer.name || user?.userName || 'user';
         avatar = (peer.image || user?.image || '').trim();
       } else {
-     
         const res = await createChat(userId).unwrap();
         chatId = res?.data ?? res;
         name = user?.userName || 'user';
@@ -194,19 +192,18 @@ export default function ProfileById() {
     }
   }
 
-
-  const [activeTab, setActiveTab] = useState('posts'); 
+  const [activeTab, setActiveTab] = useState('posts');
   const [followersOpen, setFollowersOpen] = useState(false);
   const [followingOpen, setFollowingOpen] = useState(false);
-    const {t, i18n} = useTranslation();
+
   if (userLoading || storiesLoading) return <Skeleton active paragraph={{ rows: 5 }} />;
-  if (userError) return <div>{t("profileById.error")}: {String(userError)}</div>;
-  if (!user) return <div>     {t("profileById.noUser")}</div>;
+  if (userError) return <div>{t('profileById.error')}: {String(userError)}</div>;
+  if (!user) return <div>{t('profileById.noUser')}</div>;
 
   return (
     <div className="w-full sm:max-w-[640px] mx-auto sm:ml-[100px] mt-2 sm:mt-5 px-3 sm:px-0">
       {/* HEADER */}
-        <section className="w-full flex  sm:flex-row items-start sm:items-start justify-between gap-4 sm:gap-[30px] h-auto sm:h-[160px]">
+      <section className="w-full flex  sm:flex-row items-start sm:items-start justify-between gap-4 sm:gap-[30px] h-auto sm:h-[160px]">
         <div
           className={
             hasStory
@@ -220,17 +217,17 @@ export default function ProfileById() {
             width={160}
             height={160}
             src={IMG(user?.image)}
-                 className="h-[96px] w-[96px] sm:h-[160px] sm:w-[160px] object-cover rounded-full bg-white"
+            className="h-[96px] w-[96px] sm:h-[160px] sm:w-[160px] object-cover rounded-full bg-white"
           />
         </div>
 
-      <article className="w-[70%] flex flex-col items-start justify-between h-auto sm:h-[142px]">
+        <article className="w-[70%] flex flex-col items-start justify-between h-auto sm:h-[142px]">
           <div className="w-full flex sm:flex-row flex-col items-start gap-[20px]">
             <p className="text-[20px] font-[700]">{user.userName}</p>
 
             {/* Follow/Unfollow */}
             {myId && myId !== String(userId) && (
-              <div className='flex items-start gap-[20px] mb-[10px]'>
+              <div className="flex items-start gap-[20px] mb-[10px]">
                 <button
                   onClick={onToggleFollow}
                   disabled={followLoading || unfollowLoading}
@@ -238,25 +235,31 @@ export default function ProfileById() {
                     isFollowing ? 'bg-gray-500 hover:bg-gray-600' : 'bg-blue-600 hover:bg-blue-500'
                   }`}
                 >
-                  {isFollowing ? `${t("profileById.unfollow")}` :  `${t("profileById.follow")}`}
+                  {isFollowing ? t('profileById.unfollow') : t('profileById.follow')}
                 </button>
-                    <button onClick={goToChat} disabled={creatingChat} className="sm:px-4 sm:hidden px-1 text-[10px]  py-2 sm:py-1 rounded-md border">
-             {t("profileById.sendMessage")}
-            </button>
+                <button
+                  onClick={goToChat}
+                  disabled={creatingChat}
+                  className="sm:px-4 sm:hidden px-1 text-[10px]  py-2 sm:py-1 rounded-md border"
+                >
+                  {t('profileById.sendMessage')}
+                </button>
               </div>
             )}
 
-            <button onClick={goToChat} disabled={creatingChat} className="sm:px-4 px-1 sm:block hidden text-[10px]  py-2 rounded-md border">
-             {t("profileById.sendMessage")}
+            <button
+              onClick={goToChat}
+              disabled={creatingChat}
+              className="sm:px-4 px-1 sm:block hidden text-[10px]  py-2 rounded-md border"
+            >
+              {t('profileById.sendMessage')}
             </button>
           </div>
 
-
-
-
           <div className="flex gap-6">
             <p className="text-[14px] font-[600]">
-              {user.postCount || 0} <span className="text-[#64748B] font-[400]">     {t("profileById.posts")}</span>
+              {user.postCount || 0}{' '}
+              <span className="text-[#64748B] font-[400]">{t('profileById.posts')}</span>
             </p>
 
             <p
@@ -264,7 +267,7 @@ export default function ProfileById() {
               onClick={() => setFollowersOpen(true)}
             >
               {user.subscribersCount || 0}{' '}
-              <span className="text-[#64748B] font-[400]">     {t("profileById.followers")}</span>
+              <span className="text-[#64748B] font-[400]">{t('profileById.followers')}</span>
             </p>
 
             <p
@@ -272,7 +275,7 @@ export default function ProfileById() {
               onClick={() => setFollowingOpen(true)}
             >
               {user.subscriptionsCount || 0}{' '}
-              <span className="text-[#64748B] font-[400]">     {t("profileById.following")}</span>
+              <span className="text-[#64748B] font-[400]">{t('profileById.following')}</span>
             </p>
           </div>
 
@@ -289,6 +292,8 @@ export default function ProfileById() {
             <ImCancelCircle
               className="absolute top-2 right-2 text-white text-3xl cursor-pointer"
               onClick={() => setShowProfileImage(false)}
+              title="Close"
+              aria-label="Close profile image"
             />
             <Image
               src={IMG(user?.image)}
@@ -307,7 +312,7 @@ export default function ProfileById() {
           <Swiper slidesPerView={6} spaceBetween={10} freeMode modules={[FreeMode]}>
             {freshStories.map((story, idx) => (
               <SwiperSlide key={story.id} className="flex flex-col items-center">
-                <button onClick={() => openStoryAt(idx)} title={`${t("profileById.storyViewTitle")}`}>
+                <button onClick={() => openStoryAt(idx)} title={t('profileById.storyViewTitle')}>
                   <div className="w-16 h-16 rounded-full p-[2px] bg-gradient-to-tr from-pink-500 via-red-500 to-yellow-500">
                     <div className="w-full h-full rounded-full overflow-hidden bg-white">
                       <Image
@@ -325,9 +330,6 @@ export default function ProfileById() {
           </Swiper>
         </div>
       )}
-
-
-
 
       {/* STORY VIEWER */}
       {storyOpen && freshStories[storyIndex] && (
@@ -360,13 +362,7 @@ export default function ProfileById() {
               ))}
             </div>
             <div className="flex items-center gap-3 text-white/90">
-              <Image
-                src={IMG(user?.image)}
-                alt="user"
-                width={32}
-                height={32}
-                className="rounded-full"
-              />
+              <Image src={IMG(user?.image)} alt="user" width={32} height={32} className="rounded-full" />
               <span className="text-sm font-semibold">{user?.userName}</span>
             </div>
           </div>
@@ -387,7 +383,8 @@ export default function ProfileById() {
               e.stopPropagation();
               closeStory();
             }}
-            title={`${t("profileById.closeStory")}`}
+            title={t('profileById.closeStory')}
+            aria-label="Close story"
           >
             ×
           </button>
@@ -402,7 +399,7 @@ export default function ProfileById() {
           }`}
           onClick={() => setActiveTab('posts')}
         >
-            {t("profileById.posts")}
+          {t('profileById.posts')}
         </button>
         <button
           className={`px-4 py-2 ${
@@ -410,7 +407,7 @@ export default function ProfileById() {
           }`}
           onClick={() => setActiveTab('tagged')}
         >
-             {t("profileById.tagged")}
+          {t('profileById.tagged')}
         </button>
       </div>
 
