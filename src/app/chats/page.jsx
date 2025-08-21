@@ -215,7 +215,7 @@ export default function MessengerApp() {
       </aside>
 
       <div className="flex-1 flex flex-col gap-6 items-center md:w-180 h-screen justify-center text-gray-500">
-        <Image src={mess} width={150} height={150} alt="mess" />
+        <Image src={mess} width={150} height={150} alt="mess" priority />
         <p className="text-xl font-bold">Your messages</p>
         <p>Send private photos and messages to a friend or group</p>
         <button className="rounded-lg bg-[#3B82F6] px-7 py-3 text-white font-bold">Send message</button>

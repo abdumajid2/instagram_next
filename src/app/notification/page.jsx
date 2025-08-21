@@ -12,6 +12,7 @@ import {
   useFollowUserMutation,
   useUnfollowUserMutation,
 } from "@/store/pages/notification/notification";
+import Image from "next/image";
 
 const API = "http://37.27.29.18:8003";
 
@@ -191,7 +192,7 @@ export default function Notification() {
                   onClick={() => router.push(`/profile-by-id/${e.byId}`)}
                 >
                   <div className="flex items-center gap-3">
-                    <img
+                    <Image
                       src={e.byPhoto}
                       alt={e.byName}
                       className="rounded-full w-[46px] h-[46px] object-cover"
@@ -205,7 +206,7 @@ export default function Notification() {
                     </div>
                   </div>
                   {e.postPreview && (
-                    <img
+                    <Image
                       src={e.postPreview}
                       alt="post"
                       className="w-[48px] h-[48px] object-cover rounded"
@@ -233,7 +234,7 @@ export default function Notification() {
                       className="flex items-center gap-3 cursor-pointer"
                       onClick={() => router.push(`/profile-by-id/${e.byId}`)}
                     >
-                      <img
+                      <Image
                         src={e.byPhoto}
                         alt={e.byName}
                         className="rounded-full w-[46px] h-[46px] object-cover"
@@ -283,7 +284,7 @@ export default function Notification() {
                     className="flex items-center gap-3 cursor-pointer"
                     onClick={() => router.push(`/profile-by-id/${e.byId}`)}
                   >
-                    <img
+                    <Image
                       src={e.byPhoto}
                       alt={e.byName}
                       className="rounded-full w-[46px] h-[46px] object-cover"
@@ -295,7 +296,7 @@ export default function Notification() {
                     </div>
                   </div>
                   {e.postPreview && (
-                    <img
+                    <Image
                       src={e.postPreview}
                       alt="post"
                       className="w-[48px] h-[48px] object-cover rounded"
@@ -328,7 +329,7 @@ export default function Notification() {
                       className="flex items-center gap-3 cursor-pointer"
                       onClick={() => router.push(`/notification/${u.userId}`)}
                     >
-                      <img
+                      <Image
                         src={avatar}
                         alt={u.userName}
                         className="rounded-full w-[40px] h-[40px] object-cover"

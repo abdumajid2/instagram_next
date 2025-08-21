@@ -23,13 +23,14 @@ import {
 } from "react-icons/fi";
 import { Spin } from "antd";
 import Peer from "peerjs";
+import Image from "next/image";
 
 
 const FILE_BASE = "http://37.27.29.18:8003/StaticFiles";
 const API_BASE = "http://37.27.29.18:8003";
 
 
-//грифтани ауз
+//грифтани токен ай ауз
 function getAuthPayload() {
   if (typeof window === "undefined") return null;
   const token = localStorage.getItem("authToken");
@@ -230,7 +231,7 @@ function VideoCallOverlay({
       {!remoteStream && (
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <div className="w-20 h-20 rounded-full overflow-hidden ring-2 ring-white/20">
-            <img
+            <Image
               src={avatar}
               alt={userName}
               className="w-full h-full object-cover"
@@ -336,7 +337,7 @@ function IgCard({ id, kind = "post", onOpenReel }) {
               preload="metadata"
             />
           ) : (
-            <img
+            <Image
               src={`${FILE_BASE}/${firstMedia}`}
               alt={data.title || ""}
               className="w-full h-full object-cover"
@@ -704,7 +705,7 @@ export default function ChatByIdPage() {
 
         <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b">
           <div className="flex items-center gap-3">
-            <img
+            <Image
               src={avatar}
               alt={userName}
               className="w-9 h-9 rounded-full object-cover"
@@ -811,7 +812,7 @@ export default function ChatByIdPage() {
                           className={`${displayText ? "mt-2" : ""} space-y-2`}
                         >
                           {isPending && m.kind === "image" && m.src && (
-                            <img
+                            <Image
                               src={m.src}
                               onError={(e) => {
                                 if (m.fallbackSrc)
@@ -857,7 +858,7 @@ export default function ChatByIdPage() {
                           )}
 
                           {!isPending && isImage(filePath) && (
-                            <img
+                            <Image
                               src={`${FILE_BASE}/${filePath}`}
                               alt="attachment"
                               className="rounded-xl max-h-64 object-contain"
