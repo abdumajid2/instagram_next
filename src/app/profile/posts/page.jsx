@@ -17,14 +17,20 @@ import Link from 'next/link'
 import SharePost from '@/components/pages/home/posts/sharePost'
 import { useTranslation } from 'react-i18next'
 import camera from '../../../assets/img/pages/profile/profile/camera.svg'
+import { skipToken } from '@reduxjs/toolkit/query/react';
 const Posts = ({ userId }) => {
 
-const { data: postsData, isLoading, isError, refetch } = userId
-  ? useGetUsersPostByIdQuery(userId)
-  : useGetMyPostsQuery();
+const userPostsQuery = useGetUsersPostByIdQuery(userId ?? skipToken);
+const myPostsQuery = useGetMyPostsQuery();
 
+// выбираем данные в зависимости от userId
+const postsData = userId ? userPostsQuery.data : myPostsQuery.data;
+const isLoading = userId ? userPostsQuery.isLoading : myPostsQuery.isLoading;
+const isError = userId ? userPostsQuery.isError : myPostsQuery.isError;
+const refetch = userId ? userPostsQuery.refetch : myPostsQuery.refetch;
+
+// корректное объявление posts
 const posts = userId ? postsData?.data || [] : postsData || [];
-
   const [selectedPost, setSelectedPost] = useState(null);
   const [addComment, { isLoading: isCommenting }] = useAddCommentMutation();
   const [postComment, setPostComment] = useState('');

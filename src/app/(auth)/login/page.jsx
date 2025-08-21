@@ -54,7 +54,11 @@ export default function Login() {
 
   return (
     <div className="flex min-h-screen items-center justify-center ">
+
       <Image alt="" className="hidden  lg:block" src={loginImg} />
+
+      <Image className="hidden lg:block" alt="" src={loginImg} />
+
       <div className="w-[500px] h-[700px] rounded border border-gray-200 bg-white p-10 shadow-md">
         <h1 className="mb-8 text-center text-3xl font-extrabold text-gray-900">
           Instagram
@@ -131,7 +135,11 @@ export default function Login() {
         </button>
 
         <p className="mt-8 text-center text-xs text-gray-500">
+
           Dont have an account?{" "}
+
+         Don&apos;t forget to login?{" "}
+
           <Link href={"/registration"} className="font-semibold text-blue-600 hover:underline">
             {" "}
             Sign up{" "}

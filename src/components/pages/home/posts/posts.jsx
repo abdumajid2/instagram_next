@@ -321,7 +321,7 @@ const Posts = () => {
                     <LiaTelegramPlane size={24} className="cursor-pointer" />
                   </div>
                   <span className="font-semibold">
-                    {postInfo?.data?.postLikeCount} отметок "Нравится"
+                    {postInfo?.data?.postLikeCount} отметок &quot;Нравится&quot;
                   </span>
                   <span className="text-xs text-gray-500 sm:block hidden">
                     Posted on:{" "}
